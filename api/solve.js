@@ -15,37 +15,35 @@ export default async function handler(req, res) {
             headers: {
                 "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
                 "Content-Type": "application/json",
-                "HTTP-Referer": "https://nexus-pro-iota.vercel.app", // Change to your domain later
-                "X-Title": "Nexus Pro AI"
             },
             body: JSON.stringify({
                 model: "google/gemini-2.0-flash-exp:free",
                 messages: [
                     { 
                         role: "system", 
-                        content: `You are an expert tutor in ${subject || 'Biology, Chemistry, Mathematics, and Physics'}. 
-                        Give clear, step-by-step explanations. Use LaTeX for equations.` 
+                        content: `You are an expert tutor specialized in ${subject || 'Biology, Chemistry, Mathematics and Physics'}. Give clear step-by-step explanations.` 
                     },
                     { role: "user", content: question }
                 ],
                 temperature: 0.7,
-                max_tokens: 1500
+                max_tokens: 1200
             })
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-            throw new Error(data.error?.message || "API Error");
+            console.error("OpenRouter Error:", data);
+            return res.status(500).json({ error: data.error?.message || "OpenRouter API error" });
         }
 
         res.status(200).json({
             success: true,
-            answer: data.choices?.[0]?.message?.content || "No response"
+            answer: data.choices?.[0]?.message?.content || "No response from AI."
         });
 
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: "Failed to get AI response" });
+        console.error("Proxy Error:", error);
+        res.status(500).json({ error: "Failed to connect to AI service" });
     }
 }
