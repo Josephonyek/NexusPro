@@ -10,27 +10,39 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
-    welcomeSub.textContent = "Connecting to database...";
+    welcomeSub.textContent = "Connecting to your profile...";
 
     try {
-        // ✅ FIXED: Correct Europe region URL
         const rtdbUrl = `https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json?auth=${userToken}`;
         
-        const response = await fetch(rtdbUrl, { method: 'GET' });
-
-        if (!response.ok) {
-            const errorBody = await response.text();
-            throw new Error(`Error ${response.status}: ${errorBody}`);
-        }
-
-        const userData = await response.json();
+        let response = await fetch(rtdbUrl, { method: 'GET' });
+        let userData = await response.json();
 
         if (userData === null || userData === undefined) {
-            welcomeSub.textContent = "Connected, but no profile data found for your account.";
-            return;
+            // Auto-create basic profile
+            welcomeSub.textContent = "Creating your profile...";
+            
+            const defaultProfile = {
+                name: "New Student",
+                role: "student",
+                createdAt: Date.now()
+            };
+
+            response = await fetch(rtdbUrl, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(defaultProfile)
+            });
+
+            if (response.ok) {
+                userData = defaultProfile;
+                welcomeSub.textContent = "New profile created successfully!";
+            } else {
+                throw new Error("Failed to create profile");
+            }
         }
 
-        // Success
+        // Load the data
         const userName = userData.name || "Student User";
         const userRole = userData.role || "student";
 
@@ -49,7 +61,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     } catch (error) {
         console.error(error);
-        welcomeSub.textContent = "Connection failed: " + error.message;
+        welcomeSub.textContent = "Error: " + error.message;
     }
 });
 
