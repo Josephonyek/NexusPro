@@ -2,43 +2,41 @@ document.addEventListener("DOMContentLoaded", async () => {
     const userToken = localStorage.getItem('nexusAuthToken');
     const userId = localStorage.getItem('nexusUserId');
 
+    const welcomeSub = document.getElementById('welcomeSubtext');
+
     if (!userToken || !userId) {
-        window.location.href = 'login.html';
+        welcomeSub.textContent = "No login data. Redirecting to login...";
+        setTimeout(() => window.location.href = 'login.html', 2000);
         return;
     }
+
+    welcomeSub.textContent = "Trying to connect to database...";
 
     try {
         const rtdbUrl = `https://nexuspro-cf948-default-rtdb.firebaseio.com/users/${userId}.json?auth=${userToken}`;
         
-        console.log("🔍 Fetching from:", rtdbUrl); // For debugging
+        const response = await fetch(rtdbUrl, { method: 'GET' });
 
-        const response = await fetch(rtdbUrl, { 
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-
-        console.log("📡 Response Status:", response.status);
+        welcomeSub.textContent = `Server responded with status: ${response.status}`;
 
         if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`HTTP ${response.status}: ${errorText || 'Permission denied or invalid token'}`);
+            const errorBody = await response.text();
+            throw new Error(`Error ${response.status}: ${errorBody}`);
         }
 
         const userData = await response.json();
-        console.log("📦 User Data:", userData);
 
-        if (!userData) {
-            throw new Error("No profile data found for this user.");
+        if (userData === null || userData === undefined) {
+            welcomeSub.textContent = "Connected, but no profile data found for your account.";
+            return;
         }
 
-        // Success path
+        // Success
         const userName = userData.name || "Student User";
         const userRole = userData.role || "student";
 
         document.getElementById('welcomeHeading').textContent = `Welcome Back, ${userName}!`;
-        document.getElementById('welcomeSubtext').textContent = `Access your Nexus Pro workspace panel modules cleanly below.`;
+        welcomeSub.textContent = "Profile loaded successfully ✅";
 
         const roleBadge = document.getElementById('roleBadge');
         roleBadge.textContent = userRole.toUpperCase();
@@ -51,14 +49,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
     } catch (error) {
-        console.error("❌ Dashboard Error:", error);
-        
-        document.getElementById('welcomeHeading').textContent = "Welcome Back!";
-        document.getElementById('welcomeSubtext').textContent = "Failed to load cloud profile variables. Running limited session mode.";
-        
-        const roleBadge = document.getElementById('roleBadge');
-        roleBadge.textContent = "Limited Access";
-        roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-yellow-900 text-yellow-400 border border-yellow-800 tracking-wider";
+        console.error(error);
+        welcomeSub.textContent = "Connection failed. Error: " + error.message;
     }
 });
 
