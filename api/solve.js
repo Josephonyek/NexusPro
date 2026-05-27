@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-    // Only allow POST requests
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
@@ -10,14 +9,10 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Question is required' });
     }
 
-    // Check if API key is loaded from Vercel Environment Variables
     const apiKey = process.env.OPENROUTER_API_KEY;
 
     if (!apiKey) {
-        return res.status(500).json({ 
-            error: "Missing API Key on server",
-            message: "Please check Vercel Environment Variables"
-        });
+        return res.status(500).json({ error: "Missing API Key on server" });
     }
 
     try {
@@ -30,12 +25,13 @@ export default async function handler(req, res) {
                 "X-Title": "Nexus Pro AI Solver"
             },
             body: JSON.stringify({
-                model: "google/gemini-2.0-flash-exp:free",
+                // ✅ Changed to a working free model
+                model: "google/gemini-2.5-flash",
                 messages: [
                     { 
                         role: "system", 
                         content: `You are an expert STEM tutor specialized in ${subject || 'Biology, Chemistry, Mathematics, and Physics'}. 
-                        Always explain concepts clearly with step-by-step reasoning. Use LaTeX for equations when needed.` 
+                        Always give clear, step-by-step explanations. Use LaTeX for math and equations.` 
                     },
                     { role: "user", content: question }
                 ],
@@ -47,9 +43,7 @@ export default async function handler(req, res) {
         const data = await response.json();
 
         if (!response.ok) {
-            return res.status(500).json({ 
-                error: data.error?.message || "OpenRouter API Error" 
-            });
+            return res.status(500).json({ error: data.error?.message || "OpenRouter Error" });
         }
 
         res.status(200).json({
@@ -58,9 +52,7 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error("AI Proxy Error:", error);
-        res.status(500).json({ 
-            error: "Failed to connect to AI service. Please try again." 
-        });
+        console.error("Proxy Error:", error);
+        res.status(500).json({ error: "Failed to connect to AI. Please try again." });
     }
 }
