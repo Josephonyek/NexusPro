@@ -1,6 +1,6 @@
-// Secure backend function for handling user authentication
+// Secure backend function for user login and role extraction
 export default async function handler(req, res) {
-    // Only allow POST requests for user authentication
+    // Only allow POST requests
     if (req.method !== 'POST') {
         return res.status(405).json({ error: 'Method not allowed' });
     }
@@ -9,47 +9,54 @@ export default async function handler(req, res) {
         const { email, password } = req.body;
 
         if (!email || !password) {
-            return res.status(400).json({ error: 'Email and password are required' });
+            return res.status(400).json({ error: 'Email and password are required.' });
         }
 
-        // Pulls your secret API key safely from your environment configuration settings 
-        // (You will add AIzaSyDbt1wfOLhRls_JG2ysysfHvqRBL8LRpBI into your host dashboard settings)
+        // Pull your secret key safely from your cloud host environment variables (.env)
         const firebaseApiKey = process.env.FIREBASE_API_KEY;
-        
-        // Target endpoint utilizing your specific app's context
-        const firebaseEndpoint = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${firebaseApiKey}`;
+        const authEndpoint = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${firebaseApiKey}`;
 
-        // Send credentials securely from the serverless backend straight to Google
-        const response = await fetch(firebaseEndpoint, {
+        // 1. Authenticate credentials against Firebase Auth
+        const authResponse = await fetch(authEndpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email: email,
-                password: password,
-                returnSecureToken: true
-            })
+            body: JSON.stringify({ email, password, returnSecureToken: true })
         });
 
-        const data = await response.json();
+        const authData = await authResponse.json();
 
-        // Catch backend error codes and map clean notices back to your phone UI
-        if (!response.ok) {
+        if (!authResponse.ok) {
             let userMessage = "Authentication failed.";
-            if (data.error && (data.error.message === "INVALID_PASSWORD" || data.error.message === "EMAIL_NOT_FOUND")) {
+            if (authData.error && (authData.error.message === "INVALID_PASSWORD" || authData.error.message === "EMAIL_NOT_FOUND")) {
                 userMessage = "Invalid email or password.";
-            } else if (data.error && data.error.message === "USER_DISABLED") {
-                userMessage = "This student account has been disabled.";
+            } else if (authData.error && authData.error.message === "USER_DISABLED") {
+                userMessage = "This account has been disabled by an administrator.";
             }
-            return res.status(response.status).json({ error: userMessage });
+            return res.status(authResponse.status).json({ error: userMessage });
         }
 
-        // Return token maps to your vanilla JS layer. Your API key remains completely hidden!
+        const userId = authData.localId;
+        const userToken = authData.idToken;
+
+        // 2. Fetch user's role parameters from Realtime Database
+        const rtdbUrl = `https://nexuspro-cf948-default-rtdb.firebaseio.com/users/${userId}.json?auth=${userToken}`;
+        const rtdbResponse = await fetch(rtdbUrl, { method: 'GET' });
+        
+        let userRole = "student"; // Fallback default state
+        
+        if (rtdbResponse.ok) {
+            const userData = await rtdbResponse.json();
+            if (userData && userData.role) {
+                userRole = userData.role; // Extracting "admin" or "student"
+            }
+        }
+
+        // Return tokens and profile mapping parameters to the frontend layer
         return res.status(200).json({
             success: true,
-            userId: data.localId,
-            token: data.idToken,
-            expiresIn: data.expiresIn,
-            projectId: "nexuspro-cf948" // Explicit tracking for your dashboard configurations
+            userId: userId,
+            token: userToken,
+            role: userRole
         });
 
     } catch (error) {
