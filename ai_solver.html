@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI STEM Solver - Nexus Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        .chat-bubble-user { 
+            background: #2563eb; 
+            color: white; 
+            border-radius: 20px 20px 5px 20px; 
+        }
+        .chat-bubble-ai { 
+            background: #1f2937; 
+            border-radius: 20px 20px 20px 5px; 
+        }
+    </style>
+</head>
+<body class="bg-gray-950 text-white min-h-screen">
+
+    <nav class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex items-center">
+        <button onclick="window.location.href='dashboard.html'" class="mr-4 text-2xl">←</button>
+        <h1 class="text-xl font-bold">AI STEM Solver</h1>
+    </nav>
+
+    <div class="max-w-4xl mx-auto px-4 py-6">
+
+        <!-- Subject Selector -->
+        <div class="mb-6">
+            <label class="block text-sm text-gray-400 mb-2">Choose Subject</label>
+            <div class="flex flex-wrap gap-2" id="subjectButtons"></div>
+        </div>
+
+        <!-- Chat Area -->
+        <div id="chatArea" class="h-[65vh] overflow-y-auto bg-gray-900 rounded-3xl p-5 space-y-4 border border-gray-800 mb-6">
+            <div class="text-center text-gray-500 text-sm py-10">
+                👋 Welcome to AI STEM Solver!<br>
+                Ask me anything in Physics, Chemistry, Biology, or Mathematics.
+            </div>
+        </div>
+
+        <!-- Input Area -->
+        <div class="flex gap-3">
+            <input id="questionInput" 
+                   type="text" 
+                   placeholder="Type your question here... (e.g. Explain the Krebs cycle)"
+                   class="flex-1 bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-blue-500">
+            <button onclick="sendQuestion()" 
+                    class="bg-blue-600 hover:bg-blue-700 px-8 rounded-2xl font-semibold">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+
+    <script src="ai-solver.js"></script>
+</body>
+      </html>
