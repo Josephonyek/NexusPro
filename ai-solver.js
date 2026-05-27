@@ -23,11 +23,7 @@ function addMessage(text, isUser) {
     const chatArea = document.getElementById('chatArea');
     const div = document.createElement('div');
     div.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
-    div.innerHTML = `
-        <div class="${isUser ? 'chat-bubble-user' : 'chat-bubble-ai'} p-4 max-w-[85%]">
-            ${text}
-        </div>
-    `;
+    div.innerHTML = `<div class="${isUser ? 'chat-bubble-user' : 'chat-bubble-ai'} p-4 max-w-[85%]">${text}</div>`;
     chatArea.appendChild(div);
     chatArea.scrollTop = chatArea.scrollHeight;
 }
@@ -40,9 +36,9 @@ async function sendQuestion() {
     addMessage(question, true);
     input.value = '';
 
-    // Show thinking
+    const thinkingHTML = `<div id="thinking" class="flex justify-start"><div class="chat-bubble-ai p-4">Thinking...</div></div>`;
     const chatArea = document.getElementById('chatArea');
-    chatArea.innerHTML += `<div id="thinking" class="flex justify-start"><div class="chat-bubble-ai p-4">Thinking...</div></div>`;
+    chatArea.innerHTML += thinkingHTML;
     chatArea.scrollTop = chatArea.scrollHeight;
 
     try {
@@ -57,25 +53,23 @@ async function sendQuestion() {
 
         const data = await res.json();
 
-        // Remove thinking message
         document.getElementById('thinking')?.remove();
 
         if (data.success) {
             addMessage(data.answer, false);
         } else {
-            addMessage("❌ " + (data.error || "Something went wrong"), false);
+            addMessage(`❌ ${data.error || "Failed to get response"}`, false);
         }
     } catch (err) {
         document.getElementById('thinking')?.remove();
-        addMessage("❌ Connection error. Please try again.", false);
+        addMessage("❌ Network error. Check if your Vercel deployment is live.", false);
     }
 }
 
 // Initialize
 document.addEventListener("DOMContentLoaded", () => {
     createSubjectButtons();
-
-    document.getElementById('questionInput').addEventListener("keypress", (e) => {
+    document.getElementById('questionInput').addEventListener("keypress", e => {
         if (e.key === "Enter") sendQuestion();
     });
 });
