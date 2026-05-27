@@ -2,68 +2,68 @@ document.addEventListener("DOMContentLoaded", async () => {
     const userToken = localStorage.getItem('nexusAuthToken');
     const userId = localStorage.getItem('nexusUserId');
 
-    // Security Guard: Route anonymous traffic straight out to portal page
     if (!userToken || !userId) {
         window.location.href = 'login.html';
         return;
     }
 
     try {
-        // Direct integration targeted at your exact Nexus Pro Realtime Database cluster
         const rtdbUrl = `https://nexuspro-cf948-default-rtdb.firebaseio.com/users/${userId}.json?auth=${userToken}`;
         
-        const response = await fetch(rtdbUrl, { method: 'GET' });
+        console.log("🔍 Fetching from:", rtdbUrl); // For debugging
+
+        const response = await fetch(rtdbUrl, { 
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log("📡 Response Status:", response.status);
 
         if (!response.ok) {
-            throw new Error("Server communication barrier hit.");
+            const errorText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errorText || 'Permission denied or invalid token'}`);
         }
 
         const userData = await response.json();
-        
-        // Safety check if database record exists but object node structure returns null
+        console.log("📦 User Data:", userData);
+
         if (!userData) {
-            throw new Error("No database profile data linked to this account ID.");
+            throw new Error("No profile data found for this user.");
         }
 
-        // Parse variables out of the structured Realtime Database JSON format
+        // Success path
         const userName = userData.name || "Student User";
-        const userRole = userData.role || "student"; // Defaults cleanly to student if empty
+        const userRole = userData.role || "student";
 
-        // 1. Refresh textual presentation headings
         document.getElementById('welcomeHeading').textContent = `Welcome Back, ${userName}!`;
         document.getElementById('welcomeSubtext').textContent = `Access your Nexus Pro workspace panel modules cleanly below.`;
-        
-        // 2. Render Role Badges & System Privileges conditionally
+
         const roleBadge = document.getElementById('roleBadge');
-        roleBadge.textContent = userRole;
+        roleBadge.textContent = userRole.toUpperCase();
 
         if (userRole === 'admin') {
-            // Apply Red Administrator styling tokens
             roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40 tracking-wider";
-            
-            // Show the top hidden admin panel container
             document.getElementById('adminSection').classList.remove('hidden');
         } else {
-            // Apply Standard Student styling tokens
             roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-blue-950 text-blue-400 border border-blue-900/40 tracking-wider";
         }
 
     } catch (error) {
-        console.error("Dashboard engine access configuration issue:", error);
+        console.error("❌ Dashboard Error:", error);
         
-        // Graceful UI fallbacks if database latency blocks role reading
         document.getElementById('welcomeHeading').textContent = "Welcome Back!";
         document.getElementById('welcomeSubtext').textContent = "Failed to load cloud profile variables. Running limited session mode.";
         
         const roleBadge = document.getElementById('roleBadge');
-        roleBadge.textContent = "Verified Account";
-        roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-gray-800 text-gray-400 border border-gray-700 tracking-wider";
+        roleBadge.textContent = "Limited Access";
+        roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-yellow-900 text-yellow-400 border border-yellow-800 tracking-wider";
     }
 });
 
-// Purge authorization signatures when hitting log out
+// Logout
 document.getElementById('logoutBtn').addEventListener('click', () => {
-    localStorage.removeItem('nexusAuthToken');
-    localStorage.removeItem('nexusUserId');
+    localStorage.clear();
     window.location.href = 'login.html';
 });
