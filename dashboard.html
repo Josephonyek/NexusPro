@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Pro - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-950 text-white min-h-screen font-sans">
+
+    <nav class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex justify-between items-center">
+        <h1 class="text-xl font-black tracking-wider text-blue-500">NEXUS PRO</h1>
+        <div class="flex items-center space-x-4">
+            <span id="roleBadge" class="px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-gray-800 text-gray-400">Loading...</span>
+            <button id="logoutBtn" class="px-4 py-2 bg-red-950/40 text-red-400 border border-red-900/50 rounded-xl text-sm font-semibold hover:bg-red-900/30 transition">
+                Log Out
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        
+        <div class="mb-8">
+            <h2 id="welcomeHeading" class="text-2xl sm:text-3xl font-bold">Welcome Back!</h2>
+            <p class="text-gray-400 text-sm mt-1">Manage your academic tools and catch up on live matches.</p>
+        </div>
+
+        <section id="adminSection" class="hidden mb-12 animate-fade-in">
+            <div class="border border-red-900/40 bg-red-950/10 rounded-2xl p-6">
+                <h2 class="text-xl font-bold text-red-400 flex items-center gap-2 mb-4">
+                    🛡️ Administrator Management Panel
+                </h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="bg-gray-900 p-4 rounded-xl border border-gray-800">
+                        <h4 class="font-semibold text-sm text-gray-300">Total System Users</h4>
+                        <p class="text-2xl font-bold mt-1 text-white">Manage Profiles</p>
+                    </div>
+                    <div class="bg-gray-900 p-4 rounded-xl border border-gray-800">
+                        <h4 class="font-semibold text-sm text-gray-300">Pending AI Queries</h4>
+                        <p class="text-2xl font-bold mt-1 text-white">Review Queue</p>
+                    </div>
+                    <div class="bg-gray-900 p-4 rounded-xl border border-gray-800">
+                        <h4 class="font-semibold text-sm text-gray-300">Community Safety</h4>
+                        <p class="text-2xl font-bold mt-1 text-white">Moderate Posts</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <h2 class="text-lg font-bold text-gray-400 mb-4 uppercase tracking-wider">Student Applications</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            
+            <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl flex flex-col justify-between hover:border-blue-500/50 transition duration-300">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-600/10 flex items-center justify-center text-blue-400 font-bold text-xl mb-4">∑</div>
+                    <h3 class="text-lg font-bold mb-2">AI Physics & Math Solver</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Submit complex mathematical equations or physics problems and get instant step-by-step breakdowns.
+                    </p>
+                </div>
+                <button onclick="window.location.href='ai-solver.html'" class="mt-6 w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl text-sm transition">
+                    Open Solver
+                </button>
+            </div>
+
+            <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl flex flex-col justify-between hover:border-green-500/50 transition duration-300">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-green-600/10 flex items-center justify-center text-green-400 font-bold text-xl mb-4">⚽</div>
+                    <h3 class="text-lg font-bold mb-2">Football Live Scores</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Track live scores, match fixtures, and view official team standings in real time.
+                    </p>
+                </div>
+                <button onclick="window.location.href='football.html'" class="mt-6 w-full py-2.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl text-sm transition">
+                    View Scores
+                </button>
+            </div>
+
+            <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl flex flex-col justify-between hover:border-purple-500/50 transition duration-300">
+                <div>
+                    <div class="w-12 h-12 rounded-xl bg-purple-600/10 flex items-center justify-center text-purple-400 font-bold text-xl mb-4">🤝</div>
+                    <h3 class="text-lg font-bold mb-2">Expert Community</h3>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Connect with top academic instructors, share solutions, and discuss questions with fellow peers.
+                    </p>
+                </div>
+                <button onclick="window.location.href='community.html'" class="mt-6 w-full py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl text-sm transition">
+                    Enter Hub
+                </button>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>
