@@ -34,24 +34,48 @@
             <p id="welcomeSubtext" class="text-gray-400 text-sm mt-1">Connecting securely to Nexus Pro servers...</p>
         </div>
 
+        <!-- Enhanced Admin Control Panel -->
         <section id="adminSection" class="hidden mb-10 animate-fade-in">
-            <div class="border border-red-900/40 bg-red-950/10 rounded-2xl p-6 shadow-xl shadow-red-950/5">
-                <div class="flex items-center space-x-2 mb-4">
-                    <span class="text-xl">🛡️</span>
-                    <h3 class="text-lg font-bold text-red-400 tracking-wide uppercase text-sm">Administrator Control Panel</h3>
+            <div class="border border-red-900/40 bg-red-950/10 rounded-3xl p-8 shadow-2xl">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-3xl">🛡️</span>
+                    <div>
+                        <h3 class="text-xl font-bold text-red-400">Administrator Control Panel</h3>
+                        <p class="text-red-400/70 text-sm">Full system oversight enabled</p>
+                    </div>
                 </div>
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div class="bg-gray-900 p-5 rounded-xl border border-gray-800 hover:border-red-900/30 transition">
-                        <h4 class="font-bold text-xs text-gray-400 uppercase tracking-wider">User Directory</h4>
-                        <p class="text-lg font-semibold mt-1 text-white">Manage Profiles & Roles</p>
+
+                <!-- AI Model Selector -->
+                <div class="mb-8 p-6 bg-gray-900 rounded-2xl border border-gray-700">
+                    <h4 class="text-sm uppercase tracking-widest text-gray-400 mb-3">🎯 Choose AI Model</h4>
+                    <select id="aiModelSelect" class="w-full bg-gray-800 border border-gray-600 rounded-2xl px-5 py-4 text-lg focus:outline-none focus:border-blue-500">
+                        <option value="gpt-4o">GPT-4o — Best Overall</option>
+                        <option value="claude-3">Claude 3 Opus — Deep Reasoning</option>
+                        <option value="gemini">Gemini 1.5 Pro — Fast & Visual</option>
+                        <option value="local">Local Physics Solver</option>
+                    </select>
+                    <button onclick="saveAIModel()" 
+                            class="mt-4 w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-2xl font-semibold transition">
+                        Apply Selected Model
+                    </button>
+                </div>
+
+                <!-- Monitoring Tools -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div onclick="monitorNews()" 
+                         class="bg-gray-900 p-6 rounded-2xl border border-amber-900/50 hover:border-amber-500 cursor-pointer transition-all hover:scale-[1.02]">
+                        <div class="text-4xl mb-4">📢</div>
+                        <h4 class="font-bold text-lg">News Monitor</h4>
+                        <p class="text-gray-400 text-sm mt-1">Track global news and updates in real-time</p>
+                        <span class="text-amber-400 text-xs mt-4 inline-block">Open Monitor →</span>
                     </div>
-                    <div class="bg-gray-900 p-5 rounded-xl border border-gray-800 hover:border-red-900/30 transition">
-                        <h4 class="font-bold text-xs text-gray-400 uppercase tracking-wider">Global Announcements</h4>
-                        <p class="text-lg font-semibold mt-1 text-white">Broadcast to Platform</p>
-                    </div>
-                    <div class="bg-gray-900 p-5 rounded-xl border border-gray-800 hover:border-red-900/30 transition">
-                        <h4 class="font-bold text-xs text-gray-400 uppercase tracking-wider">System Safety</h4>
-                        <p class="text-lg font-semibold mt-1 text-white">Moderate Community Hub</p>
+
+                    <div onclick="monitorCommunity()" 
+                         class="bg-gray-900 p-6 rounded-2xl border border-violet-900/50 hover:border-violet-500 cursor-pointer transition-all hover:scale-[1.02]">
+                        <div class="text-4xl mb-4">👥</div>
+                        <h4 class="font-bold text-lg">Community Monitor</h4>
+                        <p class="text-gray-400 text-sm mt-1">Moderate discussions and user reports</p>
+                        <span class="text-violet-400 text-xs mt-4 inline-block">Open Hub →</span>
                     </div>
                 </div>
             </div>
@@ -98,10 +122,9 @@
                     Enter Hub
                 </button>
             </div>
-
         </div>
     </main>
 
     <script src="dashboard.js"></script>
 </body>
-            </html>
+    </html>
