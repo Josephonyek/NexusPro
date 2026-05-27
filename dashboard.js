@@ -5,19 +5,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     const welcomeSub = document.getElementById('welcomeSubtext');
 
     if (!userToken || !userId) {
-        welcomeSub.textContent = "No login data. Redirecting to login...";
-        setTimeout(() => window.location.href = 'login.html', 2000);
+        welcomeSub.textContent = "No login data. Redirecting...";
+        setTimeout(() => window.location.href = 'login.html', 1500);
         return;
     }
 
-    welcomeSub.textContent = "Trying to connect to database...";
+    welcomeSub.textContent = "Connecting to database...";
 
     try {
-        const rtdbUrl = `https://nexuspro-cf948-default-rtdb.firebaseio.com/users/${userId}.json?auth=${userToken}`;
+        // ✅ FIXED: Correct Europe region URL
+        const rtdbUrl = `https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json?auth=${userToken}`;
         
         const response = await fetch(rtdbUrl, { method: 'GET' });
-
-        welcomeSub.textContent = `Server responded with status: ${response.status}`;
 
         if (!response.ok) {
             const errorBody = await response.text();
@@ -50,7 +49,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     } catch (error) {
         console.error(error);
-        welcomeSub.textContent = "Connection failed. Error: " + error.message;
+        welcomeSub.textContent = "Connection failed: " + error.message;
     }
 });
 
