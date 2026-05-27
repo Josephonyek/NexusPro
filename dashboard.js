@@ -5,7 +5,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const welcomeSub = document.getElementById('welcomeSubtext');
 
     if (!userToken || !userId) {
-        welcomeSub.textContent = "No login data. Redirecting...";
+        welcomeSub.textContent = "No login data found. Redirecting...";
         setTimeout(() => window.location.href = 'login.html', 1500);
         return;
     }
@@ -15,34 +15,25 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
         const rtdbUrl = `https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json?auth=${userToken}`;
         
-        let response = await fetch(rtdbUrl, { method: 'GET' });
+        let response = await fetch(rtdbUrl);
         let userData = await response.json();
 
-        if (userData === null || userData === undefined) {
-            // Auto-create basic profile
-            welcomeSub.textContent = "Creating your profile...";
-            
+        if (!userData) {
+            // Create default profile
             const defaultProfile = {
                 name: "New Student",
                 role: "student",
                 createdAt: Date.now()
             };
-
-            response = await fetch(rtdbUrl, {
+            await fetch(rtdbUrl, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(defaultProfile)
             });
-
-            if (response.ok) {
-                userData = defaultProfile;
-                welcomeSub.textContent = "New profile created successfully!";
-            } else {
-                throw new Error("Failed to create profile");
-            }
+            userData = defaultProfile;
         }
 
-        // Load the data
+        // Update UI with user data
         const userName = userData.name || "Student User";
         const userRole = userData.role || "student";
 
@@ -55,15 +46,57 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (userRole === 'admin') {
             roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40 tracking-wider";
             document.getElementById('adminSection').classList.remove('hidden');
+            
+            // Load saved AI model if any
+            if (userData.preferredAIModel) {
+                document.getElementById('aiModelSelect').value = userData.preferredAIModel;
+            }
         } else {
             roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-blue-950 text-blue-400 border border-blue-900/40 tracking-wider";
         }
 
     } catch (error) {
         console.error(error);
-        welcomeSub.textContent = "Error: " + error.message;
+        welcomeSub.textContent = "Connection failed. Please check your internet.";
     }
 });
+
+// ====================== ADMIN FUNCTIONS ======================
+
+// Save selected AI Model to Firebase
+async function saveAIModel() {
+    const userId = localStorage.getItem('nexusUserId');
+    const userToken = localStorage.getItem('nexusAuthToken');
+    const selectedModel = document.getElementById('aiModelSelect').value;
+
+    if (!userId || !userToken) return;
+
+    const rtdbUrl = `https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json?auth=${userToken}`;
+
+    try {
+        await fetch(rtdbUrl, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ preferredAIModel: selectedModel })
+        });
+
+        alert(`✅ AI Model changed to: ${selectedModel}`);
+    } catch (error) {
+        alert("Failed to save AI model preference.");
+    }
+}
+
+// News Monitor
+function monitorNews() {
+    alert("📢 News Monitor Activated\n\nThis feature is ready. You can create news-monitor.html later.");
+    // window.location.href = 'news-monitor.html';
+}
+
+// Community Monitor
+function monitorCommunity() {
+    alert("👥 Community Monitor Activated\n\nThis feature is ready. You can create community-moderate.html later.");
+    // window.location.href = 'community-moderate.html';
+}
 
 // Logout
 document.getElementById('logoutBtn').addEventListener('click', () => {
