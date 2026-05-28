@@ -9,36 +9,34 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Question is required' });
     }
 
-    const apiKey = process.env.OPENROUTER_API_KEY;
+    const apiKey = process.env.DEEPSEEK_API_KEY;   // ← Changed to DEEPSEEK_API_KEY
 
-    // === DEBUG INFO ===
     if (!apiKey) {
         return res.status(500).json({ 
-            error: "Missing API Key on Vercel",
-            message: "Environment variable OPENROUTER_API_KEY is not set or empty"
+            error: "Missing DeepSeek API Key on server",
+            message: "Please add DEEPSEEK_API_KEY in Vercel Environment Variables"
         });
     }
 
     try {
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        const response = await fetch("https://api.deepseek.com/chat/completions", {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${apiKey}`,
                 "Content-Type": "application/json",
-                "HTTP-Referer": "https://nexus-pro-iota.vercel.app",
-                "X-Title": "Nexus Pro"
             },
             body: JSON.stringify({
-                model: "deepseek/deepseek-chat",
+                model: "deepseek-chat",          // Good general model
                 messages: [
                     { 
                         role: "system", 
-                        content: `You are an expert STEM tutor in ${subject || 'Biology, Chemistry, Mathematics, and Physics'}. Give step-by-step explanations.` 
+                        content: `You are an expert STEM tutor specialized in ${subject || 'Biology, Chemistry, Mathematics, and Physics'}. 
+                        Explain concepts clearly with step-by-step reasoning. Use LaTeX for math equations.` 
                     },
                     { role: "user", content: question }
                 ],
                 temperature: 0.7,
-                max_tokens: 1200
+                max_tokens: 1500
             })
         });
 
@@ -46,17 +44,17 @@ export default async function handler(req, res) {
 
         if (!response.ok) {
             return res.status(500).json({ 
-                error: data.error?.message || "OpenRouter returned error",
-                status: response.status
+                error: data.error?.message || "DeepSeek API Error" 
             });
         }
 
         res.status(200).json({
             success: true,
-            answer: data.choices?.[0]?.message?.content || "No response"
+            answer: data.choices?.[0]?.message?.content || "No response received."
         });
 
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        console.error("DeepSeek Proxy Error:", error);
+        res.status(500).json({ error: "Failed to connect to DeepSeek AI. Please try again." });
     }
-                    }
+}
