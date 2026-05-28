@@ -25,18 +25,17 @@ export default async function handler(req, res) {
                 "X-Title": "Nexus Pro AI Solver"
             },
             body: JSON.stringify({
-                // ✅ Changed to a working free model
-                model: "google/gemini-2.5-flash",
+                model: "deepseek/deepseek-chat",
                 messages: [
                     { 
                         role: "system", 
                         content: `You are an expert STEM tutor specialized in ${subject || 'Biology, Chemistry, Mathematics, and Physics'}. 
-                        Always give clear, step-by-step explanations. Use LaTeX for math and equations.` 
+                        Provide clear, detailed step-by-step solutions. Use LaTeX for equations.` 
                     },
                     { role: "user", content: question }
                 ],
                 temperature: 0.7,
-                max_tokens: 1400
+                max_tokens: 1500
             })
         });
 
@@ -53,6 +52,6 @@ export default async function handler(req, res) {
 
     } catch (error) {
         console.error("Proxy Error:", error);
-        res.status(500).json({ error: "Failed to connect to AI. Please try again." });
+        res.status(500).json({ error: "Failed to connect to DeepSeek AI." });
     }
-}
+                        }
