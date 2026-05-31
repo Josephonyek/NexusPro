@@ -9,29 +9,30 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Question is required' });
     }
 
-    const apiKey = process.env.DEEPSEEK_API_KEY;   // ← Changed to DEEPSEEK_API_KEY
+    const apiKey = process.env.GROQ_API_KEY;   // ← New variable name
 
     if (!apiKey) {
         return res.status(500).json({ 
-            error: "Missing DeepSeek API Key on server",
-            message: "Please add DEEPSEEK_API_KEY in Vercel Environment Variables"
+            error: "Missing Groq API Key",
+            message: "Please add GROQ_API_KEY in Vercel Environment Variables"
         });
     }
 
     try {
-        const response = await fetch("https://api.deepseek.com/chat/completions", {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
             headers: {
                 "Authorization": `Bearer ${apiKey}`,
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                model: "deepseek-chat",          // Good general model
+                // Strong Llama model for STEM
+                model: "llama-3.3-70b-versatile",
                 messages: [
                     { 
                         role: "system", 
                         content: `You are an expert STEM tutor specialized in ${subject || 'Biology, Chemistry, Mathematics, and Physics'}. 
-                        Explain concepts clearly with step-by-step reasoning. Use LaTeX for math equations.` 
+                        Always explain step-by-step with clear reasoning. Use LaTeX for equations.` 
                     },
                     { role: "user", content: question }
                 ],
@@ -43,9 +44,7 @@ export default async function handler(req, res) {
         const data = await response.json();
 
         if (!response.ok) {
-            return res.status(500).json({ 
-                error: data.error?.message || "DeepSeek API Error" 
-            });
+            return res.status(500).json({ error: data.error?.message || "Groq API Error" });
         }
 
         res.status(200).json({
@@ -54,7 +53,7 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error("DeepSeek Proxy Error:", error);
-        res.status(500).json({ error: "Failed to connect to DeepSeek AI. Please try again." });
+        console.error("Groq Error:", error);
+        res.status(500).json({ error: "Failed to connect to Llama (Groq). Please try again." });
     }
 }
