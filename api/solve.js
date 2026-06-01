@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
-        return res.status(500).json({ error: "GROQ_API_KEY is missing" });
+        return res.status(500).json({ error: "GROQ_API_KEY is missing in Vercel" });
     }
 
     try {
@@ -23,22 +23,23 @@ export default async function handler(req, res) {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                model: "llama3-8b-8192",   // Smaller but very stable model
+                model: "llama-3.3-70b-versatile",
                 messages: [
                     { 
                         role: "system", 
-                        content: `You are an expert tutor in Biology, Chemistry, Mathematics and Physics. Explain step by step.` 
+                        content: `You are an expert STEM tutor specialized in ${subject || 'Biology, Chemistry, Mathematics, and Physics'}. 
+                        Explain step by step using clear reasoning. Use LaTeX for equations.` 
                     },
                     { role: "user", content: question }
                 ],
                 temperature: 0.7,
-                max_tokens: 1200
+                max_tokens: 1400
             })
         });
 
         if (!response.ok) {
-            const errorData = await response.text();
-            return res.status(500).json({ error: `Groq Error: ${response.status} - ${errorData}` });
+            const errorText = await response.text();
+            return res.status(500).json({ error: `Groq Error: ${response.status}` });
         }
 
         const data = await response.json();
@@ -49,9 +50,8 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error("Error:", error.message);
         res.status(500).json({ 
-            error: "Failed to connect to Groq. Check your API key and internet connection." 
+            error: "Failed to connect to Groq. Please check your new API key." 
         });
     }
-}
+                }
