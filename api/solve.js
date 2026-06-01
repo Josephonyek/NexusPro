@@ -12,10 +12,7 @@ export default async function handler(req, res) {
     const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
-        return res.status(500).json({ 
-            error: "Missing Groq API Key on server",
-            message: "GROQ_API_KEY environment variable is not set"
-        });
+        return res.status(500).json({ error: "GROQ_API_KEY is missing in Vercel" });
     }
 
     try {
@@ -30,12 +27,12 @@ export default async function handler(req, res) {
                 messages: [
                     { 
                         role: "system", 
-                        content: `You are an expert STEM tutor in ${subject || 'Biology, Chemistry, Mathematics, and Physics'}. Give clear step-by-step explanations.` 
+                        content: `You are a helpful STEM tutor.` 
                     },
                     { role: "user", content: question }
                 ],
                 temperature: 0.7,
-                max_tokens: 1200
+                max_tokens: 1000
             })
         });
 
@@ -43,21 +40,22 @@ export default async function handler(req, res) {
 
         if (!response.ok) {
             return res.status(500).json({ 
-                error: data.error?.message || "Groq API Error",
-                status: response.status
+                error: "Groq API Error",
+                status: response.status,
+                message: data.error?.message || "Unknown error"
             });
         }
 
         res.status(200).json({
             success: true,
-            answer: data.choices?.[0]?.message?.content || "No response received."
+            answer: data.choices?.[0]?.message?.content || "No response"
         });
 
     } catch (error) {
-        console.error("Groq Connection Error:", error);
         res.status(500).json({ 
             error: "Failed to connect to Groq",
-            details: error.message 
+            details: error.message,
+            stack: error.stack ? "Error occurred" : ""
         });
     }
-                }
+}
