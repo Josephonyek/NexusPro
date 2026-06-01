@@ -1,119 +1,188 @@
-<!<!DOCTYPE html>
-<html>
-    <head>
-        <link rel="stylesheet" href="index.css">
-        <meta http-equiv="content-type" content="html; charset=utf-8" />
-        <title>Nova au</title>
-        
-    </head>
-    <body>
-        <header>
-        <button class="hamburger" aria-label="Menu">
-  <span ></span>
-  <span></span>
-  <span></span>
-</button>
-
-<nav class="menu">
-  <a href="#">Home</a>
-  <a href="#">Assignments</a>
-  <a href="#">Football</a>
-</nav>
-<h1>Nexus pro</h1>
-</header>
-        <div class="Welcome">
-        <h1 class="1st">Welcome to nova</h1
-        <p>
-Nexus
-Solve. Learn. Connect.
-Nexus is your all-in-one hub for students and pros. Get instant help with assignments, solve physics and math questions step-by-step, and level up with learning tools for secondary and tertiary levels. Stay updated with live football news and scores, and join a community of experts to share, ask, and grow together.</p>
-     <a href="login.html" >  <button class="explore">Explore now</button></a>
-        </div>
-        <div class="Service">
-            <h2 class="sec">What we do</h2
-            <ol>
-            <li><h3>Study ,research amd home work</h3></li>
-            <img src="#" alt="formulas">
-            <p>We offer ai that can solve your homeworks at an instant
-            with easy tools to solve physics and mathematics with ai to study and make research</p><br>
-            <li><h3>Engage in azing communities</h3></li>
-            <img src="#" alt="Social community">
-            <p>Connect with people to learn and increase in knowledge and help people around the world to socialize with Experts researchers and inspirational people</p>
-            <br>
-            <h3>Entertainment</h3>
-            <img src="#" alt="football">
-            <p>You are not left out in entertainment we got you covered get the latest news ,scores and conversion on football teams ,clubs and league</p>
-            </ol>
-         `<a href="login.html" > <button>Join us for free</button></a>
-            </div>
-            <div class="subscribe">
-                <h3>Subscribe to our newsletter</h3>
-                <form method="post">
-                    <label>Name</label><br>
-                    <input type="name" formaction="required"><br>
-                    <label>Emai address</label><br>
-                    <input type="email" formaction="required"
-            ><br><br>
-                    <input type="submit"class="btn" >
-                </form>
-            </div>
-        </div>
-        <footer class="footer">
-  <div class="footer-container">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Pro — Solve. Learn. Connect.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Column 1: Brand -->
-    <div class="footer-col">
-      <h3>Nexus Pro</h3>
-      <p>Study smarter with AI, connect with students, and get real-time football updates all in one place.</p>
-      <div class="socials">
-        <a href="#">Discord</a>
-        <a href="#">X</a>
-        <a href="#">Instagram</a>
-        <a href="#">YouTube</a>
-      </div>
-    </div>
+</head>
+<body class="bg-gray-950 text-gray-100 min-h-screen font-sans antialiased selection:bg-blue-500 selection:text-white">
 
-    <!-- Column 2: AI Study Tools -->
-    <div class="footer-col">
-      <h4>AI Study</h4>
-      <ul>
-        <li><a href="/ai-writer">Assignment Helper</a></li>
-        <li><a href="/summarizer">Notes Summarizer</a></li>
-        <li><a href="/quiz">AI Quiz Generator</a></li>
-        <li><a href="/explain">Explain Concept</a></li>
-      </ul>
-    </div>
-
-    <!-- Column 3: Social & Community -->
-    <div class="footer-col">
-      <h4>Community</h4>
-      <ul>
-        <li><a href="/feed">Student Feed</a></li>
-        <li><a href="/study-groups">Study Groups</a></li>
-        <li><a href="/qna">Ask Questions</a></li>
-        <li><a href="/leaderboard">Top Contributors</a></li>
-      </ul>
-    </div>
-
-    <!-- Column 4: Football -->
-    <div class="footer-col">
-      <h4>Football</h4>
-      <ul>
-        <li><a href="/live-scores">Live Scores</a></li>
-        <li><a href="/news">Football News</a></li>
-        <li><a href="/predictions">AI Predictions</a></li>
-        <li><a href="/highlights">Match Highlights</a></li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="footer-bottom">
-    <p>© 2026 Nexus Pro. Learn. Connect. Watch Football.</p>
-    <p><a href="/privacy">Privacy</a> · <a href="/terms">Terms</a> · <a href="/contact">Contact</a></p>
-  </div>
-</footer>
-        <script type="text/javascript" charset="utf-8" src="index.js">
+    <header class="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50 px-6 py-4 flex justify-between items-center transition-all">
+        <h1 class="text-xl font-black tracking-wider text-blue-500">NEXUS PRO</h1>
+        
+        <div class="flex items-center space-x-6">
+            <nav class="hidden md:flex space-x-6 text-sm font-medium text-gray-300">
+                <a href="#" class="hover:text-blue-400 transition">Home</a>
+                <a href="#" class="hover:text-blue-400 transition">Assignments</a>
+                <a href="#" class="hover:text-blue-400 transition">Football</a>
+            </nav>
             
-        </script>
-    </body>
-</html>
+            <button class="hamburger md:hidden p-2 text-gray-400 hover:text-white focus:outline-none" aria-label="Menu">
+                <div class="space-y-1.5">
+                    <span class="block w-6 h-0.5 bg-current transition-transform"></span>
+                    <span class="block w-6 h-0.5 bg-current transition-opacity"></span>
+                    <span class="block w-6 h-0.5 bg-current transition-transform"></span>
+                </div>
+            </button>
+        </div>
+    </header>
+
+    <nav class="menu hidden bg-gray-900 border-b border-gray-800 px-6 py-4 flex flex-col space-y-3 md:hidden">
+        <a href="#" class="text-gray-300 hover:text-blue-400 font-medium py-1">Home</a>
+        <a href="#" class="text-gray-300 hover:text-blue-400 font-medium py-1">Assignments</a>
+        <a href="#" class="text-gray-300 hover:text-blue-400 font-medium py-1">Football</a>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-4 py-16 sm:py-24 text-center">
+        <div class="Welcome max-w-3xl mx-auto bg-gradient-to-b from-gray-900 to-gray-950/40 p-8 sm:p-12 rounded-3xl border border-gray-800/80 shadow-2xl">
+            <h1 class="1st text-3xl sm:text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-gray-200 to-gray-500 mb-6">
+                Welcome to Nova
+            </h1>
+            <p class="text-gray-400 text-base sm:text-lg leading-relaxed mb-8">
+                <strong class="text-blue-500 block text-xl font-bold mb-2">Solve. Learn. Connect.</strong>
+                Nexus is your all-in-one hub for students and pros. Get instant help with assignments, solve physics and math questions step-by-step, and level up with learning tools for secondary and tertiary levels. Stay updated with live football news and scores, and join a community of experts to share, ask, and grow together.
+            </p>
+            <a href="login.html">
+                <button class="explore px-8 py-4 bg-blue-600 hover:bg-blue-700 active:scale-[0.98] text-white font-bold rounded-2xl transition shadow-lg shadow-blue-600/20">
+                    Explore Now →
+                </button>
+            </a>
+        </div>
+    </main>
+
+    <section class="max-w-6xl mx-auto px-4 py-16 border-t border-gray-900">
+        <div class="Service text-center">
+            <h2 class="sec text-2xl sm:text-4xl font-extrabold tracking-tight text-white mb-12">What We Do</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                
+                <div class="bg-gray-900/60 border border-gray-800 p-6 rounded-2xl flex flex-col justify-between hover:border-blue-500/40 transition duration-300 shadow-xl group">
+                    <div>
+                        <div class="overflow-hidden rounded-xl mb-5 border border-gray-800">
+                            <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=600" alt="Physics and Math Formulas" class="w-full h-44 object-cover group-hover:scale-105 transition duration-500">
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <span class="text-blue-400">01.</span> Study & Homework
+                        </h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            We offer advanced AI architectures capable of breaking down complex homework in an instant with step-by-step tools built to master secondary and tertiary school physics and mathematics.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-900/60 border border-gray-800 p-6 rounded-2xl flex flex-col justify-between hover:border-purple-500/40 transition duration-300 shadow-xl group">
+                    <div>
+                        <div class="overflow-hidden rounded-xl mb-5 border border-gray-800">
+                            <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=600" alt="Social Community Network" class="w-full h-44 object-cover group-hover:scale-105 transition duration-500">
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <span class="text-purple-400">02.</span> Expert Communities
+                        </h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            Connect with people around the globe to scale your foundational skills. Exchange concepts and socialize directly with professional instructors, researchers, and inspiring peers.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-900/60 border border-gray-800 p-6 rounded-2xl flex flex-col justify-between hover:border-green-500/40 transition duration-300 shadow-xl group">
+                    <div>
+                        <div class="overflow-hidden rounded-xl mb-5 border border-gray-800">
+                            <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?auto=format&fit=crop&q=80&w=600" alt="Live Football Action" class="w-full h-44 object-cover group-hover:scale-105 transition duration-500">
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                            <span class="text-green-400">03.</span> Football Hub
+                        </h3>
+                        <p class="text-gray-400 text-sm leading-relaxed">
+                            You're never left out of the loop. Get instantaneous real-time match data, league standings, live updates, and conversational threads on global teams and tournaments.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="mt-12">
+                <a href="login.html">
+                    <button class="px-6 py-3 bg-gray-900 hover:bg-gray-800 border border-gray-700 text-sm font-semibold rounded-xl text-white transition active:scale-[0.99]">
+                        Join Us For Free
+                    </button>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="max-w-md mx-auto px-4 py-12 mb-16">
+        <div class="subscribe bg-gray-900 border border-gray-800 rounded-3xl p-6 sm:p-8 shadow-xl">
+            <h3 class="text-lg font-bold text-white mb-2 text-center">Subscribe to our newsletter</h3>
+            <p class="text-gray-400 text-xs text-center mb-6">Stay informed with system updates and direct platform insights.</p>
+            
+            <form method="post" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Name</label>
+                    <input type="text" required class="w-full bg-gray-950 border border-gray-800 focus:border-blue-500 rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1.5">Email Address</label>
+                    <input type="email" required class="w-full bg-gray-950 border border-gray-800 focus:border-blue-500 rounded-xl px-4 py-3 text-sm text-white focus:outline-none transition">
+                </div>
+                <button type="submit" class="btn w-full mt-2 py-3 bg-blue-600 hover:bg-blue-700 rounded-xl font-bold text-sm text-white transition active:scale-[0.99]">
+                    Subscribe to Directory
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <footer class="footer bg-gray-950 border-t border-gray-900 text-gray-400 text-sm pt-16 pb-8 px-6">
+        <div class="footer-container max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
+            
+            <div class="footer-col space-y-4">
+                <h3 class="text-lg font-bold text-white tracking-wider">Nexus Pro</h3>
+                <p class="text-xs text-gray-400 leading-relaxed">Study smarter with AI, connect with students, and get real-time football updates all in one place.</p>
+                <div class="socials flex flex-wrap gap-3 text-xs">
+                    <a href="#" class="hover:text-blue-400 transition bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-800">Discord</a>
+                    <a href="#" class="hover:text-blue-400 transition bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-800">X</a>
+                    <a href="#" class="hover:text-blue-400 transition bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-800">Instagram</a>
+                </div>
+            </div>
+
+            <div class="footer-col">
+                <h4 class="text-white font-bold text-xs uppercase tracking-widest mb-4">AI Study</h4>
+                <ul class="space-y-2 text-xs">
+                    <li><a href="/ai-writer" class="hover:text-blue-400 transition">Assignment Helper</a></li>
+                    <li><a href="/summarizer" class="hover:text-blue-400 transition">Notes Summarizer</a></li>
+                    <li><a href="/quiz" class="hover:text-blue-400 transition">AI Quiz Generator</a></li>
+                    <li><a href="/explain" class="hover:text-blue-400 transition">Explain Concept</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4 class="text-white font-bold text-xs uppercase tracking-widest mb-4">Community</h4>
+                <ul class="space-y-2 text-xs">
+                    <li><a href="/feed" class="hover:text-blue-400 transition">Student Feed</a></li>
+                    <li><a href="/study-groups" class="hover:text-blue-400 transition">Study Groups</a></li>
+                    <li><a href="/qna" class="hover:text-blue-400 transition">Ask Questions</a></li>
+                    <li><a href="/leaderboard" class="hover:text-blue-400 transition">Top Contributors</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-col">
+                <h4 class="text-white font-bold text-xs uppercase tracking-widest mb-4">Football</h4>
+                <ul class="space-y-2 text-xs">
+                    <li><a href="/live-scores" class="hover:text-blue-400 transition">Live Scores</a></li>
+                    <li><a href="/news" class="hover:text-blue-400 transition">Football News</a></li>
+                    <li><a href="/predictions" class="hover:text-blue-400 transition">AI Predictions</a></li>
+                    <li><a href="/highlights" class="hover:text-blue-400 transition">Match Highlights</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom max-w-6xl mx-auto border-t border-gray-900 pt-8 flex flex-col sm:flex-row justify-between items-center text-xs gap-4">
+            <p>© 2026 Nexus Pro. Learn. Connect. Watch Football.</p>
+            <p class="space-x-4"><a href="/privacy" class="hover:text-white transition">Privacy</a> · <a href="/terms" class="hover:text-white transition">Terms</a> · <a href="/contact" class="hover:text-white transition">Contact</a></p>
+        </div>
+    </footer>
+
+    <script src="index.js"></script>
+</body>
+        </html>
