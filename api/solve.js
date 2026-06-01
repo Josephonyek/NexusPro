@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
-        return res.status(500).json({ error: "GROQ_API_KEY is missing in Vercel" });
+        return res.status(500).json({ error: "GROQ_API_KEY is missing" });
     }
 
     try {
@@ -23,39 +23,35 @@ export default async function handler(req, res) {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                model: "llama-3.3-70b-versatile",
+                model: "llama3-8b-8192",   // Smaller but very stable model
                 messages: [
                     { 
                         role: "system", 
-                        content: `You are a helpful STEM tutor.` 
+                        content: `You are an expert tutor in Biology, Chemistry, Mathematics and Physics. Explain step by step.` 
                     },
                     { role: "user", content: question }
                 ],
                 temperature: 0.7,
-                max_tokens: 1000
+                max_tokens: 1200
             })
         });
 
-        const data = await response.json();
-
         if (!response.ok) {
-            return res.status(500).json({ 
-                error: "Groq API Error",
-                status: response.status,
-                message: data.error?.message || "Unknown error"
-            });
+            const errorData = await response.text();
+            return res.status(500).json({ error: `Groq Error: ${response.status} - ${errorData}` });
         }
+
+        const data = await response.json();
 
         res.status(200).json({
             success: true,
-            answer: data.choices?.[0]?.message?.content || "No response"
+            answer: data.choices?.[0]?.message?.content || "No response received."
         });
 
     } catch (error) {
+        console.error("Error:", error.message);
         res.status(500).json({ 
-            error: "Failed to connect to Groq",
-            details: error.message,
-            stack: error.stack ? "Error occurred" : ""
+            error: "Failed to connect to Groq. Check your API key and internet connection." 
         });
     }
 }
