@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40 tracking-wider";
             document.getElementById('adminSection').classList.remove('hidden');
             
-            // Fetch global active system model configuration instead of individual preference
+            // Fetch global active system model configuration
             fetchCurrentAIModel(userToken);
             
             // Load user directory framework
@@ -88,13 +88,13 @@ async function fetchCurrentAIModel(token) {
 }
 
 // Save selected AI Model globally to Firebase
-async function saveAIModel() {
+window.saveAIModel = async function() {
     const userToken = localStorage.getItem('nexusAuthToken');
     const selectedModel = document.getElementById('aiModelSelect').value;
 
     if (!userToken) return;
 
-    const systemUrl = `https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app/system/settings.json?auth=${token}`;
+    const systemUrl = `https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app/system/settings.json?auth=${userToken}`;
 
     try {
         await fetch(systemUrl, {
@@ -107,7 +107,7 @@ async function saveAIModel() {
     } catch (error) {
         alert("Failed to save global AI model preference.");
     }
-}
+};
 
 // Comprehensive User Accounts Registry Dashboard Directory Loader
 async function loadUserDirectory(token) {
@@ -178,13 +178,13 @@ async function loadUserDirectory(token) {
 }
 
 // Webmail Trigger Handler
-function emailUser(email) {
+window.emailUser = function(email) {
     if(!email || email === 'No Email') return alert("No email index registered to this account profile.");
     window.location.href = `mailto:${email}?subject=Nexus Pro System Administration Update`;
-}
+};
 
 // Edit Form Parameter Committer
-async function editUser(uid, currentName, currentRole) {
+window.editUser = async function(uid, currentName, currentRole) {
     const token = localStorage.getItem('nexusAuthToken');
     const newName = prompt(`Change name for user:`, currentName);
     if (newName === null) return; 
@@ -210,10 +210,10 @@ async function editUser(uid, currentName, currentRole) {
     } catch (e) {
         alert("Writing failure encountered.");
     }
-}
+};
 
 // System Ban Management Committer
-async function toggleBanUser(uid, currentStatus) {
+window.toggleBanUser = async function(uid, currentStatus) {
     const token = localStorage.getItem('nexusAuthToken');
     const nextStatus = currentStatus === 'banned' ? 'active' : 'banned';
     const safetyCheck = confirm(`Are you sure you want to set this user account status to ${nextStatus.toUpperCase()}?`);
@@ -232,19 +232,17 @@ async function toggleBanUser(uid, currentStatus) {
     } catch (e) {
         alert("Execution update failure.");
     }
-}
+};
 
 // News Monitor
-function monitorNews() {
+window.monitorNews = function() {
     alert("📢 News Monitor Activated\n\nThis feature is ready. You can create news-monitor.html later.");
-    // window.location.href = 'news-monitor.html';
-}
+};
 
 // Community Monitor
-function monitorCommunity() {
+window.monitorCommunity = function() {
     alert("👥 Community Monitor Activated\n\nThis feature is ready. You can create community-moderate.html later.");
-    // window.location.href = 'community-moderate.html';
-}
+};
 
 // Logout
 document.getElementById('logoutBtn').addEventListener('click', () => {
