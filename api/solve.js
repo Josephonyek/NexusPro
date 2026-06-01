@@ -9,12 +9,12 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Question is required' });
     }
 
-    const apiKey = process.env.GROQ_API_KEY;   // ← New variable name
+    const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
         return res.status(500).json({ 
-            error: "Missing Groq API Key",
-            message: "Please add GROQ_API_KEY in Vercel Environment Variables"
+            error: "Missing Groq API Key on server",
+            message: "GROQ_API_KEY environment variable is not set"
         });
     }
 
@@ -26,25 +26,26 @@ export default async function handler(req, res) {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                // Strong Llama model for STEM
                 model: "llama-3.3-70b-versatile",
                 messages: [
                     { 
                         role: "system", 
-                        content: `You are an expert STEM tutor specialized in ${subject || 'Biology, Chemistry, Mathematics, and Physics'}. 
-                        Always explain step-by-step with clear reasoning. Use LaTeX for equations.` 
+                        content: `You are an expert STEM tutor in ${subject || 'Biology, Chemistry, Mathematics, and Physics'}. Give clear step-by-step explanations.` 
                     },
                     { role: "user", content: question }
                 ],
                 temperature: 0.7,
-                max_tokens: 1500
+                max_tokens: 1200
             })
         });
 
         const data = await response.json();
 
         if (!response.ok) {
-            return res.status(500).json({ error: data.error?.message || "Groq API Error" });
+            return res.status(500).json({ 
+                error: data.error?.message || "Groq API Error",
+                status: response.status
+            });
         }
 
         res.status(200).json({
@@ -53,7 +54,10 @@ export default async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error("Groq Error:", error);
-        res.status(500).json({ error: "Failed to connect to Llama (Groq). Please try again." });
+        console.error("Groq Connection Error:", error);
+        res.status(500).json({ 
+            error: "Failed to connect to Groq",
+            details: error.message 
+        });
     }
-}
+                }
