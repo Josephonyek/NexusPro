@@ -7,15 +7,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
-        .chat-bubble-user { 
-            background: #2563eb; 
-            color: white; 
-            border-radius: 20px 20px 5px 20px; 
-        }
-        .chat-bubble-ai { 
-            background: #1f2937; 
-            border-radius: 20px 20px 20px 5px; 
-        }
+        .chat-bubble-user { background: #2563eb; color: white; border-radius: 20px 20px 5px 20px; }
+        .chat-bubble-ai { background: #1f2937; border-radius: 20px 20px 20px 5px; }
     </style>
 </head>
 <body class="bg-gray-950 text-white min-h-screen">
@@ -36,19 +29,17 @@
         <!-- Chat Area -->
         <div id="chatArea" class="h-[65vh] overflow-y-auto bg-gray-900 rounded-3xl p-5 space-y-4 border border-gray-800 mb-6">
             <div class="text-center text-gray-500 text-sm py-10">
-                👋 Welcome to AI STEM Solver!<br>
-                Ask me anything incliding Physics, Chemistry, Biology, or Mathematics.
+                👋 Hi! I'm your AI STEM Tutor.<br>
+                Ask me anything in Physics, Chemistry, Biology, or Mathematics.
             </div>
         </div>
 
-        <!-- Input Area -->
+        <!-- Input -->
         <div class="flex gap-3">
-            <input id="questionInput" 
-                   type="text" 
-                   placeholder="Type your question here... (e.g. Explain the Krebs cycle)"
+            <input id="questionInput" type="text" 
+                   placeholder="Ask a question (e.g. Explain photosynthesis)"
                    class="flex-1 bg-gray-800 border border-gray-700 rounded-2xl px-5 py-4 focus:outline-none focus:border-blue-500">
-            <button onclick="sendQuestion()" 
-                    class="bg-blue-600 hover:bg-blue-700 px-8 rounded-2xl font-semibold">
+            <button onclick="sendQuestion()" class="bg-blue-600 hover:bg-blue-700 px-8 rounded-2xl font-semibold">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
@@ -56,4 +47,4 @@
 
     <script src="ai-solver.js"></script>
 </body>
-      </html>
+</html>
