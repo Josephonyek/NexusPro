@@ -22,7 +22,7 @@ document.getElementById('loginForm').addEventListener('submit', async (e) => {
             throw new Error(data.error || "Login failed");
         }
 
-        // Save login session
+        // Save session
         localStorage.setItem('nexusAuthToken', data.idToken);
         localStorage.setItem('nexusUserId', data.userId);
 
