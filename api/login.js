@@ -10,7 +10,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const firebaseApiKey = process.env.FIREBASE_WEB_API_KEY;
+        const firebaseApiKey = process.env.FIREBASE_API_KEY;   // ← Corrected
 
         if (!firebaseApiKey) {
             return res.status(500).json({ error: "Firebase API key not configured" });
@@ -36,7 +36,6 @@ export default async function handler(req, res) {
             return res.status(401).json({ error: authData.error?.message || "Invalid email or password" });
         }
 
-        // Return tokens to frontend
         res.status(200).json({
             success: true,
             idToken: authData.idToken,
