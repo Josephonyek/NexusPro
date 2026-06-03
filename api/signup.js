@@ -3,66 +3,67 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    try {
-        const { fullName, email, password } = req.body;
+    const { name, email, password } = req.body;
 
-        if (!fullName || !email || !password) {
-            return res.status(400).json({ error: 'All fields are required.' });
+    if (!name || !email || !password) {
+        return res.status(400).json({ error: 'Name, email and password are required' });
+    }
+
+    try {
+        // Use Firebase Web API Key from environment variable (secure)
+        const firebaseApiKey = process.env.FIREBASE_WEB_API_KEY;
+
+        if (!firebaseApiKey) {
+            return res.status(500).json({ error: "Firebase API key not configured" });
         }
 
-        const firebaseApiKey = process.env.FIREBASE_API_KEY;
-        const signupEndpoint = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseApiKey}`;
-
-        // 1. Create user account inside Firebase Authentication core
-        const authResponse = await fetch(signupEndpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, returnSecureToken: true })
-        });
+        // 1. Create user with Firebase Authentication
+        const authResponse = await fetch(
+            `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseApiKey}`,
+            {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: email,
+                    password: password,
+                    returnSecureToken: true
+                })
+            }
+        );
 
         const authData = await authResponse.json();
 
         if (!authResponse.ok) {
-            let errorMsg = "Registration failed.";
-            if (authData.error && authData.error.message === "EMAIL_EXISTS") {
-                errorMsg = "This email address is already in use.";
-            }
-            return res.status(authResponse.status).json({ error: errorMsg });
+            return res.status(400).json({ error: authData.error?.message || "Signup failed" });
         }
 
         const userId = authData.localId;
-        const userToken = authData.idToken;
+        const idToken = authData.idToken;
 
-        // 2. Automatically generate the Student document structure in Firestore Database
-        // Targets: nexuspro-cf948 -> users collection -> userId document
-        const firestoreEndpoint = `https://firestore.googleapis.com/v1/projects/nexuspro-cf948/databases/(default)/documents/users/${userId}?documentId=${userId}`;
+        // 2. Save user profile to Realtime Database
+        const dbUrl = `https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json?auth=${idToken}`;
 
-        const profilePayload = {
-            fields: {
-                name: { stringValue: fullName },
-                email: { stringValue: email },
-                role: { stringValue: "student" },
-                createdAt: { timestampValue: new Date().toISOString() }
-            }
-        };
-
-        await fetch(firestoreEndpoint, {
-            method: 'PATCH', // PATCH inserts or replaces fields cleanly
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${userToken}` // Authenticates data write safely
-            },
-            body: JSON.stringify(profilePayload)
+        await fetch(dbUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: name,
+                email: email,
+                role: "student",           // Default role for new users
+                createdAt: Date.now()
+            })
         });
 
-        // Send confirmation back to your phone frontend
-        return res.status(200).json({
+        // Return success with tokens (frontend will store them)
+        res.status(200).json({
             success: true,
+            idToken: idToken,
             userId: userId,
-            token: userToken
+            message: "Account created successfully"
         });
 
     } catch (error) {
-        return res.status(500).json({ error: 'Internal Server Error' });
+        console.error("Signup Error:", error);
+        res.status(500).json({ error: "Internal server error during signup" });
     }
-}
+            }
