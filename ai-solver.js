@@ -5,7 +5,6 @@ function createSubjectButtons() {
     const values = ["all", "physics", "chemistry", "biology", "math"];
     const container = document.getElementById('subjectButtons');
 
-    container.innerHTML = '';
     subjects.forEach((name, i) => {
         const btn = document.createElement('button');
         btn.className = `px-5 py-2 rounded-2xl text-sm font-medium ${i === 0 ? 'bg-blue-600 text-white' : 'bg-gray-800 hover:bg-gray-700'}`;
@@ -36,37 +35,37 @@ async function sendQuestion() {
     addMessage(question, true);
     input.value = '';
 
-    const thinkingHTML = `<div id="thinking" class="flex justify-start"><div class="chat-bubble-ai p-4">Thinking...</div></div>`;
+    const thinkingId = 'thinking';
     const chatArea = document.getElementById('chatArea');
-    chatArea.innerHTML += thinkingHTML;
+    chatArea.innerHTML += `<div id="${thinkingId}" class="flex justify-start"><div class="chat-bubble-ai p-4">Thinking...</div></div>`;
     chatArea.scrollTop = chatArea.scrollHeight;
 
     try {
-        const res = await fetch('/api/solve', {
+        const response = await fetch('/api/solve', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
+            body: JSON.stringify({
                 question: question,
-                subject: currentSubject 
+                subject: currentSubject,
+                userId: localStorage.getItem('nexusUserId'),
+                userName: localStorage.getItem('userName') || "Student"
             })
         });
 
-        const data = await res.json();
-
-        document.getElementById('thinking')?.remove();
+        const data = await response.json();
+        document.getElementById(thinkingId)?.remove();
 
         if (data.success) {
             addMessage(data.answer, false);
         } else {
-            addMessage(`❌ ${data.error || "Failed to get response"}`, false);
+            addMessage("❌ " + (data.error || "Something went wrong"), false);
         }
     } catch (err) {
-        document.getElementById('thinking')?.remove();
-        addMessage("❌ Network error. Check if your Vercel deployment is live.", false);
+        document.getElementById(thinkingId)?.remove();
+        addMessage("❌ Connection error. Please try again.", false);
     }
 }
 
-// Initialize
 document.addEventListener("DOMContentLoaded", () => {
     createSubjectButtons();
     document.getElementById('questionInput').addEventListener("keypress", e => {
