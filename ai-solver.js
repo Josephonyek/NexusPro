@@ -1,74 +1,130 @@
-let currentSubject = "all";
+// ==================== ADMIN PROTECTION ====================
+document.addEventListener("DOMContentLoaded", async () => {
+    const userToken = localStorage.getItem('nexusAuthToken');
+    const userId = localStorage.getItem('nexusUserId');
 
-function createSubjectButtons() {
-    const subjects = ["All Subjects", "Physics", "Chemistry", "Biology", "Mathematics"];
-    const values = ["all", "physics", "chemistry", "biology", "math"];
-    const container = document.getElementById('subjectButtons');
-
-    subjects.forEach((name, i) => {
-        const btn = document.createElement('button');
-        btn.className = `px-5 py-2 rounded-2xl text-sm font-medium ${i === 0 ? 'bg-blue-600 text-white' : 'bg-gray-800 hover:bg-gray-700'}`;
-        btn.textContent = name;
-        btn.onclick = () => {
-            document.querySelectorAll('#subjectButtons button').forEach(b => b.classList.remove('bg-blue-600', 'text-white'));
-            btn.classList.add('bg-blue-600', 'text-white');
-            currentSubject = values[i];
-        };
-        container.appendChild(btn);
-    });
-}
-
-function addMessage(text, isUser) {
-    const chatArea = document.getElementById('chatArea');
-    const div = document.createElement('div');
-    div.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
-    div.innerHTML = `<div class="${isUser ? 'chat-bubble-user' : 'chat-bubble-ai'} p-4 max-w-[85%]">${text}</div>`;
-    chatArea.appendChild(div);
-    chatArea.scrollTop = chatArea.scrollHeight;
-}
-
-async function sendQuestion() {
-    const input = document.getElementById('questionInput');
-    const question = input.value.trim();
-    if (!question) return;
-
-    addMessage(question, true);
-    input.value = '';
-
-    const thinkingId = 'thinking';
-    const chatArea = document.getElementById('chatArea');
-    chatArea.innerHTML += `<div id="${thinkingId}" class="flex justify-start"><div class="chat-bubble-ai p-4">Thinking...</div></div>`;
-    chatArea.scrollTop = chatArea.scrollHeight;
+    if (!userToken || !userId) {
+        alert("You must be logged in to access this page.");
+        window.location.href = 'login.html';
+        return;
+    }
 
     try {
-        const response = await fetch('/api/solve', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                question: question,
-                subject: currentSubject,
-                userId: localStorage.getItem('nexusUserId'),
-                userName: localStorage.getItem('userName') || "Student"
-            })
-        });
+        // Check if the user is an admin
+        const rtdbUrl = `https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json?auth=${userToken}`;
+        const response = await fetch(rtdbUrl);
+        const userData = await response.json();
+
+        const userRole = (userData?.role || "").toString().toLowerCase().trim();
+
+        if (userRole !== 'admin') {
+            alert("Access Denied: Only administrators can view this page.");
+            window.location.href = 'dashboard.html';
+            return;
+        }
+
+        // If user is admin, load the usage data
+        loadUsageData();
+
+    } catch (error) {
+        console.error("Error checking admin access:", error);
+        alert("Error verifying permissions. Please try again.");
+        window.location.href = 'dashboard.html';
+    }
+});
+
+// ==================== LOAD AI USAGE DATA ====================
+async function loadUsageData() {
+    const container = document.getElementById('usageContainer');
+    container.innerHTML = `
+        <div class="text-center py-10">
+            <div class="animate-spin inline-block w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full"></div>
+            <p class="mt-3 text-gray-400">Loading AI usage data...</p>
+        </div>
+    `;
+
+    const token = localStorage.getItem('nexusAuthToken');
+
+    try {
+        const response = await fetch(
+            `https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app/ai-usage.json?auth=${token}`
+        );
 
         const data = await response.json();
-        document.getElementById(thinkingId)?.remove();
 
-        if (data.success) {
-            addMessage(data.answer, false);
-        } else {
-            addMessage("❌ " + (data.error || "Something went wrong"), false);
+        if (!data) {
+            container.innerHTML = `
+                <div class="text-center py-16 bg-gray-900 rounded-2xl border border-gray-700">
+                    <div class="text-6xl mb-4">📭</div>
+                    <h3 class="text-xl font-bold mb-2">No AI Usage Data Yet</h3>
+                    <p class="text-gray-400">Users have not used the AI Solver yet.</p>
+                </div>
+            `;
+            return;
         }
-    } catch (err) {
-        document.getElementById(thinkingId)?.remove();
-        addMessage("❌ Connection error. Please try again.", false);
+
+        container.innerHTML = '';
+
+        // Loop through each user who has used the AI
+        Object.keys(data).forEach(userId => {
+            const userLogs = data[userId];
+            const queries = Object.values(userLogs);
+            const totalQueries = queries.length;
+
+            // Get user info from the first log
+            const userName = queries[0]?.userName || "Unknown User";
+            const lastUsed = new Date(queries[queries.length - 1].timestamp).toLocaleString();
+
+            // Create user card
+            const userCard = document.createElement('div');
+            userCard.className = `bg-gray-900 border border-gray-700 rounded-2xl p-6 mb-6`;
+
+            let html = `
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-5">
+                    <div>
+                        <h3 class="text-xl font-bold">${userName}</h3>
+                        <p class="text-sm text-gray-400">User ID: ${userId}</p>
+                    </div>
+                    <div class="mt-3 md:mt-0 text-right">
+                        <div class="inline-flex items-center gap-2 bg-blue-950 text-blue-400 px-4 py-1 rounded-full text-sm">
+                            <span class="font-bold">${totalQueries}</span> 
+                            <span>queries</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1">Last used: ${lastUsed}</p>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <h4 class="text-sm uppercase tracking-widest text-gray-400 mb-2">Recent Questions</h4>
+                </div>
+                <div class="space-y-3">
+            `;
+
+            // Show the last 6 questions (most recent first)
+            queries.slice(-6).reverse().forEach(log => {
+                const date = new Date(log.timestamp).toLocaleString();
+                html += `
+                    <div class="bg-gray-800 p-4 rounded-xl border border-gray-700">
+                        <div class="flex justify-between items-start mb-2">
+                            <div class="text-xs text-gray-400">${date}</div>
+                            <div class="text-xs px-2 py-0.5 bg-gray-700 rounded">${log.subject || 'General'}</div>
+                        </div>
+                        <div class="font-medium text-white">${log.question}</div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            userCard.innerHTML = html;
+            container.appendChild(userCard);
+        });
+
+    } catch (error) {
+        console.error("Error loading usage data:", error);
+        container.innerHTML = `
+            <div class="text-center py-10 text-red-400">
+                Failed to load usage data. Please try refreshing the page.
+            </div>
+        `;
     }
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-    createSubjectButtons();
-    document.getElementById('questionInput').addEventListener("keypress", e => {
-        if (e.key === "Enter") sendQuestion();
-    });
-});
