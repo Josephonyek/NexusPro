@@ -3,7 +3,7 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    const { question, subject } = req.body || {};
+    const { question, subject, userId, userName } = req.body;
 
     if (!question) {
         return res.status(400).json({ error: 'Question is required' });
@@ -12,10 +12,11 @@ export default async function handler(req, res) {
     const apiKey = process.env.GROQ_API_KEY;
 
     if (!apiKey) {
-        return res.status(500).json({ error: "GROQ_API_KEY is missing in Vercel" });
+        return res.status(500).json({ error: "GROQ_API_KEY is missing" });
     }
 
     try {
+        // Call Groq API
         const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
             method: "POST",
             headers: {
@@ -27,8 +28,7 @@ export default async function handler(req, res) {
                 messages: [
                     { 
                         role: "system", 
-                        content: `You are an expert STEM tutor specialized in ${subject || 'Biology, Chemistry, Mathematics, and Physics'}. 
-                        Explain step by step using clear reasoning. Use LaTeX for equations.` 
+                        content: `You are an expert STEM tutor in ${subject || 'Biology, Chemistry, Mathematics, and Physics'}.` 
                     },
                     { role: "user", content: question }
                 ],
@@ -37,21 +37,38 @@ export default async function handler(req, res) {
             })
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-            const errorText = await response.text();
-            return res.status(500).json({ error: `Groq Error: ${response.status}` });
+            return res.status(500).json({ error: data.error?.message || "Groq Error" });
         }
 
-        const data = await response.json();
+        const answer = data.choices?.[0]?.message?.content || "No response";
+
+        // === LOG USAGE TO FIREBASE ===
+        if (userId) {
+            const logUrl = `https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app/ai-usage/${userId}.json`;
+            
+            await fetch(logUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    question: question,
+                    subject: subject || "General",
+                    answer: answer.substring(0, 300), // Save first 300 chars
+                    timestamp: Date.now(),
+                    userName: userName || "Unknown"
+                })
+            });
+        }
 
         res.status(200).json({
             success: true,
-            answer: data.choices?.[0]?.message?.content || "No response received."
+            answer: answer
         });
 
     } catch (error) {
-        res.status(500).json({ 
-            error: "Failed to connect to Groq. Please check your new API key." 
-        });
+        console.error("Error:", error);
+        res.status(500).json({ error: "Failed to connect to Groq" });
     }
-                }
+                                     }
