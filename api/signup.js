@@ -10,14 +10,13 @@ export default async function handler(req, res) {
     }
 
     try {
-        // Use Firebase Web API Key from environment variable (secure)
-        const firebaseApiKey = process.env.FIREBASE_WEB_API_KEY;
+        const firebaseApiKey = process.env.FIREBASE_API_KEY;   // ← Corrected
 
         if (!firebaseApiKey) {
             return res.status(500).json({ error: "Firebase API key not configured" });
         }
 
-        // 1. Create user with Firebase Authentication
+        // Create user with Firebase Authentication
         const authResponse = await fetch(
             `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${firebaseApiKey}`,
             {
@@ -40,7 +39,7 @@ export default async function handler(req, res) {
         const userId = authData.localId;
         const idToken = authData.idToken;
 
-        // 2. Save user profile to Realtime Database
+        // Save user profile to Realtime Database
         const dbUrl = `https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json?auth=${idToken}`;
 
         await fetch(dbUrl, {
@@ -49,12 +48,11 @@ export default async function handler(req, res) {
             body: JSON.stringify({
                 name: name,
                 email: email,
-                role: "student",           // Default role for new users
+                role: "student",
                 createdAt: Date.now()
             })
         });
 
-        // Return success with tokens (frontend will store them)
         res.status(200).json({
             success: true,
             idToken: idToken,
@@ -66,4 +64,4 @@ export default async function handler(req, res) {
         console.error("Signup Error:", error);
         res.status(500).json({ error: "Internal server error during signup" });
     }
-            }
+}
