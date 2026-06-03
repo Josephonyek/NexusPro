@@ -29,122 +29,106 @@
 
     <main class="max-w-6xl mx-auto px-4 py-8">
         
+        <!-- Welcome Section -->
         <div class="mb-8 p-6 bg-gradient-to-r from-gray-900 to-gray-950 border border-gray-800 rounded-2xl">
             <h2 id="welcomeHeading" class="text-2xl sm:text-3xl font-extrabold tracking-tight">Loading Profile...</h2>
             <p id="welcomeSubtext" class="text-gray-400 text-sm mt-1">Connecting securely to Nexus Pro servers...</p>
         </div>
 
+        <!-- Enhanced Admin Control Panel -->
         <section id="adminSection" class="hidden mb-10 animate-fade-in">
-            <div class="border border-red-900/40 bg-red-950/10 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-8">
-                
-                <div class="flex items-center gap-3">
+            <div class="border border-red-900/40 bg-red-950/10 rounded-3xl p-8 shadow-2xl">
+                <div class="flex items-center gap-3 mb-6">
                     <span class="text-3xl">🛡️</span>
                     <div>
                         <h3 class="text-xl font-bold text-red-400">Administrator Control Panel</h3>
-                        <p class="text-red-400/70 text-sm">Full system oversight enabled</p>
+                        <p class="text-red-400/70 text-sm">Full System Management</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div class="lg:col-span-1 p-6 bg-gray-900 rounded-2xl border border-gray-800 flex flex-col justify-between">
-                        <div>
-                            <h4 class="text-sm uppercase tracking-widest text-gray-400 mb-3">🎯 Choose AI Model</h4>
-                            <select id="aiModelSelect" class="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-blue-500">
-                                <option value="gpt-4o">GPT-4o — Best Overall</option>
-                                <option value="claude-3">Claude 3 Opus — Deep Reasoning</option>
-                                <option value="gemini">Gemini 1.5 Pro — Fast & Visual</option>
-                                <option value="local">Local Physics Solver</option>
-                            </select>
-                        </div>
-                        <button onclick="saveAIModel()" class="mt-4 w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-xl font-semibold transition text-sm">
-                            Apply Model
-                        </button>
-                    </div>
-
-                    <div onclick="monitorNews()" class="bg-gray-900 p-6 rounded-2xl border border-gray-800 hover:border-amber-500/50 cursor-pointer transition-all hover:scale-[1.01] flex flex-col justify-between">
-                        <div>
-                            <div class="text-3xl mb-2">📢</div>
-                            <h4 class="font-bold text-base">News Monitor</h4>
-                            <p class="text-gray-400 text-xs mt-1">Track global news updates in real-time</p>
-                        </div>
-                        <span class="text-amber-400 text-xs mt-4 block">Open Monitor →</span>
-                    </div>
-
-                    <div onclick="monitorCommunity()" class="bg-gray-900 p-6 rounded-2xl border border-gray-800 hover:border-violet-500/50 cursor-pointer transition-all hover:scale-[1.01] flex flex-col justify-between">
-                        <div>
-                            <div class="text-3xl mb-2">👥</div>
-                            <h4 class="font-bold text-base">Community Monitor</h4>
-                            <p class="text-gray-400 text-xs mt-1">Moderate discussions and user reports</p>
-                        </div>
-                        <span class="text-violet-400 text-xs mt-4 block">Open Hub →</span>
-                    </div>
+                <!-- AI Model Selector -->
+                <div class="mb-8 p-6 bg-gray-900 rounded-2xl border border-gray-700">
+                    <h4 class="text-sm uppercase tracking-widest text-gray-400 mb-3">🎯 Global AI Model Selector</h4>
+                    <select id="aiModelSelect" class="w-full bg-gray-800 border border-gray-600 rounded-2xl px-5 py-4 text-lg">
+                        <option value="llama-3.3-70b-versatile">Llama 3.3 70B (Recommended)</option>
+                        <option value="llama3-8b-8192">Llama 3 8B (Fast)</option>
+                        <option value="mixtral-8x7b">Mixtral 8x7B</option>
+                    </select>
+                    <button onclick="saveGlobalAIModel()" class="mt-4 w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-2xl font-semibold">
+                        Apply to All Users
+                    </button>
                 </div>
 
-                <div class="bg-gray-900 border border-gray-800 rounded-2xl p-6">
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
-                        <div>
-                            <h4 class="text-lg font-bold text-white">Registered Users Core Network</h4>
-                            <p class="text-gray-400 text-xs">Manage system status, roles, and profiles</p>
-                        </div>
-                        <div class="text-xs bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-700 text-gray-300">
-                            Total Registered: <span id="userCount" class="font-bold text-blue-400">0</span>
-                        </div>
+                <!-- Admin Quick Actions -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div onclick="showAIUsage()" class="bg-gray-900 p-6 rounded-2xl border border-blue-900/50 hover:border-blue-500 cursor-pointer transition">
+                        <div class="text-4xl mb-4">📊</div>
+                        <h4 class="font-bold text-lg">AI Usage Monitor</h4>
+                        <p class="text-gray-400 text-sm">See how users are using the AI Solver</p>
                     </div>
 
-                    <div class="overflow-x-auto custom-scrollbar">
-                        <table class="w-full text-left text-sm text-gray-300">
-                            <thead class="bg-gray-950 text-gray-400 text-xs uppercase tracking-wider border-b border-gray-800">
-                                <tr>
-                                    <th class="px-4 py-3">Username</th>
-                                    <th class="px-4 py-3">Email Address / Phone</th>
-                                    <th class="px-4 py-3">Role Status</th>
-                                    <th class="px-4 py-3 text-right">Administrative Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="userTableBody" class="divide-y divide-gray-800/60">
-                                <tr>
-                                    <td colspan="4" class="px-4 py-8 text-center text-gray-500">Syncing with database directory...</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div onclick="showUserManagement()" class="bg-gray-900 p-6 rounded-2xl border border-violet-900/50 hover:border-violet-500 cursor-pointer transition">
+                        <div class="text-4xl mb-4">👥</div>
+                        <h4 class="font-bold text-lg">User Management</h4>
+                        <p class="text-gray-400 text-sm">View, Edit, Ban users</p>
+                    </div>
+
+                    <div onclick="showFootballMonitor()" class="bg-gray-900 p-6 rounded-2xl border border-green-900/50 hover:border-green-500 cursor-pointer transition">
+                        <div class="text-4xl mb-4">⚽</div>
+                        <h4 class="font-bold text-lg">Football Monitor</h4>
+                        <p class="text-gray-400 text-sm">Supervise football feature usage</p>
                     </div>
                 </div>
-
             </div>
         </section>
 
         <h3 class="text-xs font-bold text-gray-500 mb-4 uppercase tracking-widest">Available Applications</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
+            <!-- AI Solver -->
             <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl flex flex-col justify-between hover:border-blue-500/30 transition duration-300 shadow-xl">
                 <div>
                     <div class="w-12 h-12 rounded-xl bg-blue-600/10 flex items-center justify-center text-blue-400 font-bold text-xl mb-4">∑</div>
                     <h4 class="text-lg font-bold mb-1.5">AI Physics & Math Solver</h4>
-                    <p class="text-gray-400 text-sm leading-relaxed">Submit complex mathematical equations or physics problems and get instant step-by-step breakdowns.</p>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Submit complex mathematical equations or physics problems and get instant step-by-step breakdowns.
+                    </p>
                 </div>
-                <button onclick="window.location.href='ai_solver.html'" class="mt-6 w-full py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">Open Solver</button>
+                <button onclick="window.location.href='ai-solver.html'" class="mt-6 w-full py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">
+                    Open Solver
+                </button>
             </div>
 
+            <!-- Football -->
             <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl flex flex-col justify-between hover:border-green-500/30 transition duration-300 shadow-xl">
                 <div>
                     <div class="w-12 h-12 rounded-xl bg-green-600/10 flex items-center justify-center text-green-400 font-bold text-xl mb-4">⚽</div>
                     <h4 class="text-lg font-bold mb-1.5">Football Live Scores</h4>
-                    <p class="text-gray-400 text-sm leading-relaxed">Track live scores, match fixtures, and view official league standings in real time.</p>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Track live scores, match fixtures, and view official league standings in real time.
+                    </p>
                 </div>
-                <button onclick="window.location.href='football.html'" class="mt-6 w-full py-2.5 bg-green-600 hover:bg-green-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">View Scores</button>
+                <button onclick="window.location.href='football.html'" class="mt-6 w-full py-2.5 bg-green-600 hover:bg-green-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">
+                    View Scores
+                </button>
             </div>
 
+            <!-- Community -->
             <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl flex flex-col justify-between hover:border-purple-500/30 transition duration-300 shadow-xl">
                 <div>
                     <div class="w-12 h-12 rounded-xl bg-purple-600/10 flex items-center justify-center text-purple-400 font-bold text-xl mb-4">🤝</div>
                     <h4 class="text-lg font-bold mb-1.5">Expert Community</h4>
-                    <p class="text-gray-400 text-sm leading-relaxed">Connect with top academic instructors, share solutions, and discuss questions with fellow peers.</p>
+                    <p class="text-gray-400 text-sm leading-relaxed">
+                        Connect with top academic instructors, share solutions, and discuss questions with fellow peers.
+                    </p>
                 </div>
-                <button onclick="window.location.href='community.html'" class="mt-6 w-full py-2.5 bg-purple-600 hover:bg-purple-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">Enter Hub</button>
+                <button onclick="window.location.href='community.html'" class="mt-6 w-full py-2.5 bg-purple-600 hover:bg-purple-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">
+                    Enter Hub
+                </button>
             </div>
         </div>
     </main>
 
-    <script type="module" src="dashboard.js"></script>
+    <script src="dashboard.js"></script>
 </body>
     </html>
