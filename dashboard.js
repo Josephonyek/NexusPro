@@ -12,21 +12,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         const response = await fetch(rtdbUrl);
         const userData = await response.json();
 
-        let userName = "New Student";
-        let userRole = "student";
+        const userName = userData?.name || "New Student";
+        const userRole = userData?.role || "student";
 
-        if (userData && userData.name) {
-            userName = userData.name;
-        }
-        if (userData && userData.role) {
-            userRole = userData.role;
-        }
-
-        // === THIS IS THE IMPORTANT LINE ===
+        // Welcome Message
         document.getElementById('welcomeHeading').textContent = `Welcome, ${userName}!`;
         document.getElementById('welcomeSubtext').textContent = `Access your Nexus Pro workspace panel modules cleanly below.`;
 
-        // Role badge
+        // Role Badge + Admin Panel
         const roleBadge = document.getElementById('roleBadge');
         roleBadge.textContent = userRole.toUpperCase();
 
@@ -40,11 +33,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (error) {
         console.error(error);
         document.getElementById('welcomeHeading').textContent = "Welcome!";
-        document.getElementById('welcomeSubtext').textContent = "Connection issue. Please refresh the page.";
+        document.getElementById('welcomeSubtext').textContent = "Connection issue. Please refresh.";
     }
 });
 
-// Logout button
+// Logout
 document.getElementById('logoutBtn').addEventListener('click', () => {
     localStorage.clear();
     window.location.href = 'login.html';
