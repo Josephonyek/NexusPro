@@ -29,13 +29,13 @@
 
     <main class="max-w-6xl mx-auto px-4 py-8">
         
-        <!-- Welcome Section -->
+        <!-- Welcome Message -->
         <div class="mb-8 p-6 bg-gradient-to-r from-gray-900 to-gray-950 border border-gray-800 rounded-2xl">
             <h2 id="welcomeHeading" class="text-2xl sm:text-3xl font-extrabold tracking-tight">Loading Profile...</h2>
             <p id="welcomeSubtext" class="text-gray-400 text-sm mt-1">Connecting securely to Nexus Pro servers...</p>
         </div>
 
-        <!-- Enhanced Admin Control Panel -->
+        <!-- Admin Section (Only visible to admins) -->
         <section id="adminSection" class="hidden mb-10 animate-fade-in">
             <div class="border border-red-900/40 bg-red-950/10 rounded-3xl p-8 shadow-2xl">
                 <div class="flex items-center gap-3 mb-6">
@@ -46,34 +46,24 @@
                     </div>
                 </div>
 
-                <!-- AI Model Selector -->
-                <div class="mb-8 p-6 bg-gray-900 rounded-2xl border border-gray-700">
-                    <h4 class="text-sm uppercase tracking-widest text-gray-400 mb-3">🎯 Global AI Model Selector</h4>
-                    <select id="aiModelSelect" class="w-full bg-gray-800 border border-gray-600 rounded-2xl px-5 py-4 text-lg">
-                        <option value="llama-3.3-70b-versatile">Llama 3.3 70B (Recommended)</option>
-                        <option value="llama3-8b-8192">Llama 3 8B (Fast)</option>
-                        <option value="mixtral-8x7b">Mixtral 8x7B</option>
-                    </select>
-                    <button onclick="saveGlobalAIModel()" class="mt-4 w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-2xl font-semibold">
-                        Apply to All Users
-                    </button>
-                </div>
-
-                <!-- Admin Quick Actions -->
+                <!-- Admin Quick Links -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div onclick="showAIUsage()" class="bg-gray-900 p-6 rounded-2xl border border-blue-900/50 hover:border-blue-500 cursor-pointer transition">
+                    <div onclick="window.location.href='admin-ai-usage.html'" 
+                         class="bg-gray-900 p-6 rounded-2xl border border-blue-900/50 hover:border-blue-500 cursor-pointer transition">
                         <div class="text-4xl mb-4">📊</div>
                         <h4 class="font-bold text-lg">AI Usage Monitor</h4>
-                        <p class="text-gray-400 text-sm">See how users are using the AI Solver</p>
+                        <p class="text-gray-400 text-sm">View how users are using the AI Solver</p>
                     </div>
 
-                    <div onclick="showUserManagement()" class="bg-gray-900 p-6 rounded-2xl border border-violet-900/50 hover:border-violet-500 cursor-pointer transition">
+                    <div onclick="alert('User Management coming soon')" 
+                         class="bg-gray-900 p-6 rounded-2xl border border-violet-900/50 hover:border-violet-500 cursor-pointer transition">
                         <div class="text-4xl mb-4">👥</div>
                         <h4 class="font-bold text-lg">User Management</h4>
-                        <p class="text-gray-400 text-sm">View, Edit, Ban users</p>
+                        <p class="text-gray-400 text-sm">View, edit, and manage users</p>
                     </div>
 
-                    <div onclick="showFootballMonitor()" class="bg-gray-900 p-6 rounded-2xl border border-green-900/50 hover:border-green-500 cursor-pointer transition">
+                    <div onclick="alert('Football Monitor coming soon')" 
+                         class="bg-gray-900 p-6 rounded-2xl border border-green-900/50 hover:border-green-500 cursor-pointer transition">
                         <div class="text-4xl mb-4">⚽</div>
                         <h4 class="font-bold text-lg">Football Monitor</h4>
                         <p class="text-gray-400 text-sm">Supervise football feature usage</p>
@@ -94,7 +84,7 @@
                         Submit complex mathematical equations or physics problems and get instant step-by-step breakdowns.
                     </p>
                 </div>
-                <button onclick="window.location.href='ai_solver.html'" class="mt-6 w-full py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">
+                <button onclick="window.location.href='ai-solver.html'" class="mt-6 w-full py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">
                     Open Solver
                 </button>
             </div>
@@ -131,4 +121,4 @@
 
     <script src="dashboard.js"></script>
 </body>
-    </html>
+</html>
