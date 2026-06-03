@@ -23,11 +23,11 @@ document.getElementById('signupForm').addEventListener('submit', async (e) => {
             throw new Error(data.error || "Signup failed");
         }
 
-        // Save login info
+        // Save session
         localStorage.setItem('nexusAuthToken', data.idToken);
         localStorage.setItem('nexusUserId', data.userId);
 
-        alert("Account created successfully! Redirecting...");
+        alert("Account created successfully! Redirecting to dashboard...");
         window.location.href = 'dashboard.html';
 
     } catch (error) {
