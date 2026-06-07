@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verified Health Advisor Hub</title>
+    <title>Verified Health Hub & News</title>
     <style>
         :root {
             --bg-color: #0b0f19;
@@ -22,11 +22,12 @@
             padding: 20px;
         }
 
-        .container { max-width: 850px; margin: 0 auto; }
+        .container { max-width: 1200px; margin: 0 auto; }
         header { text-align: center; margin-bottom: 30px; }
         h1 { margin: 0 0 10px 0; font-size: 2rem; color: var(--health-accent); }
         .subtitle { color: var(--text-muted); margin: 0; }
 
+        /* Split Setup: Controls at top, Results in split grid */
         .search-sections {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -34,7 +35,7 @@
             margin-bottom: 30px;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             .search-sections { grid-template-columns: 1fr; }
         }
 
@@ -70,40 +71,78 @@
             border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
-            font-size: 0.95rem;
         }
         button:hover { opacity: 0.9; }
 
+        /* Main Dashboard Grid Split */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+
+        .column-title {
+            font-size: 1.3rem;
+            color: var(--text-main);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+            margin-top: 0;
+        }
+
+        /* Advice Cards */
         .advice-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border);
-            padding: 22px;
+            padding: 20px;
             border-radius: 8px;
-            margin: 15px 0;
+            margin-bottom: 15px;
             border-left: 4px solid var(--health-accent);
         }
-
-        .advice-heading { font-size: 1.2rem; font-weight: 600; margin-top: 0; margin-bottom: 8px; }
+        .advice-heading { font-size: 1.15rem; font-weight: 600; margin: 0 0 8px 0; }
         .advice-text { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin: 0; }
-        .advice-link { display: inline-block; margin-top: 12px; color: var(--health-accent); text-decoration: none; font-size: 0.9rem; font-weight: 500; }
-        
+        .advice-link { display: inline-block; margin-top: 12px; color: var(--health-accent); text-decoration: none; font-size: 0.9rem; }
+
+        /* News Cards with Images */
+        .news-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+        .news-img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            background-color: #1f2937;
+        }
+        .news-body { padding: 15px; }
+        .news-title { font-size: 1.1rem; font-weight: 600; margin: 0 0 8px 0; color: #fff; text-decoration: none; display: block; }
+        .news-title:hover { color: var(--health-accent); }
+        .news-text { color: var(--text-muted); font-size: 0.9rem; line-height: 1.4; margin: 0; }
+
         .loading { text-align: center; color: var(--text-muted); padding: 40px; font-style: italic; }
-        .source-badge { font-size: 0.8rem; color: var(--text-muted); text-align: center; margin-top: 50px; display: block;}
     </style>
 </head>
 <body>
 
     <div class="container">
         <header>
-            <h1>Verified Health Advisor</h1>
-            <p class="subtitle">Evidence-based guidelines and condition updates from certified agencies</p>
+            <h1>Verified Health & News Center</h1>
+            <p class="subtitle">Real-time headlines and clinical advisories in one dashboard</p>
         </header>
 
         <div class="search-sections">
             <div class="panel-box">
                 <h2>1. Daily Checkups Check</h2>
                 <div class="input-row">
-                    <input type="number" id="user-age" value="25" min="1" max="120" placeholder="Age">
+                    <input type="number" id="user-age" value="25" min="1" max="120">
                     <select id="user-sex">
                         <option value="male">Male</option>
                         <option value="female">Female</option>
@@ -115,88 +154,119 @@
             <div class="panel-box">
                 <h2>2. Search Health Conditions</h2>
                 <div class="input-row">
-                    <input type="text" id="search-keyword" placeholder="e.g., Diabetes, Heart, Vaccine">
+                    <input type="text" id="search-keyword" placeholder="e.g., Diabetes, Asthma, Allergy">
                 </div>
                 <button onclick="searchConditions()">Search Directory</button>
             </div>
         </div>
 
-        <div id="health-results">
-            <div class="loading">Enter metrics or search conditions above to populate medical advisories.</div>
+        <div class="dashboard-grid">
+            <div>
+                <h3 class="column-title">Medical Advisories</h3>
+                <div id="advice-container">
+                    <div class="loading">Enter metrics above to load clinical briefs...</div>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="column-title">Breaking Health News</h3>
+                <div id="news-container">
+                    <div class="loading">Streaming medical news feed...</div>
+                </div>
+            </div>
         </div>
-        
-        <span class="source-badge">Official Data Stream: ODPHP MyHealthfinder Resource Library</span>
     </div>
 
     <script>
-        const resultDiv = document.getElementById('health-results');
+        const adviceContainer = document.getElementById('advice-container');
+        const newsContainer = document.getElementById('news-container');
 
-        // Standardized renderer that handles both API layout configurations smoothly
-        function renderCards(topics) {
+        // Render function for Clinical Guidance
+        function renderAdvice(topics) {
             if (!topics || topics.length === 0) {
-                resultDiv.innerHTML = '<div class="loading">No matching medical briefs found. Try single terms like "Diabetes", "Heart", "Vaccine", or "Obesity".</div>';
+                adviceContainer.innerHTML = '<div class="loading">No records found. Try simple terms like "Diabetes".</div>';
                 return;
             }
-
-            resultDiv.innerHTML = '';
+            adviceContainer.innerHTML = '';
             topics.forEach(item => {
-                const card = document.createElement('div');
-                card.className = 'advice-card';
-                
-                // Safely match structural object parameters across types
-                const headline = item.Title || 'Medical Guideline Update';
-                const description = item.Notes || item.Teaser || 'Click below to review official resource materials.';
-                const referenceLink = item.AccessibleVersion || '#';
-
-                card.innerHTML = `
-                    <h3 class="advice-heading">${headline}</h3>
-                    <p class="advice-text">${description}</p>
-                    <a class="advice-link" href="${referenceLink}" target="_blank">Read Full Official Guide &rarr;</a>
+                adviceContainer.innerHTML += `
+                    <div class="advice-card">
+                        <h4 class="advice-heading">${item.Title || 'Guideline Update'}</h4>
+                        <p class="advice-text">${item.Notes || item.Teaser || 'Click below to review official rules.'}</p>
+                        <a class="advice-link" href="${item.AccessibleVersion || '#'}" target="_blank">Read Guide &rarr;</a>
+                    </div>
                 `;
-                resultDiv.appendChild(card);
             });
         }
 
+        // Fetch Advice Lists
         async function getRecommendations() {
             const age = document.getElementById('user-age').value;
             const sex = document.getElementById('user-sex').value;
-            resultDiv.innerHTML = '<div class="loading">Compiling clinical guidelines...</div>';
-
+            adviceContainer.innerHTML = '<div class="loading">Compiling entries...</div>';
             try {
                 const res = await fetch(`/api/healthAdvice?type=recommendations&age=${age}&sex=${sex}`);
                 const data = await res.json();
-                
-                // Accessing recommendations list format pathway
-                const topics = data.Result?.MyHealthFinder?.ResultObjects?.ResultObject || [];
-                renderCards(topics);
-            } catch (err) {
-                resultDiv.innerHTML = '<div class="loading" style="color: #ef4444;">Error accessing general guidelines.</div>';
+                renderAdvice(data.Result?.MyHealthFinder?.ResultObjects?.ResultObject || []);
+            } catch {
+                adviceContainer.innerHTML = '<div class="loading">Error loading lists.</div>';
             }
         }
 
         async function searchConditions() {
             const keyword = document.getElementById('search-keyword').value.trim();
-            if(!keyword) return alert('Please input a condition or keyword first.');
-
-            resultDiv.innerHTML = '<div class="loading">Searching health archives...</div>';
-
+            if(!keyword) return alert('Enter a topic word.');
+            adviceContainer.innerHTML = '<div class="loading">Searching...</div>';
             try {
                 const res = await fetch(`/api/healthAdvice?type=search&keyword=${keyword}`);
                 const data = await res.json();
-                
-                // Read from data.Result.Topics.Topic if it's a keyword search return
-                let topics = [];
-                if (data.Result?.Topics?.Topic) {
-                    topics = Array.isArray(data.Result.Topics.Topic) ? data.Result.Topics.Topic : [data.Result.Topics.Topic];
-                } else if (data.Result?.MyHealthFinder?.ResultObjects?.ResultObject) {
-                    topics = data.Result.MyHealthFinder.ResultObjects.ResultObject;
-                }
-                
-                renderCards(topics);
-            } catch (err) {
-                resultDiv.innerHTML = '<div class="loading" style="color: #ef4444;">Error scanning library entries.</div>';
+                let topics = data.Result?.Topics?.Topic || data.Result?.MyHealthFinder?.ResultObjects?.ResultObject || [];
+                if (!Array.isArray(topics)) topics = [topics];
+                renderAdvice(topics);
+            } catch {
+                adviceContainer.innerHTML = '<div class="loading">Search connection dropped.</div>';
             }
         }
+
+        // Fetch and Render Live Health News with Images
+        async function fetchHealthNews() {
+            try {
+                const res = await fetch('/api/healthAdvice?type=news');
+                const data = await res.json();
+                const articles = data.items || [];
+
+                if (articles.length === 0) {
+                    newsContainer.innerHTML = '<div class="loading">No health news stories available right now.</div>';
+                    return;
+                }
+
+                newsContainer.innerHTML = '';
+                articles.slice(0, 6).forEach(story => {
+                    // Extract an image if available, else fall back to a generic fallback image
+                    const imageSrc = story.enclosure?.link || story.thumbnail || 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=500&q=80';
+                    
+                    // Clean description text from HTML snippets
+                    const tempElement = document.createElement('div');
+                    tempElement.innerHTML = story.description || '';
+                    const cleanDescription = tempElement.innerText.substring(0, 140) + '...';
+
+                    newsContainer.innerHTML += `
+                        <div class="news-card">
+                            <img class="news-img" src="${imageSrc}" alt="">
+                            <div class="news-body">
+                                <a class="news-title" href="${story.link}" target="_blank">${story.title}</a>
+                                <p class="news-text">${cleanDescription}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                newsContainer.innerHTML = '<div class="loading">Failed to stream live news cards.</div>';
+            }
+        }
+
+        // Initialize News Feed immediately on page mount
+        fetchHealthNews();
     </script>
 </body>
-    </html>
+</html>
