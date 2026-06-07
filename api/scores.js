@@ -1,32 +1,36 @@
 // api/scores.js
 
 export default async function handler(req, res) {
-  // Pull parameters from frontend query string, defaulting to soccer/EPL if left empty
-  const { sport = 'soccer', league = 'eng.1' } = req.query;
-  
-  // Access environment variables securely injected via your system setup
+  const { type = 'scores', sport = 'soccer', league = 'eng.1' } = req.query;
   const baseUrl = process.env.ESPN_API_BASE_URL || 'https://site.api.espn.com/apis/site/v2/sports';
 
   try {
-    const apiResponse = await fetch(`${baseUrl}/${sport}/${league}/scoreboard`);
-    
-    if (!apiResponse.ok) {
-      return res.status(apiResponse.status).json({ 
-        error: `External endpoint responded with status code: ${apiResponse.status}` 
-      });
+    // Action 1: Fetch News & Videos Feed
+    if (type === 'news') {
+      let newsUrl = `${baseUrl}/${sport}/${league}/news`;
+      
+      // Special case: If user wants FIFA news, ESPN handles international news via 'soccer/fifa.world'
+      if (league === 'fifa') {
+        newsUrl = `${baseUrl}/soccer/fifa.world/news`;
+      }
+
+      const newsResponse = await fetch(newsUrl);
+      if (!newsResponse.ok) throw new Error('Failed to grab sports news feed');
+      
+      const newsData = await newsResponse.json();
+      res.setHeader('Cache-Control', 's-maxage=60, stale-while-revalidate=120'); // Cache news longer than scores
+      return res.status(200).json(newsData);
     }
 
-    const data = await apiResponse.json();
-
-    // Cache responses to prevent overloading endpoints during major game matches
-    // s-maxage=15 tells Vercel to cache data for 15 seconds safely on their global CDN
-    res.setHeader('Cache-Control', 's-maxage=15, stale-while-revalidate=45');
+    // Action 2: Fetch Live Match Scores (Default)
+    const scoreResponse = await fetch(`${baseUrl}/${sport}/${league}/scoreboard`);
+    if (!scoreResponse.ok) throw new Error('Failed to grab scoreboard details');
     
-    return res.status(200).json(data);
+    const scoreData = await scoreResponse.json();
+    res.setHeader('Cache-Control', 's-maxage=15, stale-while-revalidate=45');
+    return res.status(200).json(scoreData);
+
   } catch (err) {
-    return res.status(500).json({ 
-      error: 'Internal routing connection failure', 
-      details: err.message 
-    });
+    return res.status(500).json({ error: 'Server Connection Error', details: err.message });
   }
 }
