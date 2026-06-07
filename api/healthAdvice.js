@@ -8,23 +8,26 @@ export default async function handler(req, res) {
     let targetUrl = '';
 
     if (type === 'search') {
-      // Keyword topic search endpoint
+      // Endpoint for keyword lookup
       targetUrl = `${baseUrl}/topicsearch.json?keyword=${encodeURIComponent(keyword)}`;
     } else {
-      // General preventive recommendation endpoint
+      // Endpoint for daily personalized updates
       targetUrl = `${baseUrl}/myhealthfinder.json?age=${age}&sex=${sex}`;
     }
 
     const apiResponse = await fetch(targetUrl);
-    if (!apiResponse.ok) throw new Error(`Health API returned status: ${apiResponse.status}`);
+    
+    if (!apiResponse.ok) {
+      return res.status(apiResponse.status).json({ error: `External Health API error status: ${apiResponse.status}` });
+    }
 
     const data = await apiResponse.json();
 
-    // Medical advice doesn't change by the second, cache for 1 day to ensure great speeds
+    // Cache health advice on Vercel for 1 day to make page loads blazing fast
     res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate=43200');
     return res.status(200).json(data);
 
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to fetch medical data streams', details: err.message });
+    return res.status(500).json({ error: 'Failed to complete server connection', details: err.message });
   }
-  }
+}
