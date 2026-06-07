@@ -8,6 +8,13 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+    </style>
 </head>
 <body class="bg-gray-950 text-white min-h-screen font-sans">
 
@@ -25,7 +32,7 @@
         <div class="mb-6 flex justify-between items-center">
             <div>
                 <h2 class="text-2xl font-extrabold tracking-tight">Active Accounts Database</h2>
-                <p class="text-gray-400 text-sm">Modify registration records, suspend access credentials, or contact users.</p>
+                <p class="text-gray-400 text-sm">Modify registration records, suspend access credentials, or contact users securely.</p>
             </div>
         </div>
 
@@ -51,7 +58,7 @@
     </main>
 
     <div id="actionModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md p-6 shadow-2xl">
+        <div class="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-fade-in">
             <h3 id="modalTitle" class="text-xl font-bold mb-2 text-violet-400">Modal Header</h3>
             <p id="modalSubtitle" class="text-xs text-gray-400 mb-4"></p>
             
@@ -68,23 +75,31 @@
         let db;
         let currentActiveTargetUid = '';
 
-        // Dynamic Configuration Load Handler
+        // Dynamically fetch configurations from your serverless function
         async function initializeAdminDashboard() {
             try {
-                // Fetch credentials securely from your internal endpoint
-                const configResponse = await fetch('/api/firebaseConfig');
+                // Using an explicit absolute route query path format
+                const configResponse = await fetch('./api/firebaseConfig');
+                
+                if (!configResponse.ok) {
+                    throw new Error(`Server returned status code ${configResponse.status}`);
+                }
+                
                 const firebaseConfig = await configResponse.json();
 
-                // Boot Firebase
+                // Boot Firebase Realtime Database Instance
                 if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
                 db = firebase.database();
 
-                // Start listening to the DB streams
+                // Stream users table layout data
                 listenToUsers();
             } catch (error) {
-                console.error(error);
+                console.error("Initialization error:", error);
                 document.getElementById('userTableBody').innerHTML = 
-                    `<tr><td colspan="4" class="p-8 text-center text-red-400">Failed to securely load cloud environment credentials.</td></tr>`;
+                    `<tr><td colspan="4" class="p-8 text-center text-red-400 font-medium">
+                        ⚠️ Failed to load environment variables.<br>
+                        <span class="text-xs text-gray-500 block mt-1">Reason: ${error.message}. Ensure your variables are saved in Vercel and your project has been redeployed.</span>
+                    </td></tr>`;
             }
         }
 
@@ -96,7 +111,7 @@
                 tableBody.innerHTML = '';
                 
                 if (!snapshot.exists()) {
-                    tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No active user node entries found.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No active user registry files found.</td></tr>';
                     return;
                 }
 
@@ -110,7 +125,7 @@
                     const isSuspended = userData.status === 'suspended';
 
                     const row = document.createElement('tr');
-                    row.className = "hover:bg-gray-950/30 transition duration-150";
+                    row.className = "hover:bg-gray-950/30 transition duration-150 animate-fade-in";
 
                     row.innerHTML = `
                         <td class="p-4">
@@ -184,8 +199,6 @@
             }
         }
 
-        document.getElementById('modalSubmitBtn').onclick = saveEditData;
-
         function deleteUser(uid, name) {
             if (confirm(`Are you sure you want to delete ${name}?`)) {
                 db.ref(`users/${uid}`).remove().catch(err => alert(err.message));
@@ -224,8 +237,7 @@
             document.getElementById('actionModal').classList.add('hidden');
         }
 
-        // Initialize immediately on document mount
         initializeAdminDashboard();
     </script>
 </body>
-              </html>
+</html>
