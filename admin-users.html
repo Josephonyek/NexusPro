@@ -5,9 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nexus Pro - User Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <style>
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
@@ -65,61 +62,59 @@
             <div id="modalContentSlot"></div>
 
             <div class="flex justify-end gap-3 mt-6">
-                <button onclick="closeModal()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-sm font-semibold rounded-xl transition">Cancel</button>
+                <button id="modalCancelBtn" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-sm font-semibold rounded-xl transition">Cancel</button>
                 <button id="modalSubmitBtn" class="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-sm font-semibold rounded-xl text-white transition">Apply Changes</button>
             </div>
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
         let db;
         let currentActiveTargetUid = '';
 
-        // Dynamically fetch configurations from your serverless function
         async function initializeAdminDashboard() {
             try {
-                // Using an explicit absolute route query path format
                 const configResponse = await fetch('./api/firebaseConfig');
-                
-                if (!configResponse.ok) {
-                    throw new Error(`Server returned status code ${configResponse.status}`);
-                }
+                if (!configResponse.ok) throw new Error(`Server status ${configResponse.status}`);
                 
                 const firebaseConfig = await configResponse.json();
 
-                // Boot Firebase Realtime Database Instance
-                if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-                db = firebase.database();
+                // Initialize modular App instance
+                const app = initializeApp(firebaseConfig);
+                db = getDatabase(app);
 
-                // Stream users table layout data
+                // Run data stream subscription
                 listenToUsers();
             } catch (error) {
                 console.error("Initialization error:", error);
                 document.getElementById('userTableBody').innerHTML = 
                     `<tr><td colspan="4" class="p-8 text-center text-red-400 font-medium">
                         ⚠️ Failed to load environment variables.<br>
-                        <span class="text-xs text-gray-500 block mt-1">Reason: ${error.message}. Ensure your variables are saved in Vercel and your project has been redeployed.</span>
+                        <span class="text-xs text-gray-500 block mt-1">Reason: ${error.message}</span>
                     </td></tr>`;
             }
         }
 
         function listenToUsers() {
-            const usersRef = db.ref('users');
+            const usersRef = ref(db, 'users');
             
-            usersRef.on('value', snapshot => {
+            onValue(usersRef, (snapshot) => {
                 const tableBody = document.getElementById('userTableBody');
                 tableBody.innerHTML = '';
                 
                 if (!snapshot.exists()) {
-                    tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No active user registry files found.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No active user node entries found. Check path keys.</td></tr>';
                     return;
                 }
 
-                snapshot.forEach(childSnapshot => {
+                snapshot.forEach((childSnapshot) => {
                     const uid = childSnapshot.key;
                     const userData = childSnapshot.val();
 
-                    const name = userData.name || 'Anonymous User';
+                    const name = userData.name || userData.username || 'Anonymous User';
                     const email = userData.email || 'No Linked Email';
                     const role = userData.role || 'user';
                     const isSuspended = userData.status === 'suspended';
@@ -143,19 +138,33 @@
                                 ${isSuspended ? 'Suspended' : 'Active'}
                             </span>
                         </td>
-                        <td class="p-4 text-right space-x-1.5">
-                            <button onclick="openEmailModal('${uid}', '${email}')" class="px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg font-medium transition">✉️ Email</button>
-                            <button onclick="openEditModal('${uid}', '${name}', '${role}')" class="px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg font-medium text-blue-400 transition">✏️ Edit</button>
-                            <button onclick="toggleSuspend('${uid}', ${isSuspended})" class="px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg font-medium ${isSuspended ? 'text-green-400' : 'text-yellow-500'} transition">
+                        <td class="p-4 text-right space-x-1.5 flex justify-end">
+                            <button data-action="email" data-uid="${uid}" data-email="${email}" class="px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg font-medium transition">✉️ Email</button>
+                            <button data-action="edit" data-uid="${uid}" data-name="${name}" data-role="${role}" class="px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg font-medium text-blue-400 transition">✏️ Edit</button>
+                            <button data-action="suspend" data-uid="${uid}" data-suspended="${isSuspended}" class="px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg font-medium ${isSuspended ? 'text-green-400' : 'text-yellow-500'} transition">
                                 ${isSuspended ? '🔓 Unsuspend' : '🚫 Suspend'}
                             </button>
-                            <button onclick="deleteUser('${uid}', '${name}')" class="px-2.5 py-1.5 bg-red-950/40 hover:bg-red-900/40 text-xs rounded-lg font-medium text-red-400 border border-red-900/30 transition">🗑️ Delete</button>
+                            <button data-action="delete" data-uid="${uid}" data-name="${name}" class="px-2.5 py-1.5 bg-red-950/40 hover:bg-red-900/40 text-xs rounded-lg font-medium text-red-400 border border-red-900/30 transition">🗑️ Delete</button>
                         </td>
                     `;
                     tableBody.appendChild(row);
                 });
             });
         }
+
+        // Global Action Event Listener Delegation mapping for modular scope security
+        document.getElementById('userTableBody').addEventListener('click', (e) => {
+            const btn = e.target.closest('button');
+            if (!btn) return;
+            
+            const action = btn.dataset.action;
+            const uid = btn.dataset.uid;
+
+            if (action === 'email') openEmailModal(uid, btn.dataset.email);
+            if (action === 'edit') openEditModal(uid, btn.dataset.name, btn.dataset.role);
+            if (action === 'suspend') toggleSuspend(uid, btn.dataset.suspended === 'true');
+            if (action === 'delete') deleteUser(uid, btn.dataset.name);
+        });
 
         function openEditModal(uid, name, role) {
             currentActiveTargetUid = uid;
@@ -186,7 +195,7 @@
             const newName = document.getElementById('editNameField').value;
             const newRole = document.getElementById('editRoleField').value;
 
-            db.ref(`users/${currentActiveTargetUid}`).update({
+            update(ref(db, `users/${currentActiveTargetUid}`), {
                 name: newName,
                 role: newRole
             }).then(() => closeModal()).catch(err => alert(err.message));
@@ -195,13 +204,13 @@
         function toggleSuspend(uid, currentlySuspended) {
             const targetStatusUpdate = currentlySuspended ? 'active' : 'suspended';
             if (confirm(`Change status to ${targetStatusUpdate}?`)) {
-                db.ref(`users/${uid}`).update({ status: targetStatusUpdate }).catch(err => alert(err.message));
+                update(ref(db, `users/${uid}`), { status: targetStatusUpdate }).catch(err => alert(err.message));
             }
         }
 
         function deleteUser(uid, name) {
             if (confirm(`Are you sure you want to delete ${name}?`)) {
-                db.ref(`users/${uid}`).remove().catch(err => alert(err.message));
+                remove(ref(db, `users/${uid}`)).catch(err => alert(err.message));
             }
         }
 
@@ -237,7 +246,10 @@
             document.getElementById('actionModal').classList.add('hidden');
         }
 
+        document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
+
+        // Run dashboard mount
         initializeAdminDashboard();
     </script>
 </body>
-</html>
+    </html>
