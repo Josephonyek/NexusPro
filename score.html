@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Scores & Matches</title>
+    <title>Live Match Hub & News</title>
     <style>
         :root {
             --bg-color: #0f111a;
@@ -11,11 +11,12 @@
             --text-main: #ffffff;
             --text-muted: #8a90a6;
             --accent: #00e676;
+            --video-accent: #ff1744;
             --border: #24293e;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
@@ -23,7 +24,7 @@
         }
 
         .dashboard-header {
-            max-width: 800px;
+            max-width: 1200px;
             margin: 0 auto 20px auto;
             display: flex;
             justify-content: space-between;
@@ -32,7 +33,8 @@
             gap: 15px;
         }
 
-        h1 { margin: 0; font-size: 1.8rem; color: var(--text-main); }
+        h1 { margin: 0; font-size: 1.8rem; }
+        h2 { font-size: 1.3rem; border-bottom: 2px solid var(--border); padding-bottom: 8px; margin-top: 0; }
 
         select {
             background-color: var(--card-bg);
@@ -40,177 +42,200 @@
             border: 1px solid var(--border);
             padding: 10px 15px;
             border-radius: 6px;
-            font-size: 1rem;
             cursor: pointer;
-            outline: none;
         }
 
-        .scores-grid {
-            max-width: 800px;
+        /* Two Column Layout for Scores & News */
+        .main-layout {
+            max-width: 1200px;
             margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
         }
 
+        @media (max-width: 768px) {
+            .main-layout { grid-template-columns: 1fr; }
+        }
+
+        .panel { display: flex; flex-direction: column; gap: 15px; }
+
+        /* Score Cards */
         .match-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border);
             border-radius: 10px;
-            padding: 20px;
-            transition: transform 0.2s;
+            padding: 18px;
         }
 
-        .match-card:hover {
-            transform: translateY(-2px);
-        }
+        .match-status { font-size: 0.85rem; font-weight: bold; color: var(--accent); margin-bottom: 10px; text-transform: uppercase;}
+        .team-row { display: flex; justify-content: space-between; align-items: center; margin: 8px 0; }
+        .team-info { display: flex; align-items: center; gap: 10px; }
+        .team-logo { width: 25px; height: 25px; object-fit: contain; }
+        .team-score { font-size: 1.3rem; font-weight: 700; }
 
-        .match-status {
-            font-size: 0.85rem;
-            font-weight: bold;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 12px;
-            letter-spacing: 1px;
-        }
-
-        .match-status.final {
-            color: var(--text-muted);
-        }
-
-        .team-container {
+        /* News & Video Highlight Cards */
+        .news-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
             display: flex;
             flex-direction: column;
-            gap: 12px;
         }
 
-        .team-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .news-img-wrapper { position: relative; width: 100%; height: 180px; background: #000; }
+        .news-img { width: 100%; height: 100%; object-fit: cover; }
+        
+        /* Video Badge styling if it contains an ESPN video play package */
+        .video-badge {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: var(--video-accent);
+            color: white;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border-radius: 4px;
+            text-transform: uppercase;
         }
 
-        .team-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
+        .news-content { padding: 15px; }
+        .news-title { font-size: 1.05rem; font-weight: 600; margin: 0 0 8px 0; color: var(--text-main); text-decoration: none; display: block; }
+        .news-title:hover { color: var(--accent); }
+        .news-desc { font-size: 0.9rem; color: var(--text-muted); margin: 0; line-height: 1.4; }
 
-        .team-logo {
-            width: 30px;
-            height: 30px;
-            object-fit: contain;
-        }
-
-        .team-name {
-            font-size: 1.1rem;
-            font-weight: 500;
-        }
-
-        .team-score {
-            font-size: 1.4rem;
-            font-weight: 700;
-        }
-
-        .loading, .error-msg, .no-matches {
-            text-align: center;
-            padding: 40px;
-            color: var(--text-muted);
-            font-size: 1.1rem;
-        }
+        .loading, .empty { text-align: center; color: var(--text-muted); padding: 30px; }
     </style>
 </head>
 <body>
 
     <div class="dashboard-header">
-        <h1>Live Match Hub</h1>
+        <h1>Live Arena</h1>
         <select id="league-selector">
             <option value="soccer/eng.1">⚽ Premier League</option>
             <option value="soccer/uefa.champions">⚽ Champions League</option>
-            <option value="soccer/esp.1">⚽ La Liga</option>
+            <option value="soccer/fifa">🏆 FIFA International</option>
             <option value="basketball/nba">🏀 NBA</option>
         </select>
     </div>
 
-    <div id="scores-container" class="scores-grid">
-        <div class="loading">Loading live fixtures...</div>
+    <div class="main-layout">
+        <div class="panel">
+            <h2>Live Scores</h2>
+            <div id="scores-container"><div class="loading">Loading scores...</div></div>
+        </div>
+
+        <div class="panel">
+            <h2>Latest News & Highlights</h2>
+            <div id="news-container"><div class="loading">Loading news feeds...</div></div>
+        </div>
     </div>
 
     <script>
         const leagueSelector = document.getElementById('league-selector');
-        const container = document.getElementById('scores-container');
+        const scoresContainer = document.getElementById('scores-container');
+        const newsContainer = document.getElementById('news-container');
 
-        async function loadScores() {
-            container.innerHTML = '<div class="loading">Updating latest scores...</div>';
-            
-            // Split the selector value into sport and league string parameters
-            const [sport, league] = leagueSelector.value.split('/');
-
+        async function fetchScores(sport, league) {
             try {
-                // Call your internal Vercel Serverless Function Proxy
-                const response = await fetch(`/api/scores?sport=${sport}&league=${league}`);
-                if (!response.ok) throw new Error('Network response failure');
-                
-                const data = await response.json();
+                const res = await fetch(`/api/scores?type=scores&sport=${sport}&league=${league}`);
+                const data = await res.json();
                 const events = data.events || [];
 
                 if (events.length === 0) {
-                    container.innerHTML = '<div class="no-matches">No matches scheduled or active for today.</div>';
+                    scoresContainer.innerHTML = '<div class="empty">No matches active or scheduled today.</div>';
                     return;
                 }
 
-                container.innerHTML = ''; // Clear status wrapper
-
+                scoresContainer.innerHTML = '';
                 events.forEach(match => {
-                    const matchCard = document.createElement('div');
-                    matchCard.className = 'match-card';
-
-                    const statusText = match.status?.type?.detail || 'Scheduled';
-                    const isFinal = match.status?.type?.completed;
-                    
-                    // Competitors list contains the home/away teams
+                    const status = match.status?.type?.detail || 'Scheduled';
                     const competitors = match.competitions?.[0]?.competitors || [];
                     
                     let teamsHTML = '';
-                    competitors.forEach(competitor => {
-                        const teamName = competitor.team?.displayName || 'Unknown Team';
-                        const teamLogo = competitor.team?.logo || 'https://via.placeholder.com/30';
-                        const score = competitor.score || '0';
-
+                    competitors.forEach(team => {
                         teamsHTML += `
                             <div class="team-row">
                                 <div class="team-info">
-                                    <img class="team-logo" src="${teamLogo}" alt="${teamName}">
-                                    <span class="team-name">${teamName}</span>
+                                    <img class="team-logo" src="${team.team?.logo || 'https://via.placeholder.com/25'}" alt="">
+                                    <span>${team.team?.displayName}</span>
                                 </div>
-                                <div class="team-score">${score}</div>
+                                <div class="team-score">${team.score || 0}</div>
                             </div>
                         `;
                     });
 
-                    matchCard.innerHTML = `
-                        <div class="match-status ${isFinal ? 'final' : ''}">${statusText}</div>
-                        <div class="team-container">
+                    scoresContainer.innerHTML += `
+                        <div class="match-card">
+                            <div class="match-status">${status}</div>
                             ${teamsHTML}
                         </div>
                     `;
-                    container.appendChild(matchCard);
                 });
-
-            } catch (error) {
-                console.error('Error rendering match dashboard:', error);
-                container.innerHTML = '<div class="error-msg">Failed to grab real-time data. Please check your configurations.</div>';
+            } catch (err) {
+                scoresContainer.innerHTML = '<div class="empty">Error loading match metrics.</div>';
             }
         }
 
-        // Event listeners for drop menu selection updates
-        leagueSelector.addEventListener('change', loadScores);
-        
-        // Initial setup load
-        loadScores();
+        async function fetchNews(sport, league) {
+            try {
+                const res = await fetch(`/api/scores?type=news&sport=${sport}&league=${league}`);
+                const data = await res.json();
+                const articles = data.articles || [];
 
-        // Optional: Auto refresh every 30 seconds for live updates
-        setInterval(loadScores, 30000);
+                if (articles.length === 0) {
+                    newsContainer.innerHTML = '<div class="empty">No breaking stories found.</div>';
+                    return;
+                }
+
+                newsContainer.innerHTML = '';
+                articles.slice(0, 8).forEach(article => { // Cap display out at top 8 items
+                    const image = article.images?.[0]?.url || 'https://via.placeholder.com/400x180?text=Sports+News';
+                    const description = article.description || article.headline || '';
+                    
+                    // Check if there are attached streaming media objects inside ESPN's structural metadata
+                    const hasVideo = article.categories?.some(cat => cat.type === 'video') || article.links?.web?.href?.includes('/video/');
+                    const articleLink = article.links?.web?.href || '#';
+
+                    newsContainer.innerHTML += `
+                        <div class="news-card">
+                            <div class="news-img-wrapper">
+                                <img class="news-img" src="${image}" alt="">
+                                ${hasVideo ? '<div class="video-badge">▶ Video Highlight</div>' : ''}
+                            </div>
+                            <div class="news-content">
+                                <a class="news-title" href="${articleLink}" target="_blank">${article.headline}</a>
+                                <p class="news-desc">${description}</p>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (err) {
+                newsContainer.innerHTML = '<div class="empty">Error retrieving latest news articles.</div>';
+            }
+        }
+
+        function triggerDashboardRefresh() {
+            scoresContainer.innerHTML = '<div class="loading">Refreshing match track...</div>';
+            newsContainer.innerHTML = '<div class="loading">Syncing columns...</div>';
+            
+            const [sport, league] = leagueSelector.value.split('/');
+            fetchScores(sport, league);
+            fetchNews(sport, league);
+        }
+
+        leagueSelector.addEventListener('change', triggerDashboardRefresh);
+        
+        // Boot execution
+        triggerDashboardRefresh();
+        
+        // Auto Sync scores every 45 seconds
+        setInterval(() => {
+            const [sport, league] = leagueSelector.value.split('/');
+            fetchScores(sport, league);
+        }, 45000);
     </script>
 </body>
-  </html>
+    </html>
