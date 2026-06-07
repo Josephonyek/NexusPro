@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verified Health Hub & News</title>
+    <title>Verified Health & News Center</title>
     <style>
         :root {
             --bg-color: #0b0f19;
@@ -27,7 +27,6 @@
         h1 { margin: 0 0 10px 0; font-size: 2rem; color: var(--health-accent); }
         .subtitle { color: var(--text-muted); margin: 0; }
 
-        /* Split Setup: Controls at top, Results in split grid */
         .search-sections {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -74,7 +73,6 @@
         }
         button:hover { opacity: 0.9; }
 
-        /* Main Dashboard Grid Split */
         .dashboard-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -106,7 +104,7 @@
         .advice-text { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin: 0; }
         .advice-link { display: inline-block; margin-top: 12px; color: var(--health-accent); text-decoration: none; font-size: 0.9rem; }
 
-        /* News Cards with Images */
+        /* GNews Layout Interface Elements */
         .news-card {
             background-color: var(--card-bg);
             border: 1px solid var(--border);
@@ -118,11 +116,12 @@
         }
         .news-img {
             width: 100%;
-            height: 180px;
+            height: 200px;
             object-fit: cover;
             background-color: #1f2937;
         }
         .news-body { padding: 15px; }
+        .news-source { font-size: 0.75rem; color: var(--health-accent); font-weight: bold; text-transform: uppercase; margin-bottom: 6px; display: block; }
         .news-title { font-size: 1.1rem; font-weight: 600; margin: 0 0 8px 0; color: #fff; text-decoration: none; display: block; }
         .news-title:hover { color: var(--health-accent); }
         .news-text { color: var(--text-muted); font-size: 0.9rem; line-height: 1.4; margin: 0; }
@@ -135,7 +134,7 @@
     <div class="container">
         <header>
             <h1>Verified Health & News Center</h1>
-            <p class="subtitle">Real-time headlines and clinical advisories in one dashboard</p>
+            <p class="subtitle">Global health journalism and clinical advisories unified in one view</p>
         </header>
 
         <div class="search-sections">
@@ -164,14 +163,14 @@
             <div>
                 <h3 class="column-title">Medical Advisories</h3>
                 <div id="advice-container">
-                    <div class="loading">Enter metrics above to load clinical briefs...</div>
+                    <div class="loading">Select metric updates above to drop clinical guidelines...</div>
                 </div>
             </div>
 
             <div>
-                <h3 class="column-title">Breaking Health News</h3>
+                <h3 class="column-title">Top Health Headlines</h3>
                 <div id="news-container">
-                    <div class="loading">Streaming medical news feed...</div>
+                    <div class="loading">Connecting to verified health news wire...</div>
                 </div>
             </div>
         </div>
@@ -181,10 +180,9 @@
         const adviceContainer = document.getElementById('advice-container');
         const newsContainer = document.getElementById('news-container');
 
-        // Render function for Clinical Guidance
         function renderAdvice(topics) {
             if (!topics || topics.length === 0) {
-                adviceContainer.innerHTML = '<div class="loading">No records found. Try simple terms like "Diabetes".</div>';
+                adviceContainer.innerHTML = '<div class="loading">No matching entries found. Try terms like "Diabetes".</div>';
                 return;
             }
             adviceContainer.innerHTML = '';
@@ -199,11 +197,10 @@
             });
         }
 
-        // Fetch Advice Lists
         async function getRecommendations() {
             const age = document.getElementById('user-age').value;
             const sex = document.getElementById('user-sex').value;
-            adviceContainer.innerHTML = '<div class="loading">Compiling entries...</div>';
+            adviceContainer.innerHTML = '<div class="loading">Compiling clinical guidelines...</div>';
             try {
                 const res = await fetch(`/api/healthAdvice?type=recommendations&age=${age}&sex=${sex}`);
                 const data = await res.json();
@@ -224,48 +221,45 @@
                 if (!Array.isArray(topics)) topics = [topics];
                 renderAdvice(topics);
             } catch {
-                adviceContainer.innerHTML = '<div class="loading">Search connection dropped.</div>';
+                adviceContainer.innerHTML = '<div class="loading">Search query connection dropped.</div>';
             }
         }
 
-        // Fetch and Render Live Health News with Images
+        // Fetch Verified GNews Records
         async function fetchHealthNews() {
             try {
                 const res = await fetch('/api/healthAdvice?type=news');
                 const data = await res.json();
-                const articles = data.items || [];
+                const articles = data.articles || [];
 
                 if (articles.length === 0) {
-                    newsContainer.innerHTML = '<div class="loading">No health news stories available right now.</div>';
+                    newsContainer.innerHTML = '<div class="loading">No news found. Ensure your GNEWS_API_KEY is configured on Vercel.</div>';
                     return;
                 }
 
                 newsContainer.innerHTML = '';
-                articles.slice(0, 6).forEach(story => {
-                    // Extract an image if available, else fall back to a generic fallback image
-                    const imageSrc = story.enclosure?.link || story.thumbnail || 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=500&q=80';
-                    
-                    // Clean description text from HTML snippets
-                    const tempElement = document.createElement('div');
-                    tempElement.innerHTML = story.description || '';
-                    const cleanDescription = tempElement.innerText.substring(0, 140) + '...';
+                articles.forEach(article => {
+                    const fallbackImg = 'https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=500&q=80';
+                    const imageSrc = article.image || fallbackImg;
+                    const publisher = article.source?.name || 'Verified Publisher';
 
                     newsContainer.innerHTML += `
                         <div class="news-card">
-                            <img class="news-img" src="${imageSrc}" alt="">
+                            <img class="news-img" src="${imageSrc}" alt="" onerror="this.src='${fallbackImg}'">
                             <div class="news-body">
-                                <a class="news-title" href="${story.link}" target="_blank">${story.title}</a>
-                                <p class="news-text">${cleanDescription}</p>
+                                <span class="news-source">${publisher}</span>
+                                <a class="news-title" href="${article.url}" target="_blank">${article.title}</a>
+                                <p class="news-text">${article.description || ''}</p>
                             </div>
                         </div>
                     `;
                 });
             } catch (err) {
-                newsContainer.innerHTML = '<div class="loading">Failed to stream live news cards.</div>';
+                newsContainer.innerHTML = '<div class="loading">Failed to stream live news feeds.</div>';
             }
         }
 
-        // Initialize News Feed immediately on page mount
+        // Initialize News layout execution on load
         fetchHealthNews();
     </script>
 </body>
