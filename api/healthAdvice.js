@@ -2,25 +2,30 @@
 
 export default async function handler(req, res) {
   const { type = 'recommendations', age = '25', sex = 'male', keyword = '' } = req.query;
-  const baseUrl = process.env.HEALTH_API_BASE_URL || 'https://odphp.health.gov/myhealthfinder/api/v4';
+  const baseUrl = 'https://odphp.health.gov/myhealthfinder/api/v4';
+  const gnewsApiKey = process.env.GNEWS_API_KEY;
 
   try {
-    // NEW MODE: Breaking Health News & Articles
+    // NEW UPDATED MODE: Verified Global Health News via GNews API
     if (type === 'news') {
-      // Fetching live articles from a major health news wire converted cleanly to JSON
-      const newsFeedUrl = 'https://api.rss2json.com/v1/api.json?rss_url=https%3A%2F%2Fwww.medicalnewstoday.com%2Ffeed%2Frss';
+      if (!gnewsApiKey) {
+        return res.status(500).json({ error: 'GNEWS_API_KEY environment variable is missing on Vercel' });
+      }
+
+      // Querying specifically for health topics, sorted by latest articles
+      const newsUrl = `https://gnews.io/api/v4/top-headlines?category=health&lang=en&apikey=${gnewsApiKey}`;
       
-      const newsResponse = await fetch(newsFeedUrl);
-      if (!newsResponse.ok) throw new Error('Health news wire failed to respond');
+      const newsResponse = await fetch(newsUrl);
+      if (!newsResponse.ok) throw new Error(`GNews responded with status: ${newsResponse.status}`);
       
       const newsData = await newsResponse.json();
       
-      // Cache news items for 30 minutes (1800 seconds)
-      res.setHeader('Cache-Control', 's-maxage=1800, stale-while-revalidate=900');
+      // Cache news results on Vercel Edge for 1 hour to protect your daily free tier limits
+      res.setHeader('Cache-Control', 's-maxage=3600, stale-while-revalidate=1800');
       return res.status(200).json(newsData);
     }
 
-    // Existing modes: Search and Daily recommendations
+    // Existing Clinical Advice and Keyword Search Modes
     let targetUrl = '';
     if (type === 'search') {
       targetUrl = `${baseUrl}/topicsearch.json?keyword=${encodeURIComponent(keyword)}`;
@@ -36,6 +41,6 @@ export default async function handler(req, res) {
     return res.status(200).json(data);
 
   } catch (err) {
-    return res.status(500).json({ error: 'Failed to complete server connection', details: err.message });
+    return res.status(500).json({ error: 'Failed to execute query mapping', details: err.message });
   }
-}
+        }
