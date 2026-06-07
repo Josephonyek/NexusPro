@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verified Health Hub</title>
+    <title>Verified Health Advisor Hub</title>
     <style>
         :root {
             --bg-color: #0b0f19;
@@ -55,20 +55,22 @@
             background-color: #1f2937;
             color: white;
             border: 1px solid var(--border);
-            padding: 10px;
+            padding: 11px;
             border-radius: 6px;
             flex: 1;
             outline: none;
+            font-size: 0.95rem;
         }
 
         button {
             background-color: var(--health-accent);
             color: #000;
             border: none;
-            padding: 10px 18px;
+            padding: 11px 18px;
             border-radius: 6px;
             font-weight: 600;
             cursor: pointer;
+            font-size: 0.95rem;
         }
         button:hover { opacity: 0.9; }
 
@@ -129,9 +131,10 @@
     <script>
         const resultDiv = document.getElementById('health-results');
 
+        // Standardized renderer that handles both API layout configurations smoothly
         function renderCards(topics) {
             if (!topics || topics.length === 0) {
-                resultDiv.innerHTML = '<div class="loading">No matching medical briefs found. Try another query phrase.</div>';
+                resultDiv.innerHTML = '<div class="loading">No matching medical briefs found. Try single terms like "Diabetes", "Heart", "Vaccine", or "Obesity".</div>';
                 return;
             }
 
@@ -140,8 +143,9 @@
                 const card = document.createElement('div');
                 card.className = 'advice-card';
                 
+                // Safely match structural object parameters across types
                 const headline = item.Title || 'Medical Guideline Update';
-                const description = item.Notes || item.Teaser || 'Click through to review specific resource materials.';
+                const description = item.Notes || item.Teaser || 'Click below to review official resource materials.';
                 const referenceLink = item.AccessibleVersion || '#';
 
                 card.innerHTML = `
@@ -161,6 +165,8 @@
             try {
                 const res = await fetch(`/api/healthAdvice?type=recommendations&age=${age}&sex=${sex}`);
                 const data = await res.json();
+                
+                // Accessing recommendations list format pathway
                 const topics = data.Result?.MyHealthFinder?.ResultObjects?.ResultObject || [];
                 renderCards(topics);
             } catch (err) {
@@ -177,7 +183,15 @@
             try {
                 const res = await fetch(`/api/healthAdvice?type=search&keyword=${keyword}`);
                 const data = await res.json();
-                const topics = data.Result?.MyHealthFinder?.ResultObjects?.ResultObject || [];
+                
+                // Read from data.Result.Topics.Topic if it's a keyword search return
+                let topics = [];
+                if (data.Result?.Topics?.Topic) {
+                    topics = Array.isArray(data.Result.Topics.Topic) ? data.Result.Topics.Topic : [data.Result.Topics.Topic];
+                } else if (data.Result?.MyHealthFinder?.ResultObjects?.ResultObject) {
+                    topics = data.Result.MyHealthFinder.ResultObjects.ResultObject;
+                }
+                
                 renderCards(topics);
             } catch (err) {
                 resultDiv.innerHTML = '<div class="loading" style="color: #ef4444;">Error scanning library entries.</div>';
@@ -185,5 +199,4 @@
         }
     </script>
 </body>
-</html>
-
+    </html>
