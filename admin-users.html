@@ -91,46 +91,57 @@
                 db = getDatabase(app);
                 auth = getAuth(app);
 
-                // GATEKEEPER CHECK WITH ACTIVE ACCOUNT RESCUE RE-AUTHENTICATION
+                // FIXED ASYNCHRONOUS GATEKEEPER CHECK
                 onAuthStateChanged(auth, async (user) => {
                     if (!user) {
-                        console.log("No active token session found. Attempting credential rescue fallback...");
-                        
+                        console.log("No active token session found. Running credential rescue fallback...");
                         try {
-                            // ⚠️ ADJUST THESE VALUES WITH YOUR SPECIFIC ACCOUNT TO FORCE SIGN-IN
+                            // ⚠️ TO BYPASS: ENTER YOUR ACTUAL ADMIN ACCOUNT EMAIL & PASSWORD HERE
                             await signInWithEmailAndPassword(auth, "your-admin-email@example.com", "your-admin-password");
-                            console.log("Authentication fallback complete. Reloading data framework...");
-                            return; 
+                            console.log("Authentication complete. Re-evaluating state lifecycle...");
                         } catch (signinError) {
-                            alert("🔴 Firebase Authentication Failure: Page session lost and bypass failed.\nReason: " + signinError.message);
+                            console.error("Authentication bypass completely failed:", signinError.message);
                             window.location.href = 'index.html'; 
-                            return;
                         }
+                        // CRITICAL BUG FIX: Halt execution of this specific block instance immediately 
+                        // so it does not continue running down into the redirects below!
+                        return; 
                     }
 
                     try {
-                        // Gather account attributes matching authenticated UID
+                        console.log(`🟢 Verified User Context: ${user.uid}`);
+                        
                         const userCheckRef = ref(db, `users/${user.uid}`);
                         const snapshot = await get(userCheckRef);
 
                         if (snapshot.exists()) {
                             const userData = snapshot.val();
+                            console.log("Database Node Data:", userData);
                             
                             if (userData.role === 'admin') {
                                 const statusEl = document.getElementById('loadingStatusText');
-                                if (statusEl) statusEl.innerText = "Access Authorized. Streaming user node parameters...";
+                                if (statusEl) statusEl.innerText = "Access Authorized. Streaming user node records...";
                                 listenToUsers();
                             } else {
-                                alert(`⛔ Access Denied: Your assigned database role string is "${userData.role}". Page restricts access strictly to "admin".`);
+                                alert(`⛔ Access Denied: Your account role is marked as "${userData.role}". Administrative clearance required.`);
                                 window.location.href = 'dashboard.html';
                             }
                         } else {
-                            alert(`⛔ System Routing Blocked: No profile node folder initialized at "users/${user.uid}" within your Realtime DB. Check node mapping.`);
-                            window.location.href = 'dashboard.html';
+                            // If the node doesn't exist yet, we don't kick you out instantly while debugging!
+                            // Instead, let's log the error clearly so you can write a test node.
+                            console.warn(`No node path matching users/${user.uid} found in database tree.`);
+                            document.getElementById('loadingStatusText').innerHTML = 
+                                `<span class="text-yellow-500 font-bold">⚠️ Security Verification Alert</span><br>
+                                 Logged in successfully, but your user ID profile path (<code class="bg-black px-1.5 py-0.5 rounded text-red-400">users/${user.uid}</code>) doesn't exist inside your Firebase Console yet.<br>
+                                 Go to Firebase Realtime Database and add a role key of <code class="text-violet-400">"admin"</code> directly under that path string to open access.`;
                         }
                     } catch (error) {
-                        alert("💥 Realtime Database read timed out or crashed: " + error.message);
-                        window.location.href = 'dashboard.html';
+                        console.error("Realtime Database read error:", error);
+                        document.getElementById('userTableBody').innerHTML = 
+                            `<tr><td colspan="4" class="p-8 text-center text-red-400 font-medium">
+                                ⚠️ Database Connection Blocked.<br>
+                                <span class="text-xs text-gray-500 block mt-1">Reason: ${error.message}</span>
+                            </td></tr>`;
                     }
                 });
 
@@ -152,7 +163,7 @@
                 tableBody.innerHTML = '';
                 
                 if (!snapshot.exists()) {
-                    tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No active entries found inside database node.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No user node entries found inside database.</td></tr>';
                     return;
                 }
 
@@ -298,4 +309,4 @@
         initializeAdminDashboard();
     </script>
 </body>
-    </html>
+</html>
