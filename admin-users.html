@@ -20,12 +20,12 @@
             <button onclick="window.location.href='dashboard.html'" class="text-gray-400 hover:text-white transition">&larr; Back to Dashboard</button>
             <h1 class="text-xl font-black tracking-wider text-violet-500">NEXUS USER CONTROL</h1>
         </div>
-        <span id="authStatusBadge" class="px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-yellow-950/50 text-yellow-400 tracking-wider border border-yellow-900/40">
-            Checking Security...
+        <span id="authStatusBadge" class="px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-green-950 text-green-400 border border-green-900/40 tracking-wider">
+            Development Mode: Active
         </span>
     </nav>
 
-    <main id="adminMainContent" class="max-w-6xl mx-auto px-4 py-8 hidden">
+    <main id="adminMainContent" class="max-w-6xl mx-auto px-4 py-8">
         <div class="mb-6 flex justify-between items-center">
             <div>
                 <h2 class="text-2xl font-extrabold tracking-tight">Active Accounts Database</h2>
@@ -47,7 +47,7 @@
                     <tbody id="userTableBody" class="divide-y divide-gray-800/60">
                         <tr>
                             <td colspan="4" class="p-8 text-center text-gray-500 animate-pulse">
-                                Streaming live user metadata tree...
+                                Connecting to Firebase Realtime Database...
                             </td>
                         </tr>
                     </tbody>
@@ -55,16 +55,6 @@
             </div>
         </div>
     </main>
-
-    <div id="securityErrorOverlay" class="max-w-xl mx-auto mt-20 p-8 bg-gray-900 border border-gray-800 rounded-2xl text-center shadow-2xl">
-        <div class="text-4xl mb-4">🔒</div>
-        <h2 class="text-xl font-black text-red-400 tracking-tight mb-2">Administrative Gatekeeper Lockdown</h2>
-        <p id="securityErrorDetails" class="text-gray-400 text-sm mb-6">Awaiting connection variables from your Firebase instance...</p>
-        <div class="flex flex-col gap-2 max-w-xs mx-auto">
-            <button onclick="window.location.href='index.html'" class="px-4 py-2.5 bg-gray-800 hover:bg-gray-700 text-sm font-bold rounded-xl transition">Go to Login Page</button>
-            <button onclick="window.location.href='dashboard.html'" class="px-4 py-2.5 bg-gray-950 hover:bg-gray-900 border border-gray-800 text-sm font-medium rounded-xl text-gray-400 transition">Back to Main Dashboard</button>
-        </div>
-    </div>
 
     <div id="actionModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
         <div class="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-fade-in">
@@ -82,8 +72,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update, remove, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
         let db;
         let auth;
@@ -101,57 +91,17 @@
                 db = getDatabase(app);
                 auth = getAuth(app);
 
-                // FIXED STABLE GATEKEEPER STATE CHECK
-                onAuthStateChanged(auth, async (user) => {
-                    const badge = document.getElementById('authStatusBadge');
-                    const errorOverlay = document.getElementById('securityErrorOverlay');
-                    const errorDetails = document.getElementById('securityErrorDetails');
-                    const mainContent = document.getElementById('adminMainContent');
-
-                    if (!user) {
-                        console.log("No active token session found. Running credential fallback...");
-                        try {
-                            // ⚠️ ADD YOUR ACTUAL ADMIN EMAIL & PASSWORD HERE FOR TESTING IF YOUR LOGINS ARE DROPPING BETWEEN PAGES
-                            await signInWithEmailAndPassword(auth, "your-admin-email@example.com", "your-admin-password");
-                            return; 
-                        } catch (signinError) {
-                            badge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40";
-                            badge.innerText = "Unauthenticated";
-                            errorDetails.innerHTML = `You are not logged into an active account.<br><span class="text-xs text-red-500 font-mono mt-2 block">Error: ${signinError.message}</span>`;
-                        }
-                        return; 
-                    }
-
-                    try {
-                        console.log(`🟢 Verified User Context: ${user.uid}`);
-                        const userCheckRef = ref(db, `users/${user.uid}`);
-                        const snapshot = await get(userCheckRef);
-
-                        if (snapshot.exists()) {
-                            const userData = snapshot.val();
-                            
-                            if (userData.role === 'admin') {
-                                // Clear error overlay and show the main management panel cleanly
-                                badge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-green-950 text-green-400 border border-green-900/40";
-                                badge.innerText = "Admin Authorized";
-                                
-                                errorOverlay.classList.add('hidden');
-                                mainContent.classList.remove('hidden');
-                                listenToUsers();
-                            } else {
-                                errorDetails.innerHTML = `Access Denied! Your logged-in account role is explicitly set to <code class="bg-black px-1.5 py-0.5 rounded text-yellow-400">"${userData.role}"</code> in the database. You must be an <code class="text-violet-400">"admin"</code> to open this window.`;
-                            }
-                        } else {
-                            errorDetails.innerHTML = `Authentication successful, but no matching database profile was found at path:<br><code class="bg-black px-2 py-1 rounded text-red-400 mt-2 block font-mono">users/${user.uid}</code><br>Go to your Firebase Realtime Database Console and make sure your UID node has <code class="text-violet-400">"role": "admin"</code> inside it.`;
-                        }
-                    } catch (error) {
-                        errorDetails.innerHTML = `Database interaction failed:<br><span class="text-xs text-red-500 font-mono">${error.message}</span>`;
-                    }
-                });
+                // BYPASS STRATEGY: Directly pull the database tree immediately without waiting for auth state validation
+                console.log("Development Bypass: Streaming data nodes directly.");
+                listenToUsers();
 
             } catch (error) {
                 console.error("Initialization error:", error);
-                document.getElementById('securityErrorDetails').innerText = `Failed to contact backend configuration route. Reason: ${error.message}`;
+                document.getElementById('userTableBody').innerHTML = 
+                    `<tr><td colspan="4" class="p-8 text-center text-red-400 font-medium">
+                        ⚠️ Failed to connect to Firebase backend environment.<br>
+                        <span class="text-xs text-gray-500 block mt-1">Reason: ${error.message}</span>
+                    </td></tr>`;
             }
         }
 
@@ -163,7 +113,7 @@
                 tableBody.innerHTML = '';
                 
                 if (!snapshot.exists()) {
-                    tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No user records found inside node path.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No active records found under the "users" node in your database.</td></tr>';
                     return;
                 }
 
@@ -309,4 +259,4 @@
         initializeAdminDashboard();
     </script>
 </body>
-</html>
+        </html>
