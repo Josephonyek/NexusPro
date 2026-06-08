@@ -67,12 +67,13 @@
             </div>
         </div>
     </div>
-
-    <script type="module">
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        import { getDatabase, ref, onValue, update, remove, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
         let db;
+        let auth;
         let currentActiveTargetUid = '';
 
         async function initializeAdminDashboard() {
@@ -85,9 +86,39 @@
                 // Initialize modular App instance
                 const app = initializeApp(firebaseConfig);
                 db = getDatabase(app);
+                auth = getAuth(app);
 
-                // Run data stream subscription
-                listenToUsers();
+                // ENFORCE ADMIN SECURITY CHECK ON STATE CHANGE
+                onAuthStateChanged(auth, async (user) => {
+                    if (!user) {
+                        // Not logged in at all? Kick them to the login page
+                        window.location.href = 'index.html'; 
+                        return;
+                    }
+
+                    // Fetch this specific user's role from your Realtime Database
+                    const userCheckRef = ref(db, `users/${user.uid}`);
+                    const snapshot = await get(userCheckRef);
+
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        
+                        // Strictly verify if they are an admin
+                        if (userData.role !== 'admin') {
+                            alert('Access Denied: Administrative Clearance Required.');
+                            window.location.href = 'dashboard.html'; // Kick students back to the user dashboard
+                            return;
+                        }
+                    } else {
+                        // No profile node exists? Keep them out.
+                        window.location.href = 'dashboard.html';
+                        return;
+                    }
+
+                    // If they pass the checks, load the user registry table data
+                    listenToUsers();
+                });
+
             } catch (error) {
                 console.error("Initialization error:", error);
                 document.getElementById('userTableBody').innerHTML = 
@@ -250,6 +281,9 @@
 
         // Run dashboard mount
         initializeAdminDashboard();
-    </script>
+                    </script>
+                
+           
+            
 </body>
     </html>
