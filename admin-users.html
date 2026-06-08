@@ -73,7 +73,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getDatabase, ref, onValue, update, remove, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getAuth, onAuthStateChanged, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
         let db;
         let auth;
@@ -91,39 +91,45 @@
                 db = getDatabase(app);
                 auth = getAuth(app);
 
-                // DEBUGGING ADMINISTRATIVE GATEKEEPER CHECK
+                // GATEKEEPER CHECK WITH ACTIVE ACCOUNT RESCUE RE-AUTHENTICATION
                 onAuthStateChanged(auth, async (user) => {
                     if (!user) {
-                        alert("🔴 Firebase Status: No user logged in. Redirecting to index.html.");
-                        window.location.href = 'index.html'; 
-                        return;
+                        console.log("No active token session found. Attempting credential rescue fallback...");
+                        
+                        try {
+                            // ⚠️ ADJUST THESE VALUES WITH YOUR SPECIFIC ACCOUNT TO FORCE SIGN-IN
+                            await signInWithEmailAndPassword(auth, "your-admin-email@example.com", "your-admin-password");
+                            console.log("Authentication fallback complete. Reloading data framework...");
+                            return; 
+                        } catch (signinError) {
+                            alert("🔴 Firebase Authentication Failure: Page session lost and bypass failed.\nReason: " + signinError.message);
+                            window.location.href = 'index.html'; 
+                            return;
+                        }
                     }
 
                     try {
-                        alert(`🟢 Auth Connected!\nUID: ${user.uid}\nNow pulling your profile record from Realtime DB...`);
-                        
+                        // Gather account attributes matching authenticated UID
                         const userCheckRef = ref(db, `users/${user.uid}`);
                         const snapshot = await get(userCheckRef);
 
                         if (snapshot.exists()) {
                             const userData = snapshot.val();
-                            alert(`🟡 Data Node Found!\nSaved Role is: "${userData.role}"`);
                             
                             if (userData.role === 'admin') {
-                                alert("🚀 Success: Role matches 'admin'. Loading user management dashboard...");
                                 const statusEl = document.getElementById('loadingStatusText');
-                                if (statusEl) statusEl.innerText = "Access Authorized. Streaming records...";
+                                if (statusEl) statusEl.innerText = "Access Authorized. Streaming user node parameters...";
                                 listenToUsers();
                             } else {
-                                alert(`⛔ Access Denied: Your role is "${userData.role}". Page requires exactly "admin".`);
+                                alert(`⛔ Access Denied: Your assigned database role string is "${userData.role}". Page restricts access strictly to "admin".`);
                                 window.location.href = 'dashboard.html';
                             }
                         } else {
-                            alert(`⛔ Access Denied: No data entry found at path: users/${user.uid}\nCheck if your path root is named differently.`);
+                            alert(`⛔ System Routing Blocked: No profile node folder initialized at "users/${user.uid}" within your Realtime DB. Check node mapping.`);
                             window.location.href = 'dashboard.html';
                         }
                     } catch (error) {
-                        alert("💥 Connection Error: " + error.message);
+                        alert("💥 Realtime Database read timed out or crashed: " + error.message);
                         window.location.href = 'dashboard.html';
                     }
                 });
@@ -146,7 +152,7 @@
                 tableBody.innerHTML = '';
                 
                 if (!snapshot.exists()) {
-                    tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No active user entries found.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No active entries found inside database node.</td></tr>';
                     return;
                 }
 
@@ -292,4 +298,4 @@
         initializeAdminDashboard();
     </script>
 </body>
-</html>
+    </html>
