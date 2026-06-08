@@ -47,7 +47,7 @@
                     <tbody id="userTableBody" class="divide-y divide-gray-800/60">
                         <tr>
                             <td colspan="4" class="p-8 text-center text-gray-500 animate-pulse" id="loadingStatusText">
-                                Verifying administrative clearance security parameters...
+                                Running security diagnostic verification...
                             </td>
                         </tr>
                     </tbody>
@@ -91,37 +91,39 @@
                 db = getDatabase(app);
                 auth = getAuth(app);
 
-                // ROCK-SOLID ADMIN GATEKEEPER CHECK
+                // DEBUGGING ADMINISTRATIVE GATEKEEPER CHECK
                 onAuthStateChanged(auth, async (user) => {
                     if (!user) {
-                        console.log("No active user session found. Redirecting to login...");
+                        alert("🔴 Firebase Status: No user logged in. Redirecting to index.html.");
                         window.location.href = 'index.html'; 
                         return;
                     }
 
                     try {
-                        // Fetch the user node matching the active auth runtime account uid string
+                        alert(`🟢 Auth Connected!\nUID: ${user.uid}\nNow pulling your profile record from Realtime DB...`);
+                        
                         const userCheckRef = ref(db, `users/${user.uid}`);
                         const snapshot = await get(userCheckRef);
 
                         if (snapshot.exists()) {
                             const userData = snapshot.val();
+                            alert(`🟡 Data Node Found!\nSaved Role is: "${userData.role}"`);
                             
-                            // Explicit validation check mapping to role database strings
                             if (userData.role === 'admin') {
+                                alert("🚀 Success: Role matches 'admin'. Loading user management dashboard...");
                                 const statusEl = document.getElementById('loadingStatusText');
-                                if (statusEl) statusEl.innerText = "Access Authorized. Streaming user records...";
+                                if (statusEl) statusEl.innerText = "Access Authorized. Streaming records...";
                                 listenToUsers();
                             } else {
-                                alert('Access Denied: Administrative Clearance Required.');
+                                alert(`⛔ Access Denied: Your role is "${userData.role}". Page requires exactly "admin".`);
                                 window.location.href = 'dashboard.html';
                             }
                         } else {
-                            console.warn("User record path node not initialized in database tree structure.");
+                            alert(`⛔ Access Denied: No data entry found at path: users/${user.uid}\nCheck if your path root is named differently.`);
                             window.location.href = 'dashboard.html';
                         }
                     } catch (error) {
-                        console.error("Security authorization evaluation crashed:", error);
+                        alert("💥 Connection Error: " + error.message);
                         window.location.href = 'dashboard.html';
                     }
                 });
@@ -144,7 +146,7 @@
                 tableBody.innerHTML = '';
                 
                 if (!snapshot.exists()) {
-                    tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No active user node entries found. Check path keys.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No active user entries found.</td></tr>';
                     return;
                 }
 
