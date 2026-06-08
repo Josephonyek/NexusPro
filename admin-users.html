@@ -46,7 +46,9 @@
                     </thead>
                     <tbody id="userTableBody" class="divide-y divide-gray-800/60">
                         <tr>
-                            <td colspan="4" class="p-8 text-center text-gray-500 animate-pulse">Initializing cloud database gateway...</td>
+                            <td colspan="4" class="p-8 text-center text-gray-500 animate-pulse" id="loadingStatusText">
+                                Verifying administrative clearance security parameters...
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -67,7 +69,8 @@
             </div>
         </div>
     </div>
-<script type="module">
+
+    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getDatabase, ref, onValue, update, remove, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
         import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
@@ -83,40 +86,48 @@
                 
                 const firebaseConfig = await configResponse.json();
 
-                // Initialize modular App instance
+                // Initialize modular Firebase instances
                 const app = initializeApp(firebaseConfig);
                 db = getDatabase(app);
                 auth = getAuth(app);
 
-                // ENFORCE ADMIN SECURITY CHECK ON STATE CHANGE
+                // STRICT ADMIN GATEKEEPER CHECK
                 onAuthStateChanged(auth, async (user) => {
                     if (!user) {
-                        // Not logged in at all? Kick them to the login page
-                        window.location.href = 'index.html'; 
+                        // Safe delay handle to rule out initialization latency spikes
+                        setTimeout(() => {
+                            if (!auth.currentUser) {
+                                console.log("Unauthenticated guest access detected. Redirecting...");
+                                window.location.href = 'index.html'; 
+                            }
+                        }, 1500);
                         return;
                     }
 
-                    // Fetch this specific user's role from your Realtime Database
-                    const userCheckRef = ref(db, `users/${user.uid}`);
-                    const snapshot = await get(userCheckRef);
+                    try {
+                        // Fetch the user node matching the active auth runtime account uid string
+                        const userCheckRef = ref(db, `users/${user.uid}`);
+                        const snapshot = await get(userCheckRef);
 
-                    if (snapshot.exists()) {
-                        const userData = snapshot.val();
-                        
-                        // Strictly verify if they are an admin
-                        if (userData.role !== 'admin') {
-                            alert('Access Denied: Administrative Clearance Required.');
-                            window.location.href = 'dashboard.html'; // Kick students back to the user dashboard
-                            return;
+                        if (snapshot.exists()) {
+                            const userData = snapshot.val();
+                            
+                            // Explicit validation check mapping to role database strings
+                            if (userData.role === 'admin') {
+                                document.getElementById('loadingStatusText').innerText = "Access Authorized. Streaming user node stream metadata...";
+                                listenToUsers();
+                            } else {
+                                alert('Access Denied: Administrative Clearance Required.');
+                                window.location.href = 'dashboard.html';
+                            }
+                        } else {
+                            console.warn("User record path node not initialized in database tree structure.");
+                            window.location.href = 'dashboard.html';
                         }
-                    } else {
-                        // No profile node exists? Keep them out.
+                    } catch (error) {
+                        console.error("Security authorization evaluation crashed:", error);
                         window.location.href = 'dashboard.html';
-                        return;
                     }
-
-                    // If they pass the checks, load the user registry table data
-                    listenToUsers();
                 });
 
             } catch (error) {
@@ -183,7 +194,7 @@
             });
         }
 
-        // Global Action Event Listener Delegation mapping for modular scope security
+        // Global Event Listener Delegation
         document.getElementById('userTableBody').addEventListener('click', (e) => {
             const btn = e.target.closest('button');
             if (!btn) return;
@@ -279,11 +290,8 @@
 
         document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
 
-        // Run dashboard mount
+        // Run application setup
         initializeAdminDashboard();
-                    </script>
-                
-           
-            
+    </script>
 </body>
-    </html>
+</html>
