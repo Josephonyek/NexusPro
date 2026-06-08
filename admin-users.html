@@ -91,16 +91,11 @@
                 db = getDatabase(app);
                 auth = getAuth(app);
 
-                // STRICT ADMIN GATEKEEPER CHECK
+                // ROCK-SOLID ADMIN GATEKEEPER CHECK
                 onAuthStateChanged(auth, async (user) => {
                     if (!user) {
-                        // Safe delay handle to rule out initialization latency spikes
-                        setTimeout(() => {
-                            if (!auth.currentUser) {
-                                console.log("Unauthenticated guest access detected. Redirecting...");
-                                window.location.href = 'index.html'; 
-                            }
-                        }, 1500);
+                        console.log("No active user session found. Redirecting to login...");
+                        window.location.href = 'index.html'; 
                         return;
                     }
 
@@ -114,7 +109,8 @@
                             
                             // Explicit validation check mapping to role database strings
                             if (userData.role === 'admin') {
-                                document.getElementById('loadingStatusText').innerText = "Access Authorized. Streaming user node stream metadata...";
+                                const statusEl = document.getElementById('loadingStatusText');
+                                if (statusEl) statusEl.innerText = "Access Authorized. Streaming user records...";
                                 listenToUsers();
                             } else {
                                 alert('Access Denied: Administrative Clearance Required.');
