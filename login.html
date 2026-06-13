@@ -7,25 +7,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-950 text-white min-h-screen flex items-center justify-center">
-    <div class="w-full max-w-md p-8 bg-gray-900 rounded-3xl border border-gray-800">
+    <div class="w-full max-w-md p-8 bg-gray-900 rounded-3xl border border-gray-800 shadow-2xl">
         <h1 class="text-3xl font-black text-center mb-2">Welcome Back</h1>
-        <p class="text-center text-gray-400 mb-8">Log in to your Nexus Pro account</p>
+        <p class="text-center text-gray-400 mb-6">Log in to your Nexus Pro account</p>
+
+        <div id="errorMessage" class="hidden p-4 mb-5 text-sm font-semibold rounded-2xl bg-red-950/50 border border-red-900/60 text-red-400 text-center"></div>
 
         <form id="loginForm" class="space-y-5">
             <div>
                 <label class="text-sm text-gray-400">Email Address</label>
                 <input type="email" id="email" required placeholder="you@example.com"
-                       class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-2xl px-4 py-3 focus:outline-none focus:border-blue-500">
+                       class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-2xl px-4 py-3 focus:outline-none focus:border-blue-500 transition">
             </div>
 
             <div>
                 <label class="text-sm text-gray-400">Password</label>
                 <input type="password" id="password" required placeholder="••••••••"
-                       class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-2xl px-4 py-3 focus:outline-none focus:border-blue-500">
+                       class="w-full mt-1 bg-gray-800 border border-gray-700 rounded-2xl px-4 py-3 focus:outline-none focus:border-blue-500 transition">
             </div>
 
-            <button type="submit"
-                    class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 rounded-2xl font-bold text-lg transition">
+            <button type="submit" id="submitBtn"
+                    class="w-full py-3.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-800 disabled:text-gray-500 disabled:cursor-not-allowed rounded-2xl font-bold text-lg transition">
                 Log In
             </button>
         </form>
@@ -38,4 +40,4 @@
 
     <script src="login.js"></script>
 </body>
-    </html>
+</html>
