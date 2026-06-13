@@ -1,4 +1,4 @@
-// Defensive input sanitization helper
+// Defensive input sanitization helper to stop XSS injection
 function sanitizeInput(str) {
     const div = document.createElement('div');
     div.textContent = str;
@@ -9,10 +9,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     const userToken = localStorage.getItem('nexusAuthToken');
     const userId = localStorage.getItem('nexusUserId');
 
-    // SECURE BOOT: Kick out instantly if credentials are missing
+    // SECURITY CHECK: Kick unauthorized traffic out instantly before loading anything
     if (!userToken || !userId) {
         localStorage.clear();
-        window.location.replace('login.html'); // replace prevents back-button loop hacks
+        window.location.replace('login.html');
         return;
     }
 
@@ -20,12 +20,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         const rtdbUrl = `https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json?auth=${userToken}`;
         const response = await fetch(rtdbUrl);
         
-        // Handle invalid response directly (e.g., unauthorized token)
-        if (!response.ok) throw new Error("Unauthorized Token Node");
+        if (!response.ok) throw new Error("Unauthorized access token.");
         
         const userData = await response.json();
 
-        // Ban System Check
+        // Ban Check Integration
         if (userData && userData.status === 'banned') {
             alert("This account is restricted from using Nexus Pro nodes.");
             localStorage.clear();
@@ -39,7 +38,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         const userName = sanitizeInput(rawName);
         userRole = sanitizeInput(userRole).toString().toLowerCase().trim();
 
-        // Populate Dashboard Layout Parameters
+        // Update Text Fields Safely
         document.getElementById('welcomeHeading').textContent = `Welcome, ${userName}!`;
         document.getElementById('welcomeSubtext').textContent = `Access your Nexus Pro workspace panel modules cleanly below.`;
 
@@ -50,15 +49,20 @@ document.addEventListener("DOMContentLoaded", async () => {
             roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40 tracking-wider";
             document.getElementById('adminSection').classList.remove('hidden');
         } else {
-            roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-blue-950 text-blue-400 border border-red-900/40 tracking-wider";
+            roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-blue-950 text-blue-400 border border-blue-900/40 tracking-wider";
         }
 
-        // ACCESS GRANTED: Fade out preloader and show dashboard body safely
+        // ==========================================
+        // 🚀 PRELOADER TERMINATION (ACCESS GRANTED)
+        // ==========================================
+        // 1. Reveal dashboard background content smoothly
         document.body.classList.add('access-granted');
+        
+        // 2. Fade out and remove the logo screen
         const preloader = document.getElementById('nexusPreloader');
         if (preloader) {
             preloader.classList.add('opacity-0', 'pointer-events-none');
-            setTimeout(() => preloader.remove(), 500);
+            setTimeout(() => preloader.remove(), 500); // Completely wipes elements from DOM
         }
 
     } catch (error) {
