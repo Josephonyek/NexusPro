@@ -6,7 +6,7 @@
     <title>Nexus Pro - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Anti-Flash Protection: Hides the dashboard entirely until script approves access */
+        /* Anti-Flash Shield: Keeps main layout hidden while token verification runs */
         body { opacity: 0; transition: opacity 0.4s ease-in-out; }
         body.access-granted { opacity: 1; }
 
@@ -20,17 +20,20 @@
 <body class="bg-gray-950 text-white min-h-screen font-sans">
 
     <div id="nexusPreloader" class="fixed inset-0 bg-gray-950 z-[9999] flex flex-col items-center justify-center transition-all duration-500">
-        <div class="relative flex flex-col items-center max-w-sm px-6 text-center animate-pulse">
-            <img src="6af08942-b1c3-426c-b0b4-7766f9a4394a.jpeg" alt="Nexus Pro Logo" class="w-48 h-auto object-contain mb-4 rounded-xl">
-            <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p class="text-sm font-medium tracking-widest text-blue-400 uppercase">Verifying Clearance Node...</p>
+        <div class="relative flex flex-col items-center max-w-sm px-6 text-center">
+            <div class="relative mb-6 group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-30 group-hover:opacity-50 transition duration-1000 animate-pulse"></div>
+                <img src="6af08942-b1c3-426c-b0b4-7766f9a4394a.jpeg" alt="Nexus Pro Premium Logo" class="relative w-56 h-auto object-contain rounded-2xl shadow-2xl border border-gray-800/50">
+            </div>
+            
+            <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p class="text-xs font-bold tracking-[0.2em] text-blue-400 uppercase animate-pulse">Verifying Security Node...</p>
         </div>
     </div>
 
-    <nav class="bg-gray-900 border-b border-gray-800 px-6 py-3 flex justify-between items-center">
-        <div class="flex items-center space-x-3">
-            <img src="6af08942-b1c3-426c-b0b4-7766f9a4394a.jpeg" alt="Nexus Pro Icon" class="w-8 h-8 object-contain rounded-md">
-            <h1 class="text-lg font-black tracking-wider text-blue-500">NEXUS PRO</h1>
+    <nav class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex justify-between items-center">
+        <div>
+            <h1 class="text-xl font-black tracking-widest text-blue-500 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">NEXUS PRO</h1>
         </div>
         
         <div class="flex items-center space-x-4">
