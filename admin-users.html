@@ -6,6 +6,10 @@
     <title>Nexus Pro - User Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Anti-Flash Shield: Keeps administrative interface completely invisible until admin status is cryptographically verified */
+        body { opacity: 0; transition: opacity 0.4s ease-in-out; }
+        body.access-granted { opacity: 1; }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
@@ -20,8 +24,8 @@
             <button onclick="window.location.href='dashboard.html'" class="text-gray-400 hover:text-white transition">&larr; Back to Dashboard</button>
             <h1 class="text-xl font-black tracking-wider text-violet-500">NEXUS USER CONTROL</h1>
         </div>
-        <span id="authStatusBadge" class="px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-green-950 text-green-400 border border-green-900/40 tracking-wider">
-            Development Mode: Active
+        <span id="authStatusBadge" class="px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40 tracking-wider">
+            Clearance: Admin Secure
         </span>
     </nav>
 
@@ -47,7 +51,7 @@
                     <tbody id="userTableBody" class="divide-y divide-gray-800/60">
                         <tr>
                             <td colspan="4" class="p-8 text-center text-gray-500 animate-pulse">
-                                Connecting to Firebase Realtime Database...
+                                Verifying admin administrative access tokens...
                             </td>
                         </tr>
                     </tbody>
@@ -72,34 +76,57 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update, remove } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        import { getAuth } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, onValue, update, remove, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 
         let db;
-        let auth;
         let currentActiveTargetUid = '';
 
+        // Defensive XSS Sanitizer
+        function sanitize(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
         async function initializeAdminDashboard() {
+            const userToken = localStorage.getItem('nexusAuthToken');
+            const userId = localStorage.getItem('nexusUserId');
+
+            // 1. FAST ROUTING DEFENSE: Boot out instantly if storage profiles don't exist
+            if (!userToken || !userId) {
+                localStorage.clear();
+                window.location.replace('login.html');
+                return;
+            }
+
             try {
                 const configResponse = await fetch('./api/firebaseConfig');
                 if (!configResponse.ok) throw new Error(`Server status ${configResponse.status}`);
-                
                 const firebaseConfig = await configResponse.json();
 
-                // Initialize modular Firebase instances
                 const app = initializeApp(firebaseConfig);
                 db = getDatabase(app);
-                auth = getAuth(app);
 
-                // BYPASS STRATEGY: Directly pull the database tree immediately without waiting for auth state validation
-                console.log("Development Bypass: Streaming data nodes directly.");
+                // 2. PRIVILEGE AUDIT: Query identity node directly to verify admin clearance status
+                const adminCheckRef = ref(db, `users/${userId}`);
+                const snapshot = await get(adminCheckRef);
+                const activeProfile = snapshot.val();
+
+                if (!activeProfile || activeProfile.role !== 'admin' || activeProfile.status === 'banned') {
+                    alert("Access Denied: Administrative Clearance Node missing.");
+                    window.location.replace('dashboard.html');
+                    return;
+                }
+
+                // ACCESS GRANTED: Reveal layout nodes and start live synchronized stream
+                document.body.classList.add('access-granted');
                 listenToUsers();
 
             } catch (error) {
                 console.error("Initialization error:", error);
                 document.getElementById('userTableBody').innerHTML = 
                     `<tr><td colspan="4" class="p-8 text-center text-red-400 font-medium">
-                        ⚠️ Failed to connect to Firebase backend environment.<br>
+                        ⚠️ Security Error: Handshake verification failed.<br>
                         <span class="text-xs text-gray-500 block mt-1">Reason: ${error.message}</span>
                     </td></tr>`;
             }
@@ -113,7 +140,7 @@
                 tableBody.innerHTML = '';
                 
                 if (!snapshot.exists()) {
-                    tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No active records found under the "users" node in your database.</td></tr>';
+                    tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No active records found.</td></tr>';
                     return;
                 }
 
@@ -121,9 +148,10 @@
                     const uid = childSnapshot.key;
                     const userData = childSnapshot.val();
 
-                    const name = userData.name || userData.username || 'Anonymous User';
-                    const email = userData.email || 'No Linked Email';
-                    const role = userData.role || 'user';
+                    // Sanitize values defensively to stop stored cross-site scripting scripts from rendering
+                    const name = sanitize(userData.name || userData.username || 'Anonymous User');
+                    const email = sanitize(userData.email || 'No Linked Email');
+                    const role = sanitize(userData.role || 'user');
                     const isSuspended = userData.status === 'suspended';
 
                     const row = document.createElement('tr');
@@ -259,4 +287,4 @@
         initializeAdminDashboard();
     </script>
 </body>
-        </html>
+</html>
