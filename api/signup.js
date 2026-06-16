@@ -1,9 +1,8 @@
 import crypto from 'crypto';
 
-// Server-side memory tracking for a relaxed, secure rate limit
 const ipRateLimiter = {};
-const LIMIT_WINDOW_MS = 60 * 1000; // 1 minute window
-const MAX_SIGNUPS_PER_WINDOW = 100; // Allowed up to 100 signups per minute
+const LIMIT_WINDOW_MS = 60 * 1000; 
+const MAX_SIGNUPS_PER_WINDOW = 100; 
 
 function computeSHA256(password) {
     return crypto.createHash('sha256').update(password).digest('hex');
@@ -14,7 +13,6 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Method not allowed' });
     }
 
-    // 1. Relaxed Rate Limiting: 100 requests per minute
     const clientIp = req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'global';
     const currentTime = Date.now();
     
@@ -26,9 +24,7 @@ export default async function handler(req, res) {
         } else {
             ipRateLimiter[clientIp].count += 1;
             if (ipRateLimiter[clientIp].count > MAX_SIGNUPS_PER_WINDOW) {
-                return res.status(429).json({ 
-                    error: "Too many registration attempts from this network. Please wait a minute." 
-                });
+                return res.status(429).json({ error: "Too many registration attempts. Please wait a minute." });
             }
         }
     }
@@ -40,12 +36,23 @@ export default async function handler(req, res) {
     }
 
     try {
+        // Fallback directly to your string URL if the environment variable fails to read
         const databaseUrl = process.env.FIREBASE_DATABASE_URL || 'https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app';
         const serverAuthKey = process.env.FIREBASE_SERVER_KEY;
 
-        // 2. Check if user email already exists in the database
-        const checkUrl = `${databaseUrl}/users.json${serverAuthKey ? `?auth=${serverAuthKey}` : ''}`;
+        // Clean trailing slash if it exists dynamically
+        const cleanDbUrl = databaseUrl.replace(/\/$/, "");
+
+        // 1. Fetch check
+        const checkUrl = `${cleanDbUrl}/users.json${serverAuthKey ? `?auth=${serverAuthKey}` : ''}`;
         const checkResponse = await fetch(checkUrl);
+        
+        if (!checkResponse.ok) {
+            const errText = await checkResponse.text();
+            console.error("Firebase Read Error Status:", checkResponse.status, errText);
+            return res.status(500).json({ error: `Database Read Error: ${checkResponse.status}` });
+        }
+
         const existingUsers = await checkResponse.json();
 
         if (existingUsers) {
@@ -56,33 +63,32 @@ export default async function handler(req, res) {
             }
         }
 
-        // 3. Hash the raw password using SHA-256
+        // 2. Hash and prepare node
         const securePasswordHash = computeSHA256(password);
-
-        // 4. Generate a clean, unique User ID on the backend server
         const generatedUid = 'user_' + crypto.randomBytes(8).toString('hex');
 
         const newProfileNode = {
             name: name.trim(),
             email: email.trim().toLowerCase(),
-            password: securePasswordHash, // The database saves only the secure hash string
+            password: securePasswordHash,
             role: 'student',
             status: 'active'
         };
 
-        // 5. Save explicitly using a PUT request to the generated user ID path
-        const writeUrl = `${databaseUrl}/users/${generatedUid}.json${serverAuthKey ? `?auth=${serverAuthKey}` : ''}`;
+        // 3. Write attempt using explicit user path
+        const writeUrl = `${cleanDbUrl}/users/${generatedUid}.json${serverAuthKey ? `?auth=${serverAuthKey}` : ''}`;
         const writeResponse = await fetch(writeUrl, {
-            method: 'PUT', // PUT writes directly to this specific path node
+            method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newProfileNode)
         });
 
         if (!writeResponse.ok) {
-            throw new Error("Failed to write data to Firebase database storage.");
+            const errorDetails = await writeResponse.text();
+            console.error("Firebase Write Error Details:", errorDetails);
+            return res.status(500).json({ error: `Firebase write rejected: ${writeResponse.statusText}` });
         }
 
-        // Mock a clean authorization token session string for the dashboard process
         const initialSessionToken = crypto.randomBytes(32).toString('hex');
 
         return res.status(200).json({
@@ -92,7 +98,7 @@ export default async function handler(req, res) {
         });
 
     } catch (serverError) {
-        console.error("Critical Registry Execution Error:", serverError);
-        return res.status(500).json({ error: 'Internal secure server registration failure.' });
+        console.error("Caught Serverless Error:", serverError);
+        return res.status(500).json({ error: `Server Exception: ${serverError.message}` });
     }
-        }
+    }
