@@ -3,73 +3,78 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro | AI Study, Health Hub & Football</title>
+    <title>Nexus Pro | Fast & Responsive</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
     <style>
-        .slider-container { position: relative; height: 176px; overflow: hidden; background: #111827; }
-        .slide-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.3s ease-in-out; }
+        /* This forces the container to stay open and images to overlay perfectly */
+        .slider-box { position: relative; width: 100%; height: 176px; background: #111827; overflow: hidden; border-radius: 0.75rem; }
+        .slide-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.5s ease-in-out; opacity: 0; }
+        .slide-img.active { opacity: 1; z-index: 10; }
     </style>
 </head>
-<body class="bg-gray-950 text-gray-100 font-sans">
+<body class="bg-gray-950 text-white font-sans">
 
-    <header class="bg-gray-900/80 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50 px-6 py-4 flex justify-between items-center">
+    <header class="flex justify-between items-center p-6 border-b border-gray-800">
         <div class="text-xl font-black text-blue-500">NEXUS PRO</div>
-        <nav class="hidden md:flex space-x-6 text-sm font-medium">
-            <a href="#" class="hover:text-blue-400">Home</a>
-            <a href="#" class="hover:text-blue-400">Assignments</a>
-            <a href="#" class="hover:text-blue-400">Health</a>
-            <a href="#" class="hover:text-blue-400">Football</a>
+        <button id="menu-btn" class="md:hidden text-2xl">☰</button>
+        <nav id="nav-menu" class="hidden md:flex space-x-6">
+            <a href="#">Home</a>
+            <a href="#">Assignments</a>
+            <a href="#">Health</a>
+            <a href="#">Football</a>
+            <a href="login.html" class="bg-blue-600 px-4 py-1 rounded-lg">Explore</a>
         </nav>
-        <button id="menu-btn" class="md:hidden p-2 text-gray-400">☰</button>
-        <a href="login.html" class="hidden md:block bg-blue-600 px-4 py-2 rounded-lg text-sm font-bold">Explore</a>
     </header>
 
-    <div id="mobile-menu" class="hidden md:hidden bg-gray-900 p-6 space-y-4 text-center">
+    <div id="mobile-menu" class="hidden bg-gray-900 p-4 space-y-2 md:hidden">
         <a href="#" class="block">Home</a>
         <a href="#" class="block">Assignments</a>
         <a href="#" class="block">Health</a>
         <a href="#" class="block">Football</a>
     </div>
 
-    <section class="max-w-md mx-auto px-4 py-16">
-        <form id="contact-form" class="bg-gray-900 p-8 rounded-3xl border border-gray-800 space-y-4">
-            <h3 class="text-xl font-bold">Contact Us</h3>
-            <input type="text" name="user_name" placeholder="Name" required class="w-full bg-gray-950 p-3 rounded-lg border border-gray-800">
-            <input type="email" name="user_email" placeholder="Email" required class="w-full bg-gray-950 p-3 rounded-lg border border-gray-800">
-            <textarea name="message" placeholder="Message" required class="w-full bg-gray-950 p-3 rounded-lg border border-gray-800"></textarea>
-            <button type="submit" class="w-full bg-blue-600 py-3 rounded-lg font-bold">Send Message</button>
-        </form>
+    <section class="max-w-4xl mx-auto p-6 grid md:grid-cols-3 gap-6">
+        <div>
+            <div class="slider-box study-slider">
+                <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600" class="slide-img active">
+                <img src="https://images.unsplash.com/photo-1509224765680-bb62702abe7b?w=600" class="slide-img">
+            </div>
+            <h3 class="mt-4 font-bold">Study & Homework</h3>
+        </div>
+        <div>
+            <div class="slider-box health-slider">
+                <img src="https://images.unsplash.com/photo-1505751172876-fa1923c5c5ad?w=600" class="slide-img active">
+                <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600" class="slide-img">
+            </div>
+            <h3 class="mt-4 font-bold">Health Hub</h3>
+        </div>
+        <div>
+            <div class="slider-box foot-slider">
+                <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600" class="slide-img active">
+                <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600" class="slide-img">
+            </div>
+            <h3 class="mt-4 font-bold">Football Hub</h3>
+        </div>
     </section>
 
     <script>
-        // 1. Hamburger Menu
-        document.getElementById('menu-btn').addEventListener('click', () => {
-            document.getElementById('mobile-menu').classList.toggle('hidden');
-        });
+        // 1. Mobile Menu Toggle
+        document.getElementById('menu-btn').onclick = () => document.getElementById('mobile-menu').classList.toggle('hidden');
 
         // 2. Fast Slider Logic
-        function setupSlider(className) {
-            const images = document.querySelectorAll(className);
-            let index = 0;
+        function startSlider(selector) {
+            const container = document.querySelector(selector);
+            const images = container.querySelectorAll('.slide-img');
+            let i = 0;
             setInterval(() => {
-                images[index].style.opacity = '0';
-                index = (index + 1) % images.length;
-                images[index].style.opacity = '1';
-            }, 2000); // Set to 2s for fast switching
+                images[i].classList.remove('active');
+                i = (i + 1) % images.length;
+                images[i].classList.add('active');
+            }, 2500);
         }
-        setupSlider('.study-img');
-        setupSlider('.health-img');
-        setupSlider('.foot-img');
-
-        // 3. EmailJS Form Handling
-        (function(){ emailjs.init({ publicKey: "YOUR_PUBLIC_KEY" }); })();
-        
-        document.getElementById('contact-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            emailjs.sendForm('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', this)
-                .then(() => alert('Message Sent!'), (err) => alert('Error: ' + JSON.stringify(err)));
-        });
+        startSlider('.study-slider');
+        startSlider('.health-slider');
+        startSlider('.foot-slider');
     </script>
 </body>
 </html>
