@@ -3,43 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro | Fast & Responsive</title>
+    <title>Nexus Pro | Solve. Learn. Connect.</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* This forces the container to stay open and images to overlay perfectly */
-        .slider-box { position: relative; width: 100%; height: 176px; background: #111827; overflow: hidden; border-radius: 0.75rem; }
-        .slide-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.5s ease-in-out; opacity: 0; }
-        .slide-img.active { opacity: 1; z-index: 10; }
+        /* Ensures images cross-fade instantly without blank space */
+        .slider-box { position: relative; height: 176px; overflow: hidden; border-radius: 0.75rem; background: #000; }
+        .slide-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.4s ease-in-out; opacity: 0; }
+        .slide-img.active { opacity: 1; }
     </style>
 </head>
-<body class="bg-gray-950 text-white font-sans">
+<body class="bg-gray-950 text-gray-100 font-sans">
 
-    <header class="flex justify-between items-center p-6 border-b border-gray-800">
-        <div class="text-xl font-black text-blue-500">NEXUS PRO</div>
+    <header class="flex justify-between items-center p-6 border-b border-gray-800 sticky top-0 bg-gray-950/90 z-50">
+        <div class="text-xl font-black text-blue-500 tracking-wider">NEXUS PRO</div>
         <button id="menu-btn" class="md:hidden text-2xl">☰</button>
-        <nav id="nav-menu" class="hidden md:flex space-x-6">
-            <a href="#">Home</a>
-            <a href="#">Assignments</a>
-            <a href="#">Health</a>
-            <a href="#">Football</a>
+        <nav id="nav-menu" class="hidden md:flex space-x-6 text-sm font-medium">
+            <a href="#" class="hover:text-blue-400">Home</a>
+            <a href="#" class="hover:text-blue-400">Assignments</a>
+            <a href="#" class="hover:text-blue-400">Health</a>
+            <a href="#" class="hover:text-blue-400">Football</a>
             <a href="login.html" class="bg-blue-600 px-4 py-1 rounded-lg">Explore</a>
         </nav>
     </header>
 
-    <div id="mobile-menu" class="hidden bg-gray-900 p-4 space-y-2 md:hidden">
+    <div id="mobile-menu" class="hidden bg-gray-900 p-6 space-y-4 text-center md:hidden">
         <a href="#" class="block">Home</a>
         <a href="#" class="block">Assignments</a>
         <a href="#" class="block">Health</a>
         <a href="#" class="block">Football</a>
     </div>
 
-    <section class="max-w-4xl mx-auto p-6 grid md:grid-cols-3 gap-6">
+    <main class="max-w-4xl mx-auto px-6 py-16 text-center">
+        <h1 class="text-5xl font-extrabold mb-6">Welcome to Nexus Pro</h1>
+        <p class="text-gray-400 text-lg mb-8 max-w-xl mx-auto">
+            Solve complex problems, master new skills, and stay updated with real-time sports and health insights.
+        </p>
+        <a href="login.html" class="bg-blue-600 px-8 py-4 rounded-2xl font-bold hover:bg-blue-700 transition">Explore Now →</a>
+    </main>
+
+    <section class="max-w-6xl mx-auto px-6 py-16 grid md:grid-cols-3 gap-8">
         <div>
             <div class="slider-box study-slider">
                 <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600" class="slide-img active">
                 <img src="https://images.unsplash.com/photo-1509224765680-bb62702abe7b?w=600" class="slide-img">
             </div>
             <h3 class="mt-4 font-bold">Study & Homework</h3>
+            <p class="text-xs text-gray-400 mt-2">AI-driven solutions for your physics and math problems.</p>
         </div>
         <div>
             <div class="slider-box health-slider">
@@ -47,6 +56,7 @@
                 <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600" class="slide-img">
             </div>
             <h3 class="mt-4 font-bold">Health Hub</h3>
+            <p class="text-xs text-gray-400 mt-2">Daily wellness tracking and verified health insights.</p>
         </div>
         <div>
             <div class="slider-box foot-slider">
@@ -54,14 +64,27 @@
                 <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600" class="slide-img">
             </div>
             <h3 class="mt-4 font-bold">Football Hub</h3>
+            <p class="text-xs text-gray-400 mt-2">Live scores and updates from global leagues.</p>
         </div>
     </section>
 
+    <section class="max-w-md mx-auto p-6">
+        <form id="contact-form" class="bg-gray-900 p-8 rounded-3xl border border-gray-800">
+            <h3 class="font-bold mb-4">Contact Us</h3>
+            <input type="text" name="name" placeholder="Name" class="w-full bg-gray-950 p-3 rounded-lg mb-4 border border-gray-800">
+            <input type="email" name="email" placeholder="Email" class="w-full bg-gray-950 p-3 rounded-lg mb-4 border border-gray-800">
+            <textarea name="message" placeholder="Message" class="w-full bg-gray-950 p-3 rounded-lg mb-4 border border-gray-800"></textarea>
+            <button type="submit" class="w-full bg-blue-600 py-3 rounded-lg font-bold">Send Message</button>
+        </form>
+    </section>
+
+    <footer class="border-t border-gray-900 mt-16 p-8 text-center text-gray-500 text-xs">
+        © 2026 Nexus Pro. Learn. Connect. Watch Football.
+    </footer>
+
     <script>
-        // 1. Mobile Menu Toggle
         document.getElementById('menu-btn').onclick = () => document.getElementById('mobile-menu').classList.toggle('hidden');
 
-        // 2. Fast Slider Logic
         function startSlider(selector) {
             const container = document.querySelector(selector);
             const images = container.querySelectorAll('.slide-img');
@@ -70,7 +93,7 @@
                 images[i].classList.remove('active');
                 i = (i + 1) % images.length;
                 images[i].classList.add('active');
-            }, 2500);
+            }, 2000); // 2 seconds interval
         }
         startSlider('.study-slider');
         startSlider('.health-slider');
