@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro - Dashboard</title>
+    <title>Nexus Pro 2.0 - Virtual Learning Framework</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Anti-Flash Shield: Keeps main app modules invisible during token verification loops */
+        /* Anti-Flash Shield: Invisible until server validation passes */
         body { opacity: 0; transition: opacity 0.4s ease-in-out; }
         body.access-granted { opacity: 1; }
 
@@ -33,10 +33,13 @@
 
     <nav class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex justify-between items-center">
         <div>
-            <h1 class="text-xl font-black tracking-widest text-blue-500 bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-blue-600">NEXUS PRO</h1>
+            <h1 class="text-xl font-black tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-violet-400 to-purple-500">NEXUS PRO 2.0</h1>
         </div>
         
         <div class="flex items-center space-x-4">
+            <div id="xpBadge" class="hidden sm:flex items-center space-x-1.5 bg-gray-950 border border-yellow-500/30 px-3 py-1 rounded-xl text-xs font-bold text-yellow-400">
+                <span>🏆</span> <span id="userXpText">0 XP</span>
+            </div>
             <span id="roleBadge" class="px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-gray-800 text-gray-400 tracking-wider">
                 Verifying...
             </span>
@@ -46,80 +49,96 @@
         </div>
     </nav>
 
-    <main class="max-w-6xl mx-auto px-4 py-8">
+    <main class="max-w-7xl mx-auto px-4 py-8">
         
-        <div class="mb-8 p-6 bg-gradient-to-r from-gray-900 to-gray-950 border border-gray-800 rounded-2xl">
-            <h2 id="welcomeHeading" class="text-2xl sm:text-3xl font-extrabold tracking-tight">Loading Profile...</h2>
-            <p id="welcomeSubtext" class="text-gray-400 text-sm mt-1">Connecting securely to Nexus Pro servers...</p>
+        <div class="mb-8 p-6 bg-gradient-to-r from-gray-900 via-gray-900 to-gray-950 border border-gray-800 rounded-3xl flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+            <div>
+                <h2 id="welcomeHeading" class="text-2xl sm:text-3xl font-extrabold tracking-tight">Loading Profile...</h2>
+                <p id="welcomeSubtext" class="text-gray-400 text-sm mt-1">Connecting securely to Nexus Pro servers...</p>
+            </div>
+            <div id="levelBox" class="hidden bg-gray-950 border border-gray-800 rounded-2xl p-3 min-w-[140px] text-center">
+                <div class="text-[10px] uppercase font-bold tracking-wider text-gray-500">Current Rank</div>
+                <div id="userLevelText" class="text-lg font-black text-blue-400 mt-0.5">Level --</div>
+            </div>
         </div>
 
         <section id="adminSection" class="hidden mb-10 animate-fade-in">
-            <div class="border border-red-900/40 bg-red-950/10 rounded-3xl p-8 shadow-2xl">
+            <div class="border border-red-900/40 bg-red-950/10 rounded-3xl p-6 shadow-2xl">
                 <div class="flex items-center gap-3 mb-6">
-                    <span class="text-3xl">🛡️</span>
+                    <span class="text-2xl">🛡️</span>
                     <div>
-                        <h3 class="text-xl font-bold text-red-400">Administrator Control Panel</h3>
-                        <p class="text-red-400/70 text-sm">Full System Management Enabled</p>
+                        <h3 class="text-lg font-bold text-red-400">System Management Console</h3>
+                        <p class="text-red-400/70 text-xs">Administrative Clearance Verified</p>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div onclick="window.location.href='admin-ai-usage.html'" 
-                         class="bg-gray-900 p-6 rounded-2xl border border-blue-900/50 hover:border-blue-500 cursor-pointer transition">
-                        <div class="text-4xl mb-4">📊</div>
-                        <h4 class="font-bold text-lg">AI Usage Monitor</h4>
-                        <p class="text-gray-400 text-sm">View how users are using the AI Solver</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div onclick="window.location.href='admin-users.html'" class="bg-gray-900 p-5 rounded-2xl border border-gray-800 hover:border-red-500 cursor-pointer transition">
+                        <div class="text-3xl mb-3">👥</div>
+                        <h4 class="font-bold text-base">User Directory</h4>
+                        <p class="text-gray-400 text-xs mt-1">Manage registration levels, account statuses, and roles.</p>
                     </div>
-
-                    <div onclick="window.location.href='admin-users.html'" 
-                         class="bg-gray-900 p-6 rounded-2xl border border-violet-900/50 hover:border-violet-500 cursor-pointer transition">
-                        <div class="text-4xl mb-4">👥</div>
-                        <h4 class="font-bold text-lg">User Management</h4>
-                        <p class="text-gray-400 text-sm">View, edit, and manage users</p>
-                    </div>
-
-                    <div onclick="alert('Football Monitor coming soon')" 
-                         class="bg-gray-900 p-6 rounded-2xl border border-green-900/50 hover:border-green-500 cursor-pointer transition">
-                        <div class="text-4xl mb-4">⚽</div>
-                        <h4 class="font-bold text-lg">Football Monitor</h4>
-                        <p class="text-gray-400 text-sm">Supervise football feature usage</p>
+                    <div onclick="window.location.href='admin-ai-usage.html'" class="bg-gray-900 p-5 rounded-2xl border border-gray-800 hover:border-blue-500 cursor-pointer transition">
+                        <div class="text-3xl mb-3">📊</div>
+                        <h4 class="font-bold text-base">AI Query Monitor</h4>
+                        <p class="text-gray-400 text-xs mt-1">Supervise real-time algorithmic solver usage files.</p>
                     </div>
                 </div>
             </div>
         </section>
 
-        <h3 class="text-xs font-bold text-gray-500 mb-4 uppercase tracking-widest">Available Applications</h3>
+        <h3 class="text-xs font-bold text-gray-500 mb-4 uppercase tracking-widest">Workspace Core Directories</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             
-            <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl flex flex-col justify-between hover:border-blue-500/30 transition duration-300 shadow-xl">
+            <div class="bg-gray-900 border border-gray-800 p-6 rounded-3xl flex flex-col justify-between hover:border-blue-500/30 transition duration-300 shadow-xl relative group overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-xl group-hover:bg-blue-500/10 transition"></div>
                 <div>
-                    <div class="w-12 h-12 rounded-xl bg-blue-600/10 flex items-center justify-center text-blue-400 font-bold text-xl mb-4">∑</div>
-                    <h4 class="text-lg font-bold mb-1.5">AI Physics & Math Solver</h4>
-                    <p class="text-gray-400 text-sm leading-relaxed">Submit complex mathematical equations or physics problems and get instant step-by-step breakdowns.</p>
+                    <div class="w-12 h-12 rounded-xl bg-blue-600/10 flex items-center justify-center text-blue-400 font-bold text-xl mb-4">📚</div>
+                    <h4 class="text-xl font-bold mb-1.5">Core Study Academy</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4">Access the integrated E-Library, streaming Syllabus Video References, and the persistent AI Math & Physics Solver helper console.</p>
+                    
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <span class="px-2.5 py-1 text-[11px] rounded-lg font-medium bg-gray-950 text-gray-400 border border-gray-800">📖 E-Library Docs</span>
+                        <span class="px-2.5 py-1 text-[11px] rounded-lg font-medium bg-gray-950 text-gray-400 border border-gray-800">🎥 Video Streams</span>
+                        <span class="px-2.5 py-1 text-[11px] rounded-lg font-medium bg-gray-950 text-gray-400 border border-gray-800">🤖 AI Tutor</span>
+                    </div>
                 </div>
-                <button onclick="window.location.href='ai_solver.html'" class="mt-6 w-full py-2.5 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">Open Solver</button>
+                <button onclick="window.location.href='academy.html'" class="mt-6 w-full py-3 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">Enter Academy</button>
             </div>
 
-            <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl flex flex-col justify-between hover:border-green-500/30 transition duration-300 shadow-xl">
+            <div class="bg-gray-900 border border-gray-800 p-6 rounded-3xl flex flex-col justify-between hover:border-emerald-500/30 transition duration-300 shadow-xl relative group overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl group-hover:bg-emerald-500/10 transition"></div>
                 <div>
-                    <div class="w-12 h-12 rounded-xl bg-green-600/10 flex items-center justify-center text-green-400 font-bold text-xl mb-4">⚽</div>
-                    <h4 class="text-lg font-bold mb-1.5">Football Live Scores</h4>
-                    <p class="text-gray-400 text-sm leading-relaxed">Track live scores, match fixtures, and view official league standings in real time.</p>
+                    <div class="w-12 h-12 rounded-xl bg-emerald-600/10 flex items-center justify-center text-emerald-400 font-bold text-xl mb-4">🎮</div>
+                    <h4 class="text-xl font-bold mb-1.5">The Learning Arcade</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4">Convert class homework objectives into interactive, competitive games. Complete assignments, level up your metrics, and earn profile XP ranks.</p>
+                    
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <span class="px-2.5 py-1 text-[11px] rounded-lg font-medium bg-gray-950 text-emerald-400 border border-gray-800/80">⚡ Challenge Quizzes</span>
+                        <span class="px-2.5 py-1 text-[11px] rounded-lg font-medium bg-gray-950 text-yellow-400 border border-gray-800/80">🏆 Rank Badges</span>
+                    </div>
                 </div>
-                <button onclick="window.location.href='score.html'" class="mt-6 w-full py-2.5 bg-green-600 hover:bg-green-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">View Scores</button>
+                <button onclick="window.location.href='arcade.html'" class="mt-6 w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">Launch Arcade</button>
             </div>
 
-            <div class="bg-gray-900 border border-gray-800 p-6 rounded-2xl flex flex-col justify-between hover:border-purple-500/30 transition duration-300 shadow-xl">
+            <div class="bg-gray-900 border border-gray-800 p-6 rounded-3xl flex flex-col justify-between hover:border-purple-500/30 transition duration-300 shadow-xl relative group overflow-hidden">
+                <div class="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full blur-xl group-hover:bg-purple-500/10 transition"></div>
                 <div>
-                    <div class="w-12 h-12 rounded-xl bg-purple-600/10 flex items-center justify-center text-purple-400 font-bold text-xl mb-4">🤝</div>
-                    <h4 class="text-lg font-bold mb-1.5">HEALTH HUB</h4>
-                    <p class="text-gray-400 text-sm leading-relaxed">Get real and beneficial health updates and advice that will help you stay healthy.</p>
+                    <div class="w-12 h-12 rounded-xl bg-purple-600/10 flex items-center justify-center text-purple-400 font-bold text-xl mb-4">🌱</div>
+                    <h4 class="text-xl font-bold mb-1.5">Health Hub Platform</h4>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4">Stay tuned to crucial medical parameters, global dietary updates, and actionable advice curated to boost local student focus and longevity.</p>
+                    
+                    <div class="flex flex-wrap gap-2 pt-2">
+                        <span class="px-2.5 py-1 text-[11px] rounded-lg font-medium bg-gray-950 text-gray-400 border border-gray-800">🥗 Wellness Data</span>
+                        <span class="px-2.5 py-1 text-[11px] rounded-lg font-medium bg-gray-950 text-gray-400 border border-gray-800">🩺 Research Feeds</span>
+                    </div>
                 </div>
-                <button onclick="window.location.href='health.html'" class="mt-6 w-full py-2.5 bg-purple-600 hover:bg-purple-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">Enter Hub</button>
+                <button onclick="window.location.href='health.html'" class="mt-6 w-full py-3 bg-purple-600 hover:bg-purple-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">Enter Health Hub</button>
             </div>
+
         </div>
     </main>
 
     <script src="dashboard.js"></script>
 </body>
-</html>
+                    </html>
