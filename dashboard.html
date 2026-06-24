@@ -17,7 +17,7 @@
         .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
     </style>
 </head>
-<body class="bg-gray-950 text-white min-h-screen font-sans">
+<body class="bg-gray-950 text-white min-h-screen font-sans overflow-x-hidden">
 
     <div id="nexusPreloader" class="fixed inset-0 bg-gray-950 z-[9999] flex flex-col items-center justify-center transition-all duration-500">
         <div class="relative flex flex-col items-center max-w-sm px-6 text-center">
@@ -25,13 +25,12 @@
                 <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-30 animate-pulse"></div>
                 <img src="6af08942-b1c3-426c-b0b4-7766f9a4394a.jpeg" alt="Nexus Pro Premium Logo" class="relative w-56 h-auto object-contain rounded-2xl shadow-2xl border border-gray-800/50">
             </div>
-            
             <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
             <p class="text-xs font-bold tracking-[0.2em] text-blue-400 uppercase animate-pulse">Verifying Security Node...</p>
         </div>
     </div>
 
-    <nav class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex justify-between items-center">
+    <nav class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex justify-between items-center relative z-40">
         <div>
             <h1 class="text-xl font-black tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-violet-400 to-purple-500">NEXUS PRO 2.0</h1>
         </div>
@@ -43,13 +42,58 @@
             <span id="roleBadge" class="px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-gray-800 text-gray-400 tracking-wider">
                 Verifying...
             </span>
-            <button id="logoutBtn" class="px-4 py-2 bg-red-950/40 text-red-400 border border-red-900/50 rounded-xl text-sm font-semibold hover:bg-red-900/30 transition duration-150">
-                Log Out
+
+            <button id="menuToggleBtn" class="p-2.5 bg-gray-800 hover:bg-gray-700/80 rounded-xl border border-gray-700 text-gray-300 hover:text-white transition focus:outline-none" aria-label="Toggle Navigation Menu">
+                <svg id="hamburgerIcon" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
             </button>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 py-8">
+    <div id="sideMenuDrawer" class="fixed top-0 right-0 h-full w-80 bg-gray-900 border-l border-gray-800 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col justify-between">
+        <div>
+            <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-gray-950/40">
+                <h3 class="font-black text-sm tracking-widest text-gray-400 uppercase">Navigation Control</h3>
+                <button id="menuCloseBtn" class="text-gray-400 hover:text-white transition text-xl font-bold p-1">&times;</button>
+            </div>
+
+            <nav class="p-6 space-y-2">
+                <a href="dashboard.html" class="flex items-center space-x-3 p-3 rounded-xl bg-blue-600/10 text-blue-400 border border-blue-500/20 font-bold transition">
+                    <span>🏠</span> <span class="text-sm">Main Dashboard</span>
+                </a>
+                <a href="academy.html" class="flex items-center space-x-3 p-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800 border border-transparent hover:border-gray-700/50 transition">
+                    <span>📚</span> <span class="text-sm">Core Study Academy</span>
+                </a>
+                <a href="arcade.html" class="flex items-center space-x-3 p-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800 border border-transparent hover:border-gray-700/50 transition">
+                    <span>🎮</span> <span class="text-sm">Learning Arcade</span>
+                </a>
+                <a href="health.html" class="flex items-center space-x-3 p-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800 border border-transparent hover:border-gray-700/50 transition">
+                    <span>🌱</span> <span class="text-sm">Health Hub Hub</span>
+                </a>
+
+                <div id="sidebarAdminLinks" class="hidden pt-4 mt-4 border-t border-gray-800/60 space-y-2">
+                    <div class="text-[10px] uppercase tracking-widest text-red-400 font-bold px-3 mb-1">Administrative Node</div>
+                    <a href="admin-users.html" class="flex items-center space-x-3 p-3 rounded-xl text-red-400/80 hover:text-red-400 hover:bg-red-950/20 border border-transparent hover:border-red-900/30 transition">
+                        <span>👥</span> <span class="text-sm">User Management</span>
+                    </a>
+                    <a href="admin-ai-usage.html" class="flex items-center space-x-3 p-3 rounded-xl text-red-400/80 hover:text-red-400 hover:bg-red-950/20 border border-transparent hover:border-red-900/30 transition">
+                        <span>📊</span> <span class="text-sm">AI Usage Monitors</span>
+                    </a>
+                </div>
+            </nav>
+        </div>
+
+        <div class="p-6 border-t border-gray-800 bg-gray-950/30">
+            <button id="logoutBtn" class="w-full py-3 bg-red-950/40 text-red-400 border border-red-900/40 font-bold rounded-xl text-sm hover:bg-red-900/30 active:scale-[0.99] transition">
+                🚪 Log Out System
+            </button>
+        </div>
+    </div>
+
+    <div id="menuBackdropBlur" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 opacity-0"></div>
+
+    <main class="max-w-7xl mx-auto px-4 py-8 relative z-10">
         
         <div class="mb-8 p-6 bg-gradient-to-r from-gray-900 via-gray-900 to-gray-950 border border-gray-800 rounded-3xl flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
             <div>
@@ -126,7 +170,7 @@
                 <div>
                     <div class="w-12 h-12 rounded-xl bg-purple-600/10 flex items-center justify-center text-purple-400 font-bold text-xl mb-4">🌱</div>
                     <h4 class="text-xl font-bold mb-1.5">Health Hub Platform</h4>
-                    <p class="text-gray-400 text-sm leading-relaxed mb-4">Stay tuned to crucial medical parameters, global dietary updates, and actionable advice curated to boost local student focus and longevity.</p>
+                    <p class="text-gray-400 text-sm leading-relaxed mb-4">Stay tuned to crucial medical parameters, global dietary updates, and actionable advice advice curated to boost local student focus and longevity.</p>
                     
                     <div class="flex flex-wrap gap-2 pt-2">
                         <span class="px-2.5 py-1 text-[11px] rounded-lg font-medium bg-gray-950 text-gray-400 border border-gray-800">🥗 Wellness Data</span>
@@ -139,6 +183,36 @@
         </div>
     </main>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const menuToggleBtn = document.getElementById('menuToggleBtn');
+            const menuCloseBtn = document.getElementById('menuCloseBtn');
+            const sideMenuDrawer = document.getElementById('sideMenuDrawer');
+            const backdropBlur = document.getElementById('menuBackdropBlur');
+
+            function openDrawerMenu() {
+                sideMenuDrawer.classList.remove('translate-x-full');
+                backdropBlur.classList.remove('hidden');
+                setTimeout(() => {
+                    backdropBlur.classList.remove('opacity-0');
+                    backdropBlur.classList.add('opacity-100');
+                }, 10);
+            }
+
+            function closeDrawerMenu() {
+                sideMenuDrawer.classList.add('translate-x-full');
+                backdropBlur.classList.remove('opacity-100');
+                backdropBlur.classList.add('opacity-0');
+                setTimeout(() => {
+                    backdropBlur.classList.add('hidden');
+                }, 300);
+            }
+
+            menuToggleBtn.addEventListener('click', openDrawerMenu);
+            menuCloseBtn.addEventListener('click', closeDrawerMenu);
+            backdropBlur.addEventListener('click', closeDrawerMenu);
+        });
+    </script>
     <script src="dashboard.js"></script>
 </body>
-                    </html>
+            </html>
