@@ -20,10 +20,22 @@ async function verifyAndInitializeDashboard() {
         return;
     }
 
-    try {
-        // 2. CONFIGURATION HANDSHAKE: Fetch dynamic backend maps
-        const configResponse = await fetch('./api/firebaseConfig');
-        if (!configResponse.ok) throw new Error("Could not load secure database configuration maps.");
+    // 2. CONFIGURATION HANDSHAKE: Fetch dynamic backend maps
+let databaseUrl = 'https://YOUR-PROJECT-ID-default-rtdb.firebaseio.com'; // 👈 Change this to your EXACT Firebase Database URL
+
+try {
+    const configResponse = await fetch('./api/firebaseConfig');
+    if (configResponse.ok) {
+        const firebaseConfig = await configResponse.json();
+        if (firebaseConfig.databaseURL) {
+            databaseUrl = firebaseConfig.databaseURL;
+        }
+    }
+} catch (e) {
+    console.log("Config endpoint offline, falling back to secure hardcoded URL string routing.");
+}
+
+const cleanDbUrl = databaseUrl.replace(/\/$/, "");
         const firebaseConfig = await configResponse.json();
 
         const databaseUrl = firebaseConfig.databaseURL || 'https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app';
