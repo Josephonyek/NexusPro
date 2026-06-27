@@ -6,6 +6,7 @@
     <title>Nexus Pro 2.0 - Media Content Desk</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* Anti-Flash Shield: Keeps layout hidden until admin identity is verified */
         body { opacity: 0; transition: opacity 0.4s ease-in-out; }
         body.access-granted { opacity: 1; }
     </style>
@@ -41,7 +42,7 @@
                     <span class="text-2xl">📚</span>
                     <div>
                         <h3 class="font-bold text-base">E-Library Document Register</h3>
-                        <p class="text-[11px] text-gray-400">Upload document files directly into storage arrays.</p>
+                        <p class="text-[11px] text-gray-400">Upload document files directly into storage arrays with live metrics.</p>
                     </div>
                 </div>
 
@@ -60,10 +61,12 @@
                     </div>
                     <div>
                         <label class="block font-bold text-gray-400 uppercase tracking-wider mb-1.5">Default Homework Assignment Prompt (Optional)</label>
-                        <textarea id="bookHomeworkPrompt" rows="3" placeholder="Read Chapter 3, page 45, and complete review questions 1-5 inside the learning arcade arena panels." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-blue-500 text-white transition"></textarea>
+                        <textarea id="bookHomeworkPrompt" rows="3" placeholder="Read Chapter 3, page 45, and complete review questions 1-5 inside the learning arcade panels." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-blue-500 text-white transition"></textarea>
                     </div>
 
-                    <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition shadow-md shadow-blue-900/20 mt-2">Upload and Publish Document</button>
+                    <button type="submit" id="ebookSubmitBtn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition shadow-md shadow-blue-900/20 mt-2 flex flex-col items-center justify-center min-h-[44px]">
+                        <span>Upload and Publish Document</span>
+                    </button>
                 </form>
             </section>
 
@@ -101,8 +104,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getDatabase, ref, push, set, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        // Import Firebase Storage modules to handle the direct binary stream uploads
-        import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
+        import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
 
         let db;
         let storage;
@@ -124,7 +126,7 @@
 
                 const app = initializeApp(firebaseConfig);
                 db = getDatabase(app);
-                storage = getStorage(app); // Instantiate storage reference pointer maps
+                storage = getStorage(app); 
 
                 const userSnapshot = await get(ref(db, `users/${uid}`));
                 const userProfile = userSnapshot.val();
@@ -148,13 +150,12 @@
         }
 
         function bindUploaderSubmissionForms() {
-            // Updated E-Book Publishing Submission Handler with Cloud Storage Stream
+            // E-Book Publishing Submission Handler with Resumable Progress Tracking
             document.getElementById('ebookUploadForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
-                const submitBtn = e.target.querySelector('button[type="submit"]');
+                const submitBtn = document.getElementById('ebookSubmitBtn');
 
                 const title = document.getElementById('bookTitle').value.trim();
-                // Forces values to lower case cleanly for consistent category database query filtering
                 const category = document.getElementById('bookCategory').value.trim().toLowerCase();
                 const fileHandle = document.getElementById('bookFile').files[0];
                 const homeworkPrompt = document.getElementById('bookHomeworkPrompt').value.trim();
@@ -166,42 +167,64 @@
 
                 try {
                     submitBtn.disabled = true;
-                    submitBtn.textContent = "Uploading binary file to Storage Node...";
 
-                    // 1. Establish isolated storage path node name matching timestamp loops to prevent file name collisions
+                    // Establish isolated storage path node name
                     const uniqueFileName = `${Date.now()}_${fileHandle.name.replace(/\s+/g, '_')}`;
                     const storageBucketRef = sRef(storage, `elibrary/${uniqueFileName}`);
 
-                    // 2. Stream byte buffers straight to Cloud Storage Buckets
-                    const uploadResult = await uploadBytes(storageBucketRef, fileHandle);
-                    
-                    submitBtn.textContent = "Resolving secure token address...";
-                    // 3. Extract the clean download string resource target token
-                    const publicFileUrl = await getDownloadURL(uploadResult.ref);
+                    // 1. LAUNCH THE RESUMABLE DATA STREAM PIPELINE
+                    const uploadTask = uploadBytesResumable(storageBucketRef, fileHandle);
 
-                    submitBtn.textContent = "Writing entry metadata records...";
-                    const libraryRootRef = ref(db, 'elibrary');
-                    const newBookRecordRef = push(libraryRootRef);
+                    // 2. LISTEN TO PROGRESS PERCENTAGE METRICS IN REAL-TIME
+                    uploadTask.on('state_changed', 
+                        (snapshot) => {
+                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                            
+                            // Inject tracking string and a mini progress bar inside the button
+                            submitBtn.innerHTML = `
+                                <span class="inline-block animate-pulse text-amber-400">⏳ Uploading: ${Math.round(progress)}%</span>
+                                <div class="w-48 bg-gray-950 h-1 rounded-full mt-1 overflow-hidden border border-gray-800">
+                                    <div class="bg-blue-500 h-full transition-all duration-150" style="width: ${progress}%"></div>
+                                </div>
+                            `;
+                        }, 
+                        (error) => {
+                            console.error("Upload Task Interrupted:", error);
+                            alert(`Upload Interrupted: ${error.message}`);
+                            resetSubmitButton(submitBtn);
+                        }, 
+                        async () => {
+                            // 3. UPLOAD COMPLETION NODE: Triggered when progress reaches 100%
+                            submitBtn.textContent = "💾 Publishing records to database...";
+                            const publicFileUrl = await getDownloadURL(uploadTask.snapshot.ref);
 
-                    // 4. Save to Realtime DB matching the category string value
-                    await set(newBookRecordRef, {
-                        title,
-                        category,
-                        fileUrl: publicFileUrl,
-                        homeworkPrompt: homeworkPrompt || `Read core chapters inside ${title} to compile review criteria.`
-                    });
+                            const libraryRootRef = ref(db, 'elibrary');
+                            const newBookRecordRef = push(libraryRootRef);
 
-                    alert(`🎉 Success! "${title}" has been safely uploaded and published.`);
-                    e.target.reset();
+                            await set(newBookRecordRef, {
+                                title,
+                                category,
+                                fileUrl: publicFileUrl,
+                                homeworkPrompt: homeworkPrompt || `Read core chapters inside ${title} to compile review criteria.`
+                            });
+
+                            alert(`🎉 Success! "${title}" has been safely processed and live-published.`);
+                            e.target.reset();
+                            resetSubmitButton(submitBtn);
+                        }
+                    );
 
                 } catch (err) {
-                    console.error("Storage pipeline crash:", err);
+                    console.error("Storage pipeline initialization fault:", err);
                     alert("Asset execution fault: " + err.message);
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = "Upload and Publish Document";
+                    resetSubmitButton(submitBtn);
                 }
             });
+
+            function resetSubmitButton(btn) {
+                btn.disabled = false;
+                btn.textContent = "Upload and Publish Document";
+            }
 
             // Video Stream Publishing Submission Handler with Custom Subject Input
             document.getElementById('videoUploadForm').addEventListener('submit', async (e) => {
@@ -248,4 +271,4 @@
         runSecurityAuditHandshake();
     </script>
 </body>
-                            </html>
+</html>
