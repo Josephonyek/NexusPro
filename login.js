@@ -1,56 +1,98 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const loginForm = document.getElementById('loginForm');
-    const errorBanner = document.getElementById('errorMessage');
-    const submitBtn = document.getElementById('submitBtn');
+// Nexus Pro 2.0 - Core Authentication & Sign-In Controller Pipeline
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 
-    loginForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+let app, auth, db;
 
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
+// Initialize Firebase using your project configuration settings
+async function bootstrapAuthSystem() {
+    try {
+        const configResponse = await fetch('./api/firebaseConfig');
+        if (!configResponse.ok) throw new Error("Could not download backend connection maps.");
+        const firebaseConfig = await configResponse.json();
 
-        // Visual feedback state
+        app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getDatabase(app);
+
+        // Bind form submission event once Firebase is ready
+        document.getElementById('loginForm').addEventListener('submit', executeSecureLoginSequence);
+    } catch (err) {
+        console.error("Auth initialization engine failure:", err);
+        alert("System Error: Failed to connect to secure servers.");
+    }
+}
+
+async function executeSecureLoginSequence(e) {
+    e.preventDefault();
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    if (!email || !password) {
+        alert("Please complete all credential fields.");
+        return;
+    }
+
+    try {
         submitBtn.disabled = true;
-        submitBtn.textContent = "Verifying Credentials...";
-        errorBanner.classList.add('hidden');
+        submitBtn.textContent = "Verifying identity credentials...";
 
-        try {
-            // Route data securely straight into your backend API folder endpoint
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
-            });
+        // 1. STEP ONE: Authenticate with Firebase Auth FIRST to get a token
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
 
-            const data = await response.json();
+        // 2. STEP TWO: Extract the secure identity token string
+        const secureToken = await user.getIdToken();
 
-            if (response.ok) {
-                errorBanner.className = "p-4 mb-5 text-sm font-semibold rounded-2xl bg-emerald-950/50 border border-emerald-900/60 text-emerald-400 text-center";
-                errorBanner.textContent = "Clearance verified! Redirecting...";
-                errorBanner.classList.remove('hidden');
+        submitBtn.textContent = "Authorizing security clearances...";
 
-                // Save session pointers to pass your dashboard authorization script checks
-                localStorage.setItem('nexusAuthToken', data.token);
-                localStorage.setItem('nexusUserId', data.userId);
+        // 3. STEP THREE: Fetch the specific user profile node using their verified UID
+        const userProfileRef = ref(db, `users/${user.uid}`);
+        const snapshot = await get(userProfileRef);
 
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1200);
-
-            } else {
-                // Display the custom server response message (e.g., user is locked out/banned/wrong password)
-                errorBanner.textContent = data.error || "An error occurred during authentication.";
-                errorBanner.classList.remove('hidden');
-                submitBtn.disabled = false;
-                submitBtn.textContent = "Log In";
-            }
-
-        } catch (error) {
-            console.error("Frontend HTTP Pipeline Exception:", error);
-            errorBanner.textContent = "⚠️ Cloud server timeout. Check network status connection.";
-            errorBanner.classList.remove('hidden');
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Log In";
+        if (!snapshot.exists()) {
+            throw new Error("Profile record missing from database index.");
         }
-    });
-});
+
+        const profile = snapshot.val();
+
+        if (profile.status === 'banned' || profile.status === 'suspended') {
+            alert("🔒 Access Denied: This account node has been permanently suspended.");
+            auth.signOut();
+            return;
+        }
+
+        // 4. STEP FOUR: Save session matrices locally for dashboard access validation
+        localStorage.setItem('nexusAuthToken', secureToken);
+        localStorage.setItem('nexusUserId', user.uid);
+        localStorage.setItem('nexusUserRole', profile.role || 'student');
+
+        submitBtn.textContent = "Redirecting to console...";
+        
+        // 5. STEP FIVE: Clear path to Dashboard workspace console
+        window.location.replace('dashboard.html');
+
+    } catch (err) {
+        console.error("Authentication handshake rejected:", err);
+        
+        // Friendly error handler messages
+        if (err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found' || err.message.includes("missing")) {
+            alert("❌ Invalid email or password combination. Please try again.");
+        } else if (err.code === 'auth/too-many-requests') {
+            alert("⚠️ System Locked: Too many failed login attempts. Please sleep on it or try again later.");
+        } else {
+            alert("Login Pipeline Error: " + err.message);
+        }
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Sign In to Dashboard";
+        }
+    }
+}
+
+// Fire up auth listener setup on page load
+document.addEventListener('DOMContentLoaded', bootstrapAuthSystem);
