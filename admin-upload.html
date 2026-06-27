@@ -6,7 +6,6 @@
     <title>Nexus Pro 2.0 - Media Content Desk</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Anti-Flash Shield: Keeps layout hidden until admin identity is verified */
         body { opacity: 0; transition: opacity 0.4s ease-in-out; }
         body.access-granted { opacity: 1; }
     </style>
@@ -32,7 +31,7 @@
     <main class="max-w-5xl mx-auto px-4 py-10">
         <div class="mb-8">
             <h2 class="text-2xl font-extrabold tracking-tight">Resource Inventory Uplink</h2>
-            <p class="text-gray-400 text-sm mt-0.5">Populate library manuscripts or append video tutorials dynamically to user academy dashboards.</p>
+            <p class="text-gray-400 text-sm mt-0.5">Upload local document files directly or append video tutorials dynamically to user academy dashboards.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -42,7 +41,7 @@
                     <span class="text-2xl">📚</span>
                     <div>
                         <h3 class="font-bold text-base">E-Library Document Register</h3>
-                        <p class="text-[11px] text-gray-400">Inject digital textbooks directly into the file index.</p>
+                        <p class="text-[11px] text-gray-400">Upload document files directly into storage arrays.</p>
                     </div>
                 </div>
 
@@ -52,23 +51,19 @@
                         <input type="text" id="bookTitle" placeholder="e.g., Senior Secondary Physics - Volume 2" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-blue-500 text-white transition" required>
                     </div>
                     <div>
-                        <label class="block font-bold text-gray-400 uppercase tracking-wider mb-1.5">Academic Domain Category</label>
-                        <select id="bookCategory" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-blue-500 text-gray-300 transition">
-                            <option value="physics">Physics</option>
-                            <option value="chemistry">Chemistry</option>
-                            <option value="mathematics">Mathematics</option>
-                        </select>
+                        <label class="block font-bold text-gray-400 uppercase tracking-wider mb-1.5">Custom Subject or Course Track Name</label>
+                        <input type="text" id="bookCategory" placeholder="e.g., Further Mathematics, Technical Drawing" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-blue-500 text-white transition" required>
                     </div>
                     <div>
-                        <label class="block font-bold text-gray-400 uppercase tracking-wider mb-1.5">Resource File Source URL (PDF Link)</label>
-                        <input type="url" id="bookFileUrl" placeholder="https://example.com/storage/physics-sec2.pdf" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-blue-500 text-white transition" required>
+                        <label class="block font-bold text-gray-400 uppercase tracking-wider mb-1.5">Upload E-Book File (PDF, EPUB)</label>
+                        <input type="file" id="bookFile" accept=".pdf,.epub" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-blue-500 text-gray-400 transition file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-gray-800 file:text-blue-400 hover:file:bg-gray-700 file:cursor-pointer" required>
                     </div>
                     <div>
                         <label class="block font-bold text-gray-400 uppercase tracking-wider mb-1.5">Default Homework Assignment Prompt (Optional)</label>
                         <textarea id="bookHomeworkPrompt" rows="3" placeholder="Read Chapter 3, page 45, and complete review questions 1-5 inside the learning arcade arena panels." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-blue-500 text-white transition"></textarea>
                     </div>
 
-                    <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition shadow-md shadow-blue-900/20 mt-2">Publish Document to Vault</button>
+                    <button type="submit" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition shadow-md shadow-blue-900/20 mt-2">Upload and Publish Document</button>
                 </form>
             </section>
 
@@ -77,7 +72,7 @@
                     <span class="text-2xl">🎥</span>
                     <div>
                         <h3 class="font-bold text-base">Video Stream Reference Map</h3>
-                        <p class="text-[11px] text-gray-400">Bind YouTube reference channels to course streams.</p>
+                        <p class="text-[11px] text-gray-400">Bind YouTube reference channels to custom course streams.</p>
                     </div>
                 </div>
 
@@ -87,17 +82,13 @@
                         <input type="text" id="videoTitle" placeholder="e.g., Understanding Projectile Motion Step-by-Step" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-emerald-500 text-white transition" required>
                     </div>
                     <div>
-                        <label class="block font-bold text-gray-400 uppercase tracking-wider mb-1.5">Subject Stream Reference Matrix</label>
-                        <select id="videoSubject" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-emerald-500 text-gray-300 transition">
-                            <option value="physics">Physics</option>
-                            <option value="chemistry">Chemistry</option>
-                            <option value="mathematics">Mathematics</option>
-                        </select>
+                        <label class="block font-bold text-gray-400 uppercase tracking-wider mb-1.5">Custom Subject Stream Reference</label>
+                        <input type="text" id="videoSubject" placeholder="e.g., Further Mathematics, Anatomy" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-emerald-500 text-white transition" required>
                     </div>
                     <div>
                         <label class="block font-bold text-gray-400 uppercase tracking-wider mb-1.5">YouTube Embed URL Pathway</label>
                         <input type="url" id="videoEmbedUrl" placeholder="https://www.youtube.com/embed/VIDEO_ID" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-emerald-500 text-white transition" required>
-                        <p class="text-[9px] text-gray-500 mt-1">⚠️ Important: The link must use the /embed/ path format so it plays perfectly inside the academy viewport iframe.</p>
+                        <p class="text-[9px] text-gray-500 mt-1">⚠️ Links must use the /embed/ path layout format so it plays inside the academy frame canvas maps.</p>
                     </div>
 
                     <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition shadow-md shadow-emerald-900/20 mt-8">Mount Reference Stream</button>
@@ -110,10 +101,12 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
         import { getDatabase, ref, push, set, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+        // Import Firebase Storage modules to handle the direct binary stream uploads
+        import { getStorage, ref as sRef, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
 
         let db;
+        let storage;
 
-        // 1. HARD ADMINISTRATIVE SYSTEM ACCESS AUDIT BLOCK
         async function runSecurityAuditHandshake() {
             const token = localStorage.getItem('nexusAuthToken');
             const uid = localStorage.getItem('nexusUserId');
@@ -131,22 +124,20 @@
 
                 const app = initializeApp(firebaseConfig);
                 db = getDatabase(app);
+                storage = getStorage(app); // Instantiate storage reference pointer maps
 
-                // Look up admin identity variables explicitly
                 const userSnapshot = await get(ref(db, `users/${uid}`));
                 const userProfile = userSnapshot.val();
 
                 if (!userProfile || userProfile.role !== 'admin' || userProfile.status === 'banned') {
-                    alert("Security Exception: Access Denied. Administrative Role parameters missing.");
+                    alert("Security Exception: Access Denied.");
                     window.location.replace('dashboard.html');
                     return;
                 }
 
-                // Authentication passed: drop preloader cover shielding
                 document.body.classList.add('access-granted');
                 document.getElementById('uploadPreloader').remove();
 
-                // Bind Form Push submission hooks cleanly
                 bindUploaderSubmissionForms();
 
             } catch (err) {
@@ -157,52 +148,70 @@
         }
 
         function bindUploaderSubmissionForms() {
-            // E-Book Publishing Submission Logic Handler
+            // Updated E-Book Publishing Submission Handler with Cloud Storage Stream
             document.getElementById('ebookUploadForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const submitBtn = e.target.querySelector('button[type="submit"]');
 
                 const title = document.getElementById('bookTitle').value.trim();
-                const category = document.getElementById('bookCategory').value;
-                const fileUrl = document.getElementById('bookFileUrl').value.trim();
+                // Forces values to lower case cleanly for consistent category database query filtering
+                const category = document.getElementById('bookCategory').value.trim().toLowerCase();
+                const fileHandle = document.getElementById('bookFile').files[0];
                 const homeworkPrompt = document.getElementById('bookHomeworkPrompt').value.trim();
+
+                if (!fileHandle) {
+                    alert("Please select a physical document file block first.");
+                    return;
+                }
 
                 try {
                     submitBtn.disabled = true;
-                    submitBtn.textContent = "Writing fields to Cloud Database...";
+                    submitBtn.textContent = "Uploading binary file to Storage Node...";
 
-                    // Generate an automated dynamic reference key string under the /elibrary directory node
+                    // 1. Establish isolated storage path node name matching timestamp loops to prevent file name collisions
+                    const uniqueFileName = `${Date.now()}_${fileHandle.name.replace(/\s+/g, '_')}`;
+                    const storageBucketRef = sRef(storage, `elibrary/${uniqueFileName}`);
+
+                    // 2. Stream byte buffers straight to Cloud Storage Buckets
+                    const uploadResult = await uploadBytes(storageBucketRef, fileHandle);
+                    
+                    submitBtn.textContent = "Resolving secure token address...";
+                    // 3. Extract the clean download string resource target token
+                    const publicFileUrl = await getDownloadURL(uploadResult.ref);
+
+                    submitBtn.textContent = "Writing entry metadata records...";
                     const libraryRootRef = ref(db, 'elibrary');
                     const newBookRecordRef = push(libraryRootRef);
 
+                    // 4. Save to Realtime DB matching the category string value
                     await set(newBookRecordRef, {
                         title,
                         category,
-                        fileUrl,
+                        fileUrl: publicFileUrl,
                         homeworkPrompt: homeworkPrompt || `Read core chapters inside ${title} to compile review criteria.`
                     });
 
-                    alert(`🎉 Success! "${title}" has been published to your E-Library asset node tree.`);
+                    alert(`🎉 Success! "${title}" has been safely uploaded and published.`);
                     e.target.reset();
 
                 } catch (err) {
-                    alert("Asset save error: " + err.message);
+                    console.error("Storage pipeline crash:", err);
+                    alert("Asset execution fault: " + err.message);
                 } finally {
                     submitBtn.disabled = false;
-                    submitBtn.textContent = "Publish Document to Vault";
+                    submitBtn.textContent = "Upload and Publish Document";
                 }
             });
 
-            // Video Stream Publishing Submission Logic Handler
+            // Video Stream Publishing Submission Handler with Custom Subject Input
             document.getElementById('videoUploadForm').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const submitBtn = e.target.querySelector('button[type="submit"]');
 
                 const title = document.getElementById('videoTitle').value.trim();
-                const subject = document.getElementById('videoSubject').value;
+                const subject = document.getElementById('videoSubject').value.trim().toLowerCase();
                 let embedUrl = document.getElementById('videoEmbedUrl').value.trim();
 
-                // Simple regex helper to convert standard youtube links to embed layout paths if pasted incorrectly
                 if (embedUrl.includes("watch?v=")) {
                     const videoId = embedUrl.split("v=")[1]?.split("&")[0];
                     if (videoId) embedUrl = `https://www.youtube.com/embed/${videoId}`;
@@ -224,7 +233,7 @@
                         embedUrl
                     });
 
-                    alert(`🎉 Success! Video guide mounted cleanly for the ${subject} syllabus reference catalog.`);
+                    alert(`🎉 Success! Video guide mounted cleanly for the "${subject}" syllabus reference catalog.`);
                     e.target.reset();
 
                 } catch (err) {
@@ -236,8 +245,7 @@
             });
         }
 
-        // Initialize execution matrix
         runSecurityAuditHandshake();
     </script>
 </body>
-  </html>
+                            </html>
