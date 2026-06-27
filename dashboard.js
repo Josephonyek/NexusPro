@@ -9,7 +9,7 @@ function sanitize(str) {
 }
 
 async function verifyAndInitializeDashboard() {
-    // 1. AUTHENTICATION LOCK: Instantly reject if credentials do not exist in local cache
+    // 1. AUTHENTICATION LOCK: Instantly reject if local credentials do not exist
     const sessionToken = localStorage.getItem('nexusAuthToken');
     const userId = localStorage.getItem('nexusUserId');
 
@@ -21,7 +21,7 @@ async function verifyAndInitializeDashboard() {
     }
 
     try {
-        // 2. CONFIGURATION HANDSHAKE: Fetch server settings dynamically
+        // 2. CONFIGURATION HANDSHAKE: Fetch dynamic backend maps
         const configResponse = await fetch('./api/firebaseConfig');
         if (!configResponse.ok) throw new Error("Could not load secure database configuration maps.");
         const firebaseConfig = await configResponse.json();
@@ -29,8 +29,8 @@ async function verifyAndInitializeDashboard() {
         const databaseUrl = firebaseConfig.databaseURL || 'https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app';
         const cleanDbUrl = databaseUrl.replace(/\/$/, "");
 
-        // 3. SECURE NODE LOOKUP: Fetch user credentials directly from database path
-        const userFetchResponse = await fetch(`${cleanDbUrl}/users/${userId}.json`);
+        // 3. SECURE NODE LOOKUP: Appends the auth token query parameter to satisfy security rules
+        const userFetchResponse = await fetch(`${cleanDbUrl}/users/${userId}.json?auth=${sessionToken}`);
         
         if (!userFetchResponse.ok) {
             throw new Error("Security verification failed on database query.");
@@ -46,60 +46,55 @@ async function verifyAndInitializeDashboard() {
             return;
         }
 
-        // ACCESS AUTHORIZED: Begin populating elements defensively
-        
-        // Render Role Badges and Welcome Greetings Safely
+        // ACCESS AUTHORIZED: Begin populating dashboard panels securely
         const cleanName = sanitize(profileData.name || "Scholar");
         const cleanRole = sanitize(profileData.role || "student");
 
         document.getElementById('welcomeHeading').innerHTML = `Welcome Back, ${cleanName}!`;
-        document.getElementById('welcomeSubtext').innerText = "Track assignments, review materials, or step into the learning arcade panels.";
+        if (document.getElementById('welcomeSubtext')) {
+            document.getElementById('welcomeSubtext').innerText = "Track assignments, review materials, or step into the learning academy panels.";
+        }
         
         const roleBadge = document.getElementById('roleBadge');
-        roleBadge.innerText = cleanRole;
-        
-        // Dynamically style badge colors based on authentication role metrics
-        if (cleanRole === 'admin') {
-            roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40 tracking-wider";
-            // Unhide Administrative Grid Desk Panels and Sidebar Links
-            document.getElementById('adminSection')?.classList.remove('hidden');
-            document.getElementById('sidebarAdminLinks')?.classList.remove('hidden');
-        } else {
-            roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-blue-950 text-blue-400 border border-blue-900/40 tracking-wider";
+        if (roleBadge) {
+            roleBadge.innerText = cleanRole;
+            // Dynamically apply visual aesthetics based on roles
+            if (cleanRole === 'admin') {
+                roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40 tracking-wider";
+                // Reveal administrative operational units
+                document.getElementById('adminSection')?.classList.remove('hidden');
+                document.getElementById('sidebarAdminLinks')?.classList.remove('hidden');
+            } else {
+                roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-blue-950 text-blue-400 border border-blue-900/40 tracking-wider";
+            }
         }
 
-        // 5. GAMIFICATION METRICS INTEGRATION: Inject user XP level components
+        // 5. GAMIFICATION PROGRESS METRICS: Populating XP parameters
         if (profileData.gameMetrics) {
             const currentXp = parseInt(profileData.gameMetrics.totalXP || 0);
             const currentLevel = parseInt(profileData.gameMetrics.currentLevel || 1);
 
-            document.getElementById('userXpText').innerText = `${currentXp.toLocaleString()} XP`;
-            document.getElementById('userLevelText').innerText = `Level ${currentLevel}`;
-            
-            // Reveal gamification structures visually once values settle
-            document.getElementById('xpBadge')?.classList.remove('hidden');
-            document.getElementById('xpBadge')?.classList.add('flex');
-            document.getElementById('levelBox')?.classList.remove('hidden');
+            if (document.getElementById('userXpText')) document.getElementById('userXpText').innerText = `${currentXp.toLocaleString()} XP`;
+            if (document.getElementById('userLevelText')) document.getElementById('userLevelText').innerText = `Level ${currentLevel}`;
         } else {
-            // Default structural display if game metrics object is fresh or uninitialized
-            document.getElementById('userXpText').innerText = "0 XP";
-            document.getElementById('userLevelText').innerText = "Level 1";
-            document.getElementById('xpBadge')?.classList.remove('hidden');
-            document.getElementById('xpBadge')?.classList.add('flex');
-            document.getElementById('levelBox')?.classList.remove('hidden');
+            if (document.getElementById('userXpText')) document.getElementById('userXpText').innerText = "0 XP";
+            if (document.getElementById('userLevelText')) document.getElementById('userLevelText').innerText = "Level 1";
         }
+        
+        // Reveal components visually
+        document.getElementById('xpBadge')?.classList.remove('hidden');
+        document.getElementById('xpBadge')?.classList.add('flex');
+        document.getElementById('levelBox')?.classList.remove('hidden');
 
-        // ACCESS SEQUENCE COMPLETE: Reveal body viewport canvas and drop the styled preloader overlay
-        document.body.classList.add('access-granted');
+        // ACCESS SEQUENCE COMPLETE: Drop styled preloader mask overlay screen cleanly
         dropPreloaderScreen();
 
     } catch (criticalError) {
         console.error("Dashboard Core Execution Exception:", criticalError);
-        // Show clear debugging text directly inside the loading window before crashing out gracefully
-        const preloaderTextNode = document.querySelector('#nexusPreloader p');
+        const preloaderTextNode = document.querySelector('#nexusPreloader p, #uploadPreloader p');
         if (preloaderTextNode) {
             preloaderTextNode.className = "text-xs font-bold text-red-400 uppercase text-center mt-2 px-4";
-            preloaderTextNode.innerText = `Handshake Fault: ${criticalError.message}`;
+            preloaderTextNode.innerText = `Handshake Fault: Permission Denied or Lost Connection`;
         }
     }
 }
@@ -124,9 +119,6 @@ function terminateSessionChannel() {
 
 // Hook Global Events on Runtime Execution Loop
 document.addEventListener("DOMContentLoaded", () => {
-    // Bind click listeners cleanly across navigation elements
     document.getElementById('logoutBtn')?.addEventListener('click', terminateSessionChannel);
-    
-    // Execute server verification sequence
     verifyAndInitializeDashboard();
 });
