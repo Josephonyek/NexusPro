@@ -36,7 +36,7 @@ async function bootstrapAuthSystem() {
                 // 3. THE ULTIMATE UN-STOPPABLE REDIRECT FORCE
                 // Using timeout to clear execution stack lines completely
                 setTimeout(() => {
-                    window.location.href = './dashboard.html'; 
+                    window.location.href = 'dashboard.html'; 
                 }, 50);
 
             } catch (err) {
