@@ -1,50 +1,74 @@
-document.getElementById('signupForm').addEventListener('submit', async (e) => {
-    e.preventDefault();
+// Nexus Pro 2.0 - Core Registration & Instant Redirect Pipeline
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 
-    const name = document.getElementById('name').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const password = document.getElementById('password').value;
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-
-    if (!name || !email || !password) {
-        alert("Please fill in all fields.");
-        return;
-    }
-
+async function bootstrapRegisterSystem() {
     try {
-        // Disable button to prevent quick double-tap submissions
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.textContent = "Creating Account...";
-        }
+        const configResponse = await fetch('./api/firebaseConfig');
+        const firebaseConfig = await configResponse.json();
 
-        const response = await fetch('/api/signup', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password })
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            
+            const fullName = document.getElementById('regName').value.trim();
+            const email = document.getElementById('regEmail').value.trim();
+            const password = document.getElementById('regPassword').value;
+
+            try {
+                submitBtn.disabled = true;
+                submitBtn.textContent = "Forging security keys...";
+
+                // 1. Create the user inside Firebase Authentication
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+                const secureToken = await user.getIdToken();
+
+                submitBtn.textContent = "Writing secure profile node...";
+
+                // 2. Write their initial account data to the Realtime Database
+                // This satisfies our exact rule: auth != null && !data.exists()
+                const newUserProfileRef = ref(db, `users/${user.uid}`);
+                await set(newUserProfileRef, {
+                    name: fullName,
+                    role: "student", // Automatically joins as a student
+                    status: "active",
+                    gameMetrics: {
+                        totalXP: 0,
+                        currentLevel: 1
+                    }
+                });
+
+                // 3. Clear existing tokens and save fresh session matrices locally
+                localStorage.clear();
+                localStorage.setItem('nexusAuthToken', secureToken);
+                localStorage.setItem('nexusUserId', user.uid);
+                localStorage.setItem('nexusUserRole', 'student');
+
+                submitBtn.textContent = "SIGN UP SUCCESSFUL! REDIRECTING...";
+
+                // 4. NATIVE SYSTEM FORCE REDIRECT
+                // Placed in a mini-timeout to give localStorage a split second to lock in
+                setTimeout(() => {
+                    window.location.href = './dashboard.html';
+                }, 100);
+
+            } catch (err) {
+                console.error("Registration pipeline aborted:", err);
+                alert(`Sign Up Failed: ${err.message}`);
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Create Account";
+            }
         });
 
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.error || "Signup failed");
-        }
-
-        // Save backend approved session tokens safely
-        localStorage.setItem('nexusAuthToken', data.token);
-        localStorage.setItem('nexusUserId', data.userId);
-
-        alert("Account created successfully! Redirecting to dashboard...");
-        window.location.replace('dashboard.html');
-
-    } catch (error) {
-        console.error("Signup Loop Exception:", error);
-        alert(error.message);
-        
-        // Re-enable button on failure so they can try again
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Sign Up";
-        }
+    } catch (criticalErr) {
+        alert("System connection error. Could not reach configuration servers.");
     }
-});
+}
+
+document.addEventListener('DOMContentLoaded', bootstrapRegisterSystem);
