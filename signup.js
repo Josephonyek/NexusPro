@@ -1,4 +1,4 @@
-// Nexus Pro 2.0 - Core Registration & Instant Redirect Pipeline
+// Nexus Pro 2.0 - Core Registration & Bug-Free Redirect Engine
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
@@ -12,31 +12,35 @@ async function bootstrapRegisterSystem() {
         const auth = getAuth(app);
         const db = getDatabase(app);
 
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+        const formElement = document.getElementById('registerForm');
+        
+        formElement.addEventListener('submit', async (e) => {
+            // FIX #1: Lock the browser down immediately so it CANNOT refresh the page
             e.preventDefault();
-            const submitBtn = e.target.querySelector('button[type="submit"]');
+            e.stopPropagation();
             
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.disabled = true;
+
             const fullName = document.getElementById('regName').value.trim();
             const email = document.getElementById('regEmail').value.trim();
             const password = document.getElementById('regPassword').value;
 
             try {
-                submitBtn.disabled = true;
-                submitBtn.textContent = "Forging security keys...";
+                if (submitBtn) submitBtn.textContent = "Creating Account...";
 
-                // 1. Create the user inside Firebase Authentication
+                // 1. Authenticate user via Firebase Auth
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
                 const secureToken = await user.getIdToken();
 
-                submitBtn.textContent = "Writing secure profile node...";
+                if (submitBtn) submitBtn.textContent = "Saving Profile...";
 
-                // 2. Write their initial account data to the Realtime Database
-                // This satisfies our exact rule: auth != null && !data.exists()
+                // 2. Safely push user metadata to Realtime Database
                 const newUserProfileRef = ref(db, `users/${user.uid}`);
                 await set(newUserProfileRef, {
                     name: fullName,
-                    role: "student", // Automatically joins as a student
+                    role: "student",
                     status: "active",
                     gameMetrics: {
                         totalXP: 0,
@@ -44,30 +48,29 @@ async function bootstrapRegisterSystem() {
                     }
                 });
 
-                // 3. Clear existing tokens and save fresh session matrices locally
+                // 3. Store active session states safely
                 localStorage.clear();
                 localStorage.setItem('nexusAuthToken', secureToken);
                 localStorage.setItem('nexusUserId', user.uid);
                 localStorage.setItem('nexusUserRole', 'student');
 
-                submitBtn.textContent = "SIGN UP SUCCESSFUL! REDIRECTING...";
+                if (submitBtn) submitBtn.textContent = "Redirecting Now...";
 
-                // 4. NATIVE SYSTEM FORCE REDIRECT
-                // Placed in a mini-timeout to give localStorage a split second to lock in
-                setTimeout(() => {
-                    window.location.href = './dashboard.html';
-                }, 100);
+                // FIX #2: Unstoppable Native Window Core Location Force
+                window.location.replace('dashboard.html');
 
             } catch (err) {
-                console.error("Registration pipeline aborted:", err);
-                alert(`Sign Up Failed: ${err.message}`);
-                submitBtn.disabled = false;
-                submitBtn.textContent = "Create Account";
+                console.error("Signup bug caught:", err);
+                alert(`Sign Up Error: ${err.message}`);
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "Create Account";
+                }
             }
         });
 
     } catch (criticalErr) {
-        alert("System connection error. Could not reach configuration servers.");
+        console.error("Config connection fault:", criticalErr);
     }
 }
 
