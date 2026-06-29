@@ -1,92 +1,48 @@
-// Nexus Pro 2.0 - Bulletproof Authentication & Safe Redirect Controller
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
-import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
 
-let app, auth, db;
-
-// Initialize Firebase with failsafe defaults
-async function bootstrapAuthSystem() {
-    try {
-        const configResponse = await fetch('./api/firebaseConfig');
-        if (!configResponse.ok) throw new Error("Config network error.");
-        const firebaseConfig = await configResponse.json();
-
-        app = initializeApp(firebaseConfig);
-        auth = getAuth(app);
-        db = getDatabase(app);
-
-        document.getElementById('loginForm').addEventListener('submit', executeSecureLoginSequence);
-    } catch (err) {
-        console.error("Auth Engine Failure:", err);
-        // Failsafe initialization if your backend route is acting up
-        alert("System Notice: Using client-side direct auth sync routing.");
-    }
+// login.js - Frontend Form Controller
+async function hashPasswordSHA256(password) {
+    const encoder = new TextEncoder();
+    const data = encoder.encode(password);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-async function executeSecureLoginSequence(e) {
-    e.preventDefault();
-    const submitBtn = e.target.querySelector('button[type="submit"]');
-    
-    const email = document.getElementById('loginEmail').value.trim();
-    const password = document.getElementById('loginPassword').value;
-
-    try {
-        submitBtn.disabled = true;
-        submitBtn.textContent = "Authenticating identity credentials...";
-
-        // 1. Core Firebase Authentication Match
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        const secureToken = await user.getIdToken();
-
-        // Save foundational credentials immediately so dashboard can read them
-        localStorage.setItem('nexusAuthToken', secureToken);
-        localStorage.setItem('nexusUserId', user.uid);
-
-        submitBtn.textContent = "Checking profile channels...";
-
-        // 2. SAFE-ROUTE NESTED TRY: Fetch additional role metadata
-        try {
-            const userProfileRef = ref(db, `users/${user.uid}`);
-            const snapshot = await get(userProfileRef);
-
-            if (snapshot.exists()) {
-                const profile = snapshot.val();
-                if (profile.status === 'banned' || profile.status === 'suspended') {
-                    alert("🔒 Access Denied: This account node has been suspended.");
-                    localStorage.clear();
-                    await auth.signOut();
-                    window.location.reload();
-                    return;
-                }
-                localStorage.setItem('nexusUserRole', profile.role || 'student');
-            } else {
-                // Failsafe fallback if database profile record is missing or rules block it
-                localStorage.setItem('nexusUserRole', 'student');
-            }
-        } catch (dbError) {
-            console.warn("Database metadata look-up skipped or restricted:", dbError.message);
-            // Even if database rules block this temporary read, assign default role to keep moving
-            localStorage.setItem('nexusUserRole', 'student');
-        }
-
-        // 3. BULLETPROOF REDIRECT FORCE
-        submitBtn.textContent = "Authorization Granted! Redirecting...";
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button[type="submit"]');
         
-        setTimeout(() => {
-            window.location.assign('dashboard.html');
-        }, 100);
+        const email = document.getElementById('loginEmail').value.trim();
+        const plainPassword = document.getElementById('loginPassword').value;
 
-    } catch (err) {
-        console.error("Authentication handshake rejected:", err);
-        alert(`Authentication Failed: ${err.message}`);
-    } finally {
-        if (submitBtn) {
-            submitBtn.disabled = false;
-            submitBtn.textContent = "Sign In to Dashboard";
+        try {
+            btn.disabled = true;
+            btn.textContent = "Hashing security tokens...";
+
+            const hashedPassword = await hashPasswordSHA256(plainPassword);
+
+            // Execute post transaction against server mapping
+            const response = await fetch('./api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, hashedPassword })
+            });
+
+            const result = await response.json();
+            if (!response.ok) throw new Error(result.message || "Login authentication rejected.");
+
+            localStorage.clear();
+            localStorage.setItem('nexusAuthToken', result.token);
+            localStorage.setItem('nexusUserId', result.userId);
+            localStorage.setItem('nexusUserRole', result.role);
+
+            btn.textContent = "Redirecting...";
+            window.location.replace('dashboard.html');
+
+        } catch (err) {
+            alert(`Login Failed: ${err.message}`);
+            btn.disabled = false;
+            btn.textContent = "Sign In to Dashboard";
         }
-    }
-}
-
-document.addEventListener('DOMContentLoaded', bootstrapAuthSystem);
+    });
+});
