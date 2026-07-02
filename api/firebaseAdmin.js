@@ -1,18 +1,19 @@
-// api/firebaseAdmin.js
-import { initializeApp, getApps } from "firebase-admin/app";
-import { getAuth } from "firebase-admin/auth";
-import { getDatabase } from "firebase-admin/database";
+// api/firebaseAdmin.js - Fixed CommonJS Version
+const admin = require("firebase-admin");
 
-const firebaseConfig = {
-    projectId: process.env.FIREBASE_PROJECT_ID,
-    databaseURL: process.env.FIREBASE_DATABASE_URL
-};
+// Pull environmental properties natively from the Vercel hosting platform
+const projectId = process.env.FIREBASE_PROJECT_ID;
+const databaseURL = process.env.FIREBASE_DATABASE_URL;
 
-// Prevent duplicate initialization crashes during warm reloads
-let app;
-if (!getApps().length) {
-    app = initializeApp(firebaseConfig);
+// Prevent duplicate app initialization crashes on serverless execution loops
+if (!admin.apps.length) {
+    admin.initializeApp({
+        projectId: projectId,
+        databaseURL: databaseURL
+    });
 }
 
-export const adminAuth = getAuth(app);
-export const adminDb = getDatabase(app);
+const adminAuth = admin.auth();
+const adminDb = admin.database();
+
+module.exports = { adminAuth, adminDb };
