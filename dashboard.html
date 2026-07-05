@@ -6,7 +6,7 @@
     <title>Nexus Pro | Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        /* Precision acceleration overrides to speed up the loading rhythm */
+        /* Lightning-fast loading rhythm override */
         .animate-fast-pulse {
             animation: pulse 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
@@ -16,13 +16,12 @@
         }
     </style>
 </head>
-<body class="bg-neutral-950 text-neutral-100 min-h-screen antialiased selection:bg-blue-600/30 selection:text-blue-400">
+<body class="bg-neutral-950 text-neutral-100 min-h-screen antialiased selection:bg-blue-600/30 selection:text-blue-400 scroll-smooth">
 
     <div id="nexusPreloader" class="fixed inset-0 bg-neutral-950 z-50 flex flex-col justify-center items-center p-6 transition-all duration-300 ease-out will-change-transform">
         <div class="w-full max-w-4xl space-y-6 animate-fast-pulse">
             <div class="h-10 bg-neutral-900 rounded-xl w-1/4"></div>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="h-28 bg-neutral-900 rounded-2xl"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="h-28 bg-neutral-900 rounded-2xl"></div>
                 <div class="h-28 bg-neutral-900 rounded-2xl"></div>
             </div>
@@ -46,7 +45,7 @@
                 
                 <div id="sidebarAdminLinks" class="hidden pt-4 border-t border-neutral-800/60 mt-4 space-y-1.5">
                     <span class="block px-3 text-[10px] font-bold tracking-wider text-neutral-500 uppercase mb-1">Management</span>
-                    <a href="#admin" class="flex items-center gap-3 px-3 py-2.5 text-red-400 hover:bg-red-950/20 rounded-xl font-medium text-sm transition-all">Console Control</a>
+                    <a href="#adminSection" class="flex items-center gap-3 px-3 py-2.5 text-red-400 hover:bg-red-950/20 rounded-xl font-medium text-sm transition-all">Console Control</a>
                 </div>
             </nav>
 
@@ -89,7 +88,7 @@
 
             <div class="p-6 space-y-6 flex-1 overflow-y-auto max-w-7xl w-full mx-auto">
                 
-                <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="bg-neutral-900 border border-neutral-800/60 p-6 rounded-2xl relative overflow-hidden group hover:border-blue-500/30 transition-all">
                         <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Academic Level Status</div>
                         <div id="userLevelText" class="text-3xl font-extrabold mt-2 tracking-tight text-white">Level 1</div>
@@ -100,26 +99,31 @@
                         <div id="userXpText" class="text-3xl font-extrabold mt-2 tracking-tight bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">0 XP</div>
                         <div class="mt-2 text-xs text-neutral-400">Earned via solver operations</div>
                     </div>
-                    <div class="bg-neutral-900 border border-neutral-800/60 p-6 rounded-2xl relative overflow-hidden group hover:border-emerald-500/30 transition-all">
-                        <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Live Football Core Panel</div>
-                        <div id="footballScorePanel" class="text-sm font-medium mt-2 text-neutral-300 space-y-1">
-                            <div class="flex justify-between border-b border-neutral-800/40 pb-1"><span>Arsenal vs Chelsea</span> <span class="text-emerald-400 font-bold">Live</span></div>
-                            <div class="text-xs text-neutral-500 mt-1">Real-time stadium match array active</div>
-                        </div>
-                    </div>
                 </section>
 
-                <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div id="solvers" class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 space-y-4">
-                        <h3 class="text-lg font-bold tracking-tight text-neutral-100 flex items-center gap-2">📐 Core Physics & Chemistry Solvers</h3>
-                        <p class="text-neutral-400 text-sm">Instantly compute kinematics vectors, geometric optical refraction matrices, and standard analytical solubility product curves.</p>
-                        <button class="bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer">Launch Engineering Modules</button>
+                <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div id="solvers" class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-neutral-700/80 transition-all">
+                        <div class="space-y-2">
+                            <h3 class="text-lg font-bold tracking-tight text-neutral-100 flex items-center gap-2">📐 Academic Solvers</h3>
+                            <p class="text-neutral-400 text-sm">Instantly compute kinematics vectors, geometric optical refraction matrices, and standard analytical solubility product curves.</p>
+                        </div>
+                        <button class="w-full bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer mt-2">Launch Engineering Modules</button>
                     </div>
 
-                    <div id="elibrary" class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 space-y-4">
-                        <h3 class="text-lg font-bold tracking-tight text-neutral-100 flex items-center gap-2">📚 Trivex Academy E-Library</h3>
-                        <p class="text-neutral-400 text-sm">Browse core textbooks, structured reference syllabi, exam practice logs, and digital revision summaries.</p>
-                        <button class="bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer">Open Library Vault</button>
+                    <div id="elibrary" class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-neutral-700/80 transition-all">
+                        <div class="space-y-2">
+                            <h3 class="text-lg font-bold tracking-tight text-neutral-100 flex items-center gap-2">📚 E-Library Hub</h3>
+                            <p class="text-neutral-400 text-sm">Access core textbooks, structured WAEC/JAMB reference syllabi, exam practice logs, and digital revision summaries.</p>
+                        </div>
+                        <button class="w-full bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer mt-2">Open Library Vault</button>
+                    </div>
+
+                    <div id="research" class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-neutral-700/80 transition-all">
+                        <div class="space-y-2">
+                            <h3 class="text-lg font-bold tracking-tight text-neutral-100 flex items-center gap-2">🩺 Health Research Room</h3>
+                            <p class="text-neutral-400 text-sm">Analyze foundational physiological research documentation, surgical data architectures, and clinical system designs.</p>
+                        </div>
+                        <button class="w-full bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer mt-2">Enter Research Lab</button>
                     </div>
                 </section>
 
@@ -133,4 +137,4 @@
 
     <script type="module" src="dashboard.js"></script>
 </body>
-                    </html>
+                                                                                                                                                                                      </html>
