@@ -1,4 +1,4 @@
-// api/login.js - Connected directly to your Vercel Variables
+// api/login.js - Production Ready with Cloud Fallbacks
 module.exports = async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -9,16 +9,12 @@ module.exports = async function handler(req, res) {
 
     const { email, hashedPassword } = req.body;
     
-    // MATCHING YOUR VERCEL PANEL SCREENSHOT:
-    const apiKey = process.env.FIREBASE_API_KEY; 
-    const dbUrl = process.env.FIREBASE_BASE_URL?.replace(/\/$/, "");
+    // HARDCODED FALLBACKS: If Vercel's environment variables are missing, use these directly
+    const apiKey = process.env.FIREBASE_API_KEY || "AIzaSyDbt1wfOLhRls_JG2ysysfHvqRBL8LRpBI"; 
+    const dbUrl = (process.env.FIREBASE_BASE_URL || "https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app").replace(/\/$/, "");
 
     try {
-        if (!apiKey || !dbUrl) {
-            throw new Error("Missing variable mapping links inside the Vercel cloud dashboard container setup.");
-        }
-
-        // 1. Exchange security keys directly via web identity frameworks
+        // 1. Authenticate credentials
         const identityResponse = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -26,12 +22,12 @@ module.exports = async function handler(req, res) {
         });
 
         const identityData = await identityResponse.json();
-        if (!identityResponse.ok) throw new Error(identityData.error?.message || "Invalid Email or Password credentials provided.");
+        if (!identityResponse.ok) throw new Error(identityData.error?.message || "Invalid Email or Password credentials.");
 
         const userId = identityData.localId;
         const idToken = identityData.idToken;
 
-        // 2. Perform metadata clearance check against real-time node structures
+        // 2. Clear user state validation
         const dbResponse = await fetch(`${dbUrl}/users/${userId}.json?auth=${idToken}`);
         const profile = dbResponse.ok ? await dbResponse.json() : null;
         
@@ -39,7 +35,7 @@ module.exports = async function handler(req, res) {
         const accountStatus = profile?.status || 'active';
 
         if (accountStatus === 'banned' || accountStatus === 'suspended') {
-            return res.status(403).json({ success: false, message: '🔒 This account has been flagged and suspended.' });
+            return res.status(403).json({ success: false, message: '🔒 This account has been suspended.' });
         }
 
         return res.status(200).json({
@@ -50,7 +46,7 @@ module.exports = async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error("Login Endpoint Fault Intercepted:", error.message);
+        console.error("Login Endpoint Fault:", error.message);
         return res.status(400).json({ success: false, message: error.message });
     }
 };
