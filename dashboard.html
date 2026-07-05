@@ -3,221 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro 2.0 - Virtual Learning Framework</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Anti-Flash Shield: Invisible until server validation passes */
-        body { opacity: 0; transition: opacity 0.4s ease-in-out; }
-        body.access-granted { opacity: 1; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
-    </style>
+    <title>Nexus Pro | Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
-<body class="bg-gray-950 text-white min-h-screen font-sans overflow-x-hidden">
+<body class="bg-neutral-950 text-neutral-100 min-h-screen antialiased selection:bg-blue-600/30 selection:text-blue-400">
 
-    <div id="nexusPreloader" class="fixed inset-0 bg-gray-950 z-[9999] flex flex-col items-center justify-center transition-all duration-500">
-        <div class="relative flex flex-col items-center max-w-sm px-6 text-center">
-            <div class="relative mb-6 group">
-                <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl blur opacity-30 animate-pulse"></div>
-                <img src="6af08942-b1c3-426c-b0b4-7766f9a4394a.jpeg" alt="Nexus Pro Premium Logo" class="relative w-56 h-auto object-contain rounded-2xl shadow-2xl border border-gray-800/50">
+    <div id="nexusPreloader" class="fixed inset-0 bg-neutral-950 z-50 flex flex-col justify-center items-center p-6 transition-all duration-500">
+        <div class="w-full max-w-4xl space-y-6 animate-pulse">
+            <div class="h-12 bg-neutral-900 rounded-xl w-1/3"></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="h-32 bg-neutral-900 rounded-2xl"></div>
+                <div class="h-32 bg-neutral-900 rounded-2xl"></div>
+                <div class="h-32 bg-neutral-900 rounded-2xl"></div>
             </div>
-            <div class="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p class="text-xs font-bold tracking-[0.2em] text-blue-400 uppercase animate-pulse">Verifying Security Node...</p>
+            <div class="h-64 bg-neutral-900 rounded-2xl w-full"></div>
         </div>
     </div>
 
-    <nav class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex justify-between items-center relative z-40">
-        <div>
-            <h1 class="text-xl font-black tracking-widest bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-violet-400 to-purple-500">NEXUS PRO 2.0</h1>
-        </div>
+    <div class="flex min-h-screen">
         
-        <div class="flex items-center space-x-4">
-            <div id="xpBadge" class="hidden sm:flex items-center space-x-1.5 bg-gray-950 border border-yellow-500/30 px-3 py-1 rounded-xl text-xs font-bold text-yellow-400">
-                <span>🏆</span> <span id="userXpText">0 XP</span>
+        <aside class="hidden lg:flex flex-col w-64 bg-neutral-900 border-r border-neutral-800/60 p-5 shrink-0">
+            <div class="flex items-center gap-3 mb-8 px-2">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black shadow-md shadow-blue-600/20">N</div>
+                <span class="text-lg font-bold tracking-tight">Nexus Pro</span>
             </div>
-            <span id="roleBadge" class="px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-gray-800 text-gray-400 tracking-wider">
-                Verifying...
-            </span>
-
-            <button id="menuToggleBtn" class="p-2.5 bg-gray-800 hover:bg-gray-700/80 rounded-xl border border-gray-700 text-gray-300 hover:text-white transition focus:outline-none" aria-label="Toggle Navigation Menu">
-                <svg id="hamburgerIcon" class="w-6 h-6 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 6h16M4 12h16M4 18h16"/>
-                </svg>
-            </button>
-        </div>
-    </nav>
-
-    <div id="sideMenuDrawer" class="fixed top-0 right-0 h-full w-80 bg-gray-900 border-l border-gray-800 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col justify-between">
-        <div>
-            <div class="p-6 border-b border-gray-800 flex justify-between items-center bg-gray-950/40">
-                <h3 class="font-black text-sm tracking-widest text-gray-400 uppercase">Navigation Control</h3>
-                <button id="menuCloseBtn" class="text-gray-400 hover:text-white transition text-xl font-bold p-1">&times;</button>
-            </div>
-
-            <nav class="p-6 space-y-2">
-                <a href="dashboard.html" class="flex items-center space-x-3 p-3 rounded-xl bg-blue-600/10 text-blue-400 border border-blue-500/20 font-bold transition">
-                    <span>🏠</span> <span class="text-sm">Main Dashboard</span>
-                </a>
-                <a href="academy.html" class="flex items-center space-x-3 p-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800 border border-transparent hover:border-gray-700/50 transition">
-                    <span>📚</span> <span class="text-sm">Core Study Academy</span>
-                </a>
-                <a href="arcade.html" class="flex items-center space-x-3 p-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800 border border-transparent hover:border-gray-700/50 transition">
-                    <span>🎮</span> <span class="text-sm">Learning Arcade</span>
-                </a>
-                <a href="health.html" class="flex items-center space-x-3 p-3 rounded-xl text-gray-300 hover:text-white hover:bg-gray-800 border border-transparent hover:border-gray-700/50 transition">
-                    <span>🌱</span> <span class="text-sm">Health Hub Hub</span>
-                </a>
-
-                <div id="sidebarAdminLinks" class="hidden pt-4 mt-4 border-t border-gray-800/60 space-y-2">
-                    <div class="text-[10px] uppercase tracking-widest text-red-400 font-bold px-3 mb-1">Administrative Node</div>
-                    <a href="admin-users.html" class="flex items-center space-x-3 p-3 rounded-xl text-red-400/80 hover:text-red-400 hover:bg-red-950/20 border border-transparent hover:border-red-900/30 transition">
-                        <span>👥</span> <span class="text-sm">User Management</span>
-                    </a>
-                    <a href="admin-ai-usage.html" class="flex items-center space-x-3 p-3 rounded-xl text-red-400/80 hover:text-red-400 hover:bg-red-950/20 border border-transparent hover:border-red-900/30 transition">
-                        <span>📊</span> <span class="text-sm">AI Usage Monitors</span>
-                    </a>
+            
+            <nav class="space-y-1.5 flex-1">
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-neutral-800 text-blue-400 rounded-xl font-medium text-sm transition-all">Workspace Dashboard</a>
+                <a href="#solvers" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">Academic Solvers</a>
+                <a href="#elibrary" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">E-Library Hub</a>
+                <a href="#research" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">Health Research Room</a>
+                
+                <div id="sidebarAdminLinks" class="hidden pt-4 border-t border-neutral-800/60 mt-4 space-y-1.5">
+                    <span class="block px-3 text-[10px] font-bold tracking-wider text-neutral-500 uppercase mb-1">Management</span>
+                    <a href="#admin" class="flex items-center gap-3 px-3 py-2.5 text-red-400 hover:bg-red-950/20 rounded-xl font-medium text-sm transition-all">Console Control</a>
                 </div>
             </nav>
-        </div>
 
-        <div class="p-6 border-t border-gray-800 bg-gray-950/30">
-            <button id="logoutBtn" class="w-full py-3 bg-red-950/40 text-red-400 border border-red-900/40 font-bold rounded-xl text-sm hover:bg-red-900/30 active:scale-[0.99] transition">
-                🚪 Log Out System
+            <button id="sidebarLogoutBtn" class="flex items-center gap-3 px-3 py-2.5 text-neutral-500 hover:text-red-400 rounded-xl font-medium text-sm transition-all w-full text-left cursor-pointer">
+                Sign Out System
             </button>
-        </div>
+        </aside>
+
+        <main class="flex-1 min-w-0 flex flex-col">
+            
+            <header class="h-16 border-b border-neutral-800/60 flex items-center justify-between px-6 bg-neutral-900/40 backdrop-blur-md sticky top-0 z-30">
+                <div class="flex items-center gap-4">
+                    <button id="menuToggleBtn" class="lg:hidden p-2 text-neutral-400 hover:text-neutral-200 focus:outline-none cursor-pointer">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                    </button>
+                    <h2 id="welcomeHeading" class="text-lg font-bold tracking-tight text-neutral-200">Initializing Nexus Engine...</h2>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <span id="roleBadge" class="px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-neutral-800 text-neutral-400 border border-neutral-700/40">Student</span>
+                </div>
+            </header>
+
+            <div id="mobileMenuOverlay" class="fixed inset-0 bg-black/60 z-40 hidden transition-opacity duration-300 opacity-0"></div>
+            <aside id="mobileSidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-neutral-900 z-50 transform -translate-x-full transition-transform duration-300 ease-in-out p-5 flex flex-col border-r border-neutral-800">
+                <div class="flex items-center justify-between mb-8">
+                    <span class="text-lg font-bold tracking-tight text-blue-400">Nexus Workspace</span>
+                    <button id="menuCloseBtn" class="p-1 text-neutral-400 hover:text-neutral-200 cursor-pointer">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <nav class="space-y-1.5 flex-1">
+                    <a href="#" class="mobile-link block px-3 py-2.5 bg-neutral-800 text-blue-400 rounded-xl text-sm font-medium">Workspace Dashboard</a>
+                    <a href="#solvers" class="mobile-link block px-3 py-2.5 text-neutral-400 rounded-xl text-sm font-medium">Academic Solvers</a>
+                    <a href="#elibrary" class="mobile-link block px-3 py-2.5 text-neutral-400 rounded-xl text-sm font-medium">E-Library Hub</a>
+                    <a href="#research" class="mobile-link block px-3 py-2.5 text-neutral-400 rounded-xl text-sm font-medium">Health Research Room</a>
+                </nav>
+                <button id="logoutBtn" class="flex items-center gap-3 px-3 py-2.5 text-neutral-500 hover:text-red-400 rounded-xl font-medium text-sm transition-all w-full text-left cursor-pointer">Sign Out</button>
+            </aside>
+
+            <div class="p-6 space-y-6 flex-1 overflow-y-auto max-w-7xl w-full mx-auto">
+                
+                <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-neutral-900 border border-neutral-800/60 p-6 rounded-2xl relative overflow-hidden group hover:border-blue-500/30 transition-all">
+                        <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Academic Level Status</div>
+                        <div id="userLevelText" class="text-3xl font-extrabold mt-2 tracking-tight text-white">Level 1</div>
+                        <div class="mt-2 text-xs text-neutral-400">Senior Secondary 3 Rank Acceleration</div>
+                    </div>
+                    <div class="bg-neutral-900 border border-neutral-800/60 p-6 rounded-2xl relative overflow-hidden group hover:border-indigo-500/30 transition-all">
+                        <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Total Experience Points</div>
+                        <div id="userXpText" class="text-3xl font-extrabold mt-2 tracking-tight bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">0 XP</div>
+                        <div class="mt-2 text-xs text-neutral-400">Earned via solver operations</div>
+                    </div>
+                    <div class="bg-neutral-900 border border-neutral-800/60 p-6 rounded-2xl relative overflow-hidden group hover:border-emerald-500/30 transition-all">
+                        <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Live Football Core Panel</div>
+                        <div id="footballScorePanel" class="text-sm font-medium mt-2 text-neutral-300 space-y-1">
+                            <div class="flex justify-between border-b border-neutral-800/40 pb-1"><span>Arsenal vs Chelsea</span> <span class="text-emerald-400 font-bold">Live</span></div>
+                            <div class="text-xs text-neutral-500 mt-1">Real-time stadium match array active</div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div id="solvers" class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 space-y-4">
+                        <h3 class="text-lg font-bold tracking-tight text-neutral-100 flex items-center gap-2">📐 Core Physics & Chemistry Solvers</h3>
+                        <p class="text-neutral-400 text-sm">Instantly compute kinematics vectors, geometric optical refraction matrices, and standard analytical solubility product curves.</p>
+                        <button class="bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer">Launch Engineering Modules</button>
+                    </div>
+
+                    <div id="elibrary" class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 space-y-4">
+                        <h3 class="text-lg font-bold tracking-tight text-neutral-100 flex items-center gap-2">📚 Trivex Academy E-Library</h3>
+                        <p class="text-neutral-400 text-sm">Browse core textbooks, structured reference syllabi, exam practice logs, and digital revision summaries.</p>
+                        <button class="bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer">Open Library Vault</button>
+                    </div>
+                </section>
+
+                <section id="adminSection" class="hidden bg-neutral-900/40 border border-red-900/30 rounded-2xl p-6 space-y-4">
+                    <h3 class="text-lg font-bold tracking-tight text-red-400">🔒 System Overlord Operations Console</h3>
+                    <p class="text-neutral-400 text-sm">Review global backend node properties, adjust global application metrics, and handle user profile authorization flags.</p>
+                </section>
+            </div>
+        </main>
     </div>
 
-    <div id="menuBackdropBlur" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 opacity-0"></div>
-
-    <main class="max-w-7xl mx-auto px-4 py-8 relative z-10">
-        
-        <div class="mb-8 p-6 bg-gradient-to-r from-gray-900 via-gray-900 to-gray-950 border border-gray-800 rounded-3xl flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
-            <div>
-                <h2 id="welcomeHeading" class="text-2xl sm:text-3xl font-extrabold tracking-tight">Loading Profile...</h2>
-                <p id="welcomeSubtext" class="text-gray-400 text-sm mt-1">Connecting securely to Nexus Pro servers...</p>
-            </div>
-            <div id="levelBox" class="hidden bg-gray-950 border border-gray-800 rounded-2xl p-3 min-w-[140px] text-center">
-                <div class="text-[10px] uppercase font-bold tracking-wider text-gray-500">Current Rank</div>
-                <div id="userLevelText" class="text-lg font-black text-blue-400 mt-0.5">Level --</div>
-            </div>
-        </div>
-
-        <section id="adminSection" class="hidden mb-10 animate-fade-in">
-            <div class="border border-red-900/40 bg-red-950/10 rounded-3xl p-6 shadow-2xl">
-                <div class="flex items-center gap-3 mb-6">
-                    <span class="text-2xl">🛡️</span>
-                    <div>
-                        <h3 class="text-lg font-bold text-red-400">System Management Console</h3>
-                        <p class="text-red-400/70 text-xs">Administrative Clearance Verified</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div onclick="window.location.href='admin-users.html'" class="bg-gray-900 p-5 rounded-2xl border border-gray-800 hover:border-red-500 cursor-pointer transition">
-                        <div class="text-3xl mb-3">👥</div>
-                        <h4 class="font-bold text-base">User Directory</h4>
-                        <p class="text-gray-400 text-xs mt-1">Manage registration levels, account statuses, and roles.</p>
-                    </div>
-                    <div onclick="window.location.href='admin-upload.html'" class="bg-gray-900 p-5 rounded-2xl border border-gray-800 hover:border-emerald-500 cursor-pointer transition">
-    <div class="text-3xl mb-3">📤</div>
-    <h4 class="font-bold text-base">Resource Ingestion Desk</h4>
-    <p class="text-gray-400 text-xs mt-1">Upload study manuals, E-Books, or embed new course video strings.</p>
-                    </div>
-                    <div onclick="window.location.href='admin-ai-usage.html'" class="bg-gray-900 p-5 rounded-2xl border border-gray-800 hover:border-blue-500 cursor-pointer transition">
-                        <div class="text-3xl mb-3">📊</div>
-                        <h4 class="font-bold text-base">AI Query Monitor</h4>
-                        <p class="text-gray-400 text-xs mt-1">Supervise real-time algorithmic solver usage files.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <h3 class="text-xs font-bold text-gray-500 mb-4 uppercase tracking-widest">Workspace Core Directories</h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            <div class="bg-gray-900 border border-gray-800 p-6 rounded-3xl flex flex-col justify-between hover:border-blue-500/30 transition duration-300 shadow-xl relative group overflow-hidden">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-blue-500/5 rounded-full blur-xl group-hover:bg-blue-500/10 transition"></div>
-                <div>
-                    <div class="w-12 h-12 rounded-xl bg-blue-600/10 flex items-center justify-center text-blue-400 font-bold text-xl mb-4">📚</div>
-                    <h4 class="text-xl font-bold mb-1.5">Core Study Academy</h4>
-                    <p class="text-gray-400 text-sm leading-relaxed mb-4">Access the integrated E-Library, streaming Syllabus Video References, and the persistent AI Math & Physics Solver helper console.</p>
-                    
-                    <div class="flex flex-wrap gap-2 pt-2">
-                        <span class="px-2.5 py-1 text-[11px] rounded-lg font-medium bg-gray-950 text-gray-400 border border-gray-800">📖 E-Library Docs</span>
-                        <span class="px-2.5 py-1 text-[11px] rounded-lg font-medium bg-gray-950 text-gray-400 border border-gray-800">🎥 Video Streams</span>
-                        <span class="px-2.5 py-1 text-[11px] rounded-lg font-medium bg-gray-950 text-gray-400 border border-gray-800">🤖 AI Tutor</span>
-                    </div>
-                </div>
-                <button onclick="window.location.href='academy.html'" class="mt-6 w-full py-3 bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">Enter Academy</button>
-            </div>
-
-            <div class="bg-gray-900 border border-gray-800 p-6 rounded-3xl flex flex-col justify-between hover:border-emerald-500/30 transition duration-300 shadow-xl relative group overflow-hidden">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl group-hover:bg-emerald-500/10 transition"></div>
-                <div>
-                    <div class="w-12 h-12 rounded-xl bg-emerald-600/10 flex items-center justify-center text-emerald-400 font-bold text-xl mb-4">🎮</div>
-                    <h4 class="text-xl font-bold mb-1.5">The Learning Arcade</h4>
-                    <p class="text-gray-400 text-sm leading-relaxed mb-4">Convert class homework objectives into interactive, competitive games. Complete assignments, level up your metrics, and earn profile XP ranks.</p>
-                    
-                    <div class="flex flex-wrap gap-2 pt-2">
-                        <span class="px-2.5 py-1 text-[11px] rounded-lg font-medium bg-gray-950 text-emerald-400 border border-gray-800/80">⚡ Challenge Quizzes</span>
-                        <span class="px-2.5 py-1 text-[11px] rounded-lg font-medium bg-gray-950 text-yellow-400 border border-gray-800/80">🏆 Rank Badges</span>
-                    </div>
-                </div>
-                <button onclick="window.location.href='arcade.html'" class="mt-6 w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">Launch Arcade</button>
-            </div>
-
-            <div class="bg-gray-900 border border-gray-800 p-6 rounded-3xl flex flex-col justify-between hover:border-purple-500/30 transition duration-300 shadow-xl relative group overflow-hidden">
-                <div class="absolute top-0 right-0 w-24 h-24 bg-purple-500/5 rounded-full blur-xl group-hover:bg-purple-500/10 transition"></div>
-                <div>
-                    <div class="w-12 h-12 rounded-xl bg-purple-600/10 flex items-center justify-center text-purple-400 font-bold text-xl mb-4">🌱</div>
-                    <h4 class="text-xl font-bold mb-1.5">Health Hub Platform</h4>
-                    <p class="text-gray-400 text-sm leading-relaxed mb-4">Stay tuned to crucial medical parameters, global dietary updates, and actionable advice advice curated to boost local student focus and longevity.</p>
-                    
-                    <div class="flex flex-wrap gap-2 pt-2">
-                        <span class="px-2.5 py-1 text-[11px] rounded-lg font-medium bg-gray-950 text-gray-400 border border-gray-800">🥗 Wellness Data</span>
-                        <span class="px-2.5 py-1 text-[11px] rounded-lg font-medium bg-gray-950 text-gray-400 border border-gray-800">🩺 Research Feeds</span>
-                    </div>
-                </div>
-                <button onclick="window.location.href='health.html'" class="mt-6 w-full py-3 bg-purple-600 hover:bg-purple-700 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition">Enter Health Hub</button>
-            </div>
-
-        </div>
-    </main>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const menuToggleBtn = document.getElementById('menuToggleBtn');
-            const menuCloseBtn = document.getElementById('menuCloseBtn');
-            const sideMenuDrawer = document.getElementById('sideMenuDrawer');
-            const backdropBlur = document.getElementById('menuBackdropBlur');
-
-            function openDrawerMenu() {
-                sideMenuDrawer.classList.remove('translate-x-full');
-                backdropBlur.classList.remove('hidden');
-                setTimeout(() => {
-                    backdropBlur.classList.remove('opacity-0');
-                    backdropBlur.classList.add('opacity-100');
-                }, 10);
-            }
-
-            function closeDrawerMenu() {
-                sideMenuDrawer.classList.add('translate-x-full');
-                backdropBlur.classList.remove('opacity-100');
-                backdropBlur.classList.add('opacity-0');
-                setTimeout(() => {
-                    backdropBlur.classList.add('hidden');
-                }, 300);
-            }
-
-            menuToggleBtn.addEventListener('click', openDrawerMenu);
-            menuCloseBtn.addEventListener('click', closeDrawerMenu);
-            backdropBlur.addEventListener('click', closeDrawerMenu);
-        });
-    </script>
-    <script src="dashboard.js"></script>
+    <script type="module" src="dashboard.js"></script>
 </body>
-            </html>
+                            </html>
