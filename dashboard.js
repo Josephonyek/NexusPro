@@ -1,5 +1,5 @@
 /**
- * Nexus Pro 2.0 - Core Dashboard Management Engine
+ * Nexus Pro 2.0 - Core Dashboard Management Engine (High Speed Performance Optimization)
  */
 
 const FIREBASE_CONFIG = {
@@ -7,7 +7,6 @@ const FIREBASE_CONFIG = {
     databaseURL: "https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app"
 };
 
-// Data cleansing to protect layout layers against layout code injections
 function sanitizeString(str) {
     if (!str) return '';
     const tempDiv = document.createElement('div');
@@ -15,29 +14,23 @@ function sanitizeString(str) {
     return tempDiv.innerHTML;
 }
 
-// Global UI Dashboard Controller Initialization Sequence
 async function verifyAndInitializeDashboard() {
     const userId = localStorage.getItem('nexusUserId');
     const secureToken = localStorage.getItem('nexusAuthToken');
     const cachedRole = localStorage.getItem('nexusUserRole') || 'student';
 
-    // If there is no active token session, immediately return them to security checkpoint
     if (!userId || !secureToken) {
-        console.warn("Session verification token missing. Exiting to gateway.");
         executeHardLogout();
         return;
     }
 
     try {
         const dbUrl = FIREBASE_CONFIG.databaseURL.replace(/\/$/, "");
-
-        // Securely fetch user data directly using the validated session token
         const response = await fetch(`${dbUrl}/users/${userId}.json?auth=${secureToken}`);
         
-        if (!response.ok) throw new Error(`Database authentication failure: ${response.status}`);
+        if (!response.ok) throw new Error(`Database authentication failure`);
         const profileData = await response.json();
 
-        // FALLBACK MAPPING: If a newly signed-up profile hasn't fully propagated, provide a safe template
         const finalProfile = profileData || {
             name: "Scholar",
             role: cachedRole,
@@ -46,12 +39,11 @@ async function verifyAndInitializeDashboard() {
         };
 
         if (finalProfile.status === 'suspended' || finalProfile.status === 'banned') {
-            alert("🔒 Access privileges revoked. This account has been suspended.");
+            alert("🔒 Access privileges revoked.");
             executeHardLogout();
             return;
         }
 
-        // Apply clean variables directly to DOM text points
         const cleanName = sanitizeString(finalProfile.name);
         const cleanRole = sanitizeString(finalProfile.role);
 
@@ -67,12 +59,9 @@ async function verifyAndInitializeDashboard() {
                 document.getElementById('sidebarAdminLinks')?.classList.remove('hidden');
             } else {
                 roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-blue-950 text-blue-400 border border-blue-900/40";
-                document.getElementById('adminSection')?.classList.add('hidden');
-                document.getElementById('sidebarAdminLinks')?.classList.add('hidden');
             }
         }
 
-        // Setup Gamification progression layers
         if (finalProfile.gameMetrics) {
             const currentXp = parseInt(finalProfile.gameMetrics.totalXP || 0);
             const currentLevel = parseInt(finalProfile.gameMetrics.currentLevel || 1);
@@ -82,20 +71,24 @@ async function verifyAndInitializeDashboard() {
 
     } catch (criticalError) {
         console.error("Dashboard Engine Fallback Active:", criticalError.message);
-        // Fail-safe visibility so screen never locks up on poor connections
         const welcomeHeading = document.getElementById('welcomeHeading');
         if (welcomeHeading) welcomeHeading.innerHTML = "Welcome to Nexus Workspace!";
     } finally {
+        // Run preloader clear instantly
         clearPreloaderOverlay();
     }
 }
 
-// Smoothly animation-fade out the modern skeleton preloader mask
+// Optimized hyper-speed preloader collapse transition handler
 function clearPreloaderOverlay() {
     const loaderMask = document.getElementById('nexusPreloader');
     if (!loaderMask) return;
-    loaderMask.classList.add('opacity-0', 'pointer-events-none');
-    setTimeout(() => { loaderMask.remove(); }, 500);
+    
+    // Combine opacity fade out with a scaling compression transition for extreme speed feel
+    loaderMask.classList.add('opacity-0', 'scale-98', 'pointer-events-none');
+    setTimeout(() => { 
+        loaderMask.remove(); 
+    }, 200); // Reduced delay to clear node from render cycle instantly
 }
 
 function executeHardLogout() {
@@ -103,7 +96,6 @@ function executeHardLogout() {
     window.location.replace('login.html');
 }
 
-// INITIALIZE HAMBURGER MENU ACTIONS AND INTERFACES
 document.addEventListener("DOMContentLoaded", () => {
     const menuToggleBtn = document.getElementById('menuToggleBtn');
     const menuCloseBtn = document.getElementById('menuCloseBtn');
@@ -123,22 +115,19 @@ document.addEventListener("DOMContentLoaded", () => {
         mobileMenuOverlay.classList.add('opacity-0');
         setTimeout(() => {
             mobileMenuOverlay.classList.add('hidden');
-        }, 300);
+        }, 200);
     }
 
     menuToggleBtn?.addEventListener('click', openMobileMenu);
-    menuCloseBtn?.addEventListener('click', closeMenuSequence);
-    mobileMenuOverlay?.addEventListener('click', closeMenuSequence);
+    menuCloseBtn?.addEventListener('click', closeMobileMenu);
+    mobileMenuOverlay?.addEventListener('click', closeMobileMenu);
 
-    // Auto close drawer when clicking any link inside it
     document.querySelectorAll('.mobile-link').forEach(link => {
         link.addEventListener('click', closeMobileMenu);
     });
 
-    // Handle logout operations listeners
     document.getElementById('logoutBtn')?.addEventListener('click', () => { if (confirm("Sign out of Nexus Pro?")) executeHardLogout(); });
     document.getElementById('sidebarLogoutBtn')?.addEventListener('click', () => { if (confirm("Sign out of Nexus Pro?")) executeHardLogout(); });
 
-    // Initialize execution run thread
     verifyAndInitializeDashboard();
 });
