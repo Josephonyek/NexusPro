@@ -1,4 +1,4 @@
-// api/login.js - Secure REST Framework (No Service Account Required)
+// api/login.js - Connected directly to your Vercel Variables
 module.exports = async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -8,36 +8,38 @@ module.exports = async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ success: false, message: 'Method not allowed' });
 
     const { email, hashedPassword } = req.body;
-    const apiKey = process.env.FIREBASE_PUBLIC_API_KEY;
-    const dbUrl = process.env.FIREBASE_DATABASE_URL?.replace(/\/$/, "");
+    
+    // MATCHING YOUR VERCEL PANEL SCREENSHOT:
+    const apiKey = process.env.FIREBASE_API_KEY; 
+    const dbUrl = process.env.FIREBASE_BASE_URL?.replace(/\/$/, "");
 
     try {
         if (!apiKey || !dbUrl) {
-            throw new Error("Missing variables on Vercel settings.");
+            throw new Error("Missing variable mapping links inside the Vercel cloud dashboard container setup.");
         }
 
-        // 1. Authenticate user against Google identity platform
-        const identityFetch = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`, {
+        // 1. Exchange security keys directly via web identity frameworks
+        const identityResponse = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password: hashedPassword, returnSecureToken: true }),
         });
 
-        const identityData = await identityFetch.json();
-        if (!identityFetch.ok) throw new Error(identityData.error?.message || "Invalid email or password.");
+        const identityData = await identityResponse.json();
+        if (!identityResponse.ok) throw new Error(identityData.error?.message || "Invalid Email or Password credentials provided.");
 
         const userId = identityData.localId;
         const idToken = identityData.idToken;
 
-        // 2. Fetch corresponding authorization settings via Realtime Database REST Endpoint
-        const dbFetch = await fetch(`${dbUrl}/users/${userId}.json?auth=${idToken}`);
-        const profile = dbFetch.ok ? await dbFetch.json() : null;
+        // 2. Perform metadata clearance check against real-time node structures
+        const dbResponse = await fetch(`${dbUrl}/users/${userId}.json?auth=${idToken}`);
+        const profile = dbResponse.ok ? await dbResponse.json() : null;
         
         const activeRole = profile?.role || 'student';
         const accountStatus = profile?.status || 'active';
 
         if (accountStatus === 'banned' || accountStatus === 'suspended') {
-            return res.status(403).json({ success: false, message: '🔒 This account node has been suspended.' });
+            return res.status(403).json({ success: false, message: '🔒 This account has been flagged and suspended.' });
         }
 
         return res.status(200).json({
@@ -48,7 +50,7 @@ module.exports = async function handler(req, res) {
         });
 
     } catch (error) {
-        console.error("Login Endpoint Crash:", error.message);
+        console.error("Login Endpoint Fault Intercepted:", error.message);
         return res.status(400).json({ success: false, message: error.message });
     }
 };
