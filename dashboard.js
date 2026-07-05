@@ -1,5 +1,5 @@
 /**
- * Nexus Pro 2.0 - Core Dashboard Management Engine (High Speed Performance Optimization)
+ * Nexus Pro 2.0 - Core Dashboard Management Engine (Optimized Stack)
  */
 
 const FIREBASE_CONFIG = {
@@ -74,21 +74,18 @@ async function verifyAndInitializeDashboard() {
         const welcomeHeading = document.getElementById('welcomeHeading');
         if (welcomeHeading) welcomeHeading.innerHTML = "Welcome to Nexus Workspace!";
     } finally {
-        // Run preloader clear instantly
         clearPreloaderOverlay();
     }
 }
 
-// Optimized hyper-speed preloader collapse transition handler
 function clearPreloaderOverlay() {
     const loaderMask = document.getElementById('nexusPreloader');
     if (!loaderMask) return;
     
-    // Combine opacity fade out with a scaling compression transition for extreme speed feel
     loaderMask.classList.add('opacity-0', 'scale-98', 'pointer-events-none');
     setTimeout(() => { 
         loaderMask.remove(); 
-    }, 200); // Reduced delay to clear node from render cycle instantly
+    }, 200);
 }
 
 function executeHardLogout() {
