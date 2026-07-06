@@ -1,7 +1,9 @@
 /**
- * Nexus Pro 2.0 - Core Dashboard Management Engine (Ultra-Resilient Speed Stack)
+ * Nexus Pro 2.0 - Core Dashboard Management Engine (Direct Secure Database Integration)
  * File: dashboard.js
  */
+
+const DB_BASE_URL = "https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app";
 
 function sanitizeString(str) {
     if (!str) return '';
@@ -14,107 +16,75 @@ async function verifyAndInitializeDashboard() {
     const userId = localStorage.getItem('nexusUserId');
     const secureToken = localStorage.getItem('nexusAuthToken');
 
-    // Emergency escape: if no session, clean out and drop back to login
+    // Security Check: Kick unauthenticated sessions out instantly
     if (!userId || !secureToken) {
         executeHardLogout();
         return;
     }
 
-    // Set a strict 1-second timeout for the backend serverless fetch
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1000);
-
     try {
-        // Try the secure Vercel API endpoint first
-        const response = await fetch(`/api/profile?userId=${userId}`, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${secureToken}`,
-                'Content-Type': 'application/json'
-            },
-            signal: controller.signal
-        });
+        // Direct secure fetch using the user's secret token string
+        const dbUrl = `${DB_BASE_URL}/users/${userId}.json?auth=${secureToken}`;
+        const response = await fetch(dbUrl);
         
-        clearTimeout(timeoutId);
-        
-        if (!response.ok) throw new Error("API Route missing or offline.");
-        const result = await response.json();
-        if (!result.success) throw new Error(result.message);
-        
-        renderDashboardView(result);
+        if (!response.ok) throw new Error("Database network communication rejection.");
+        const userData = await response.json();
 
-    } catch (criticalError) {
-        console.warn("API Endpoint slow or missing. Switching to direct database fallback...", criticalError.message);
-        clearTimeout(timeoutId);
+        if (!userData) throw new Error("User profile node does not exist.");
 
-        // FALLBACK: Directly query the Firebase RTDB if the local server api is down
-        try {
-            const dbFallbackUrl = `https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app/users/${userId}.json?auth=${secureToken}`;
-            const fallbackResponse = await fetch(dbFallbackUrl);
-            
-            if (fallbackResponse.ok) {
-                const fbData = await fallbackResponse.json();
-                if (fbData) {
-                    renderDashboardView({
-                        success: true,
-                        name: fbData.name || "Scholar",
-                        role: fbData.role || "student",
-                        status: fbData.status || "active",
-                        gameMetrics: fbData.gameMetrics || { totalXP: 0, currentLevel: 1 }
-                    });
-                    return;
-                }
-            }
-        } catch (fbError) {
-            console.error("Direct fallback failed as well:", fbError.message);
+        // Account Status Enforcement
+        if (userData.status === 'suspended' || userData.status === 'banned') {
+            alert("🔒 Access privileges revoked. This account has been flagged.");
+            executeHardLogout();
+            return;
         }
 
-        // LAST RESORT FAILSAFE: Force lookups visually open instead of locking the screen
+        const cleanName = sanitizeString(userData.name || "Scholar");
+        const cleanRole = sanitizeString(userData.role || "student").toLowerCase().trim();
+
+        // Update Interface Greeting
+        const welcomeHeading = document.getElementById('welcomeHeading');
+        if (welcomeHeading) welcomeHeading.innerHTML = `Welcome Back, ${cleanName}!`;
+        
+        // STRICT ROLE ENGINE AND CONTENT MATRIX INTERFACE ROUTING
+        const roleBadge = document.getElementById('roleBadge');
+        if (roleBadge) {
+            roleBadge.innerText = cleanRole;
+            
+            if (cleanRole === 'admin') {
+                roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40";
+                
+                // Show Admin Console & Navigation Links, Hide Student view completely
+                document.getElementById('adminSection')?.classList.remove('hidden');
+                document.getElementById('sidebarAdminLinks')?.classList.remove('hidden');
+                document.getElementById('userContentSection')?.classList.add('hidden'); 
+            } else {
+                roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-blue-950 text-blue-400 border border-blue-900/40";
+                
+                // Show standard Student metrics, Lock secure Admin views away
+                document.getElementById('adminSection')?.classList.add('hidden');
+                document.getElementById('sidebarAdminLinks')?.classList.add('hidden');
+                document.getElementById('userContentSection')?.classList.remove('hidden');
+            }
+        }
+
+        // Gamification Processing for Student accounts
+        if (userData.gameMetrics && cleanRole !== 'admin') {
+            const currentXp = parseInt(userData.gameMetrics.totalXP || 0);
+            const currentLevel = parseInt(userData.gameMetrics.currentLevel || 1);
+            if (document.getElementById('userXpText')) document.getElementById('userXpText').innerText = `${currentXp.toLocaleString()} XP`;
+            if (document.getElementById('userLevelText')) document.getElementById('userLevelText').innerText = `Level ${currentLevel}`;
+        }
+
+    } catch (criticalError) {
+        console.error("Critical Dashboard Initialization Failure:", criticalError.message);
+        // Fallback layout protection to prevent permanent screen freezing
         const welcomeHeading = document.getElementById('welcomeHeading');
         if (welcomeHeading) welcomeHeading.innerHTML = "Welcome to Nexus Workspace!";
         document.getElementById('userContentSection')?.classList.remove('hidden');
     } finally {
-        // ESSENTIAL: Drop the loading preloader immediately 
+        // Drop preloader instantly now that database processing is complete
         clearPreloaderOverlay();
-    }
-}
-
-// Separate UI rendering layer for optimal execution speed
-function renderDashboardView(profileData) {
-    if (profileData.status === 'suspended' || profileData.status === 'banned') {
-        alert("🔒 Access privileges revoked.");
-        executeHardLogout();
-        return;
-    }
-
-    const cleanName = sanitizeString(profileData.name);
-    const cleanRole = sanitizeString(profileData.role).toLowerCase().trim();
-
-    const welcomeHeading = document.getElementById('welcomeHeading');
-    if (welcomeHeading) welcomeHeading.innerHTML = `Welcome Back, ${cleanName}!`;
-    
-    const roleBadge = document.getElementById('roleBadge');
-    if (roleBadge) {
-        roleBadge.innerText = cleanRole;
-        
-        if (cleanRole === 'admin') {
-            roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40";
-            document.getElementById('adminSection')?.classList.remove('hidden');
-            document.getElementById('sidebarAdminLinks')?.classList.remove('hidden');
-            document.getElementById('userContentSection')?.classList.add('hidden'); 
-        } else {
-            roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-blue-950 text-blue-400 border border-blue-900/40";
-            document.getElementById('adminSection')?.classList.add('hidden');
-            document.getElementById('sidebarAdminLinks')?.classList.add('hidden');
-            document.getElementById('userContentSection')?.classList.remove('hidden');
-        }
-    }
-
-    if (profileData.gameMetrics && cleanRole !== 'admin') {
-        const currentXp = parseInt(profileData.gameMetrics.totalXP || 0);
-        const currentLevel = parseInt(profileData.gameMetrics.currentLevel || 1);
-        if (document.getElementById('userXpText')) document.getElementById('userXpText').innerText = `${currentXp.toLocaleString()} XP`;
-        if (document.getElementById('userLevelText')) document.getElementById('userLevelText').innerText = `Level ${currentLevel}`;
     }
 }
 
@@ -123,7 +93,7 @@ function clearPreloaderOverlay() {
     if (!loaderMask) return;
     
     loaderMask.classList.add('opacity-0', 'scale-98', 'pointer-events-none');
-    setTimeout(() => { loaderMask.remove(); }, 1500); 
+    setTimeout(() => { loaderMask.remove(); }, 200); 
 }
 
 function executeHardLogout() {
@@ -132,8 +102,8 @@ function executeHardLogout() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Force a failsafe backup drop of preloader if anything locks completely up for more than 2 seconds
-    setTimeout(clearPreloaderOverlay, 2000);
+    // Failsafe backup to drop the loader if network conditions stall out completely
+    setTimeout(clearPreloaderOverlay, 2500);
 
     const menuToggleBtn = document.getElementById('menuToggleBtn');
     const menuCloseBtn = document.getElementById('menuCloseBtn');
