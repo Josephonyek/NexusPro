@@ -1,173 +1,132 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro | Hub</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style>
-        .animate-fast-pulse {
-            animation: pulse 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .4; }
-        }
-    </style>
-</head>
-<body class="bg-neutral-950 text-neutral-100 min-h-screen antialiased scroll-smooth">
+/**
+ * Nexus Pro 2.0 - Core Dashboard Management Engine (Secured Backend Core Mapping)
+ * File: dashboard.js
+ */
 
-    <div id="nexusPreloader" class="fixed inset-0 bg-neutral-950 z-50 flex flex-col justify-center items-center p-6 transition-all duration-300 ease-out will-change-transform">
-        <div class="w-full max-w-4xl space-y-6 animate-fast-pulse">
-            <div class="h-10 bg-neutral-900 rounded-xl w-1/4"></div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="h-28 bg-neutral-900 rounded-2xl"></div>
-                <div class="h-28 bg-neutral-900 rounded-2xl"></div>
-            </div>
-            <div class="h-48 bg-neutral-900 rounded-2xl w-full"></div>
-        </div>
-    </div>
+function sanitizeString(str) {
+    if (!str) return '';
+    const tempDiv = document.createElement('div');
+    tempDiv.textContent = str;
+    return tempDiv.innerHTML;
+}
 
-    <div class="flex min-h-screen">
+async function verifyAndInitializeDashboard() {
+    const userId = localStorage.getItem('nexusUserId');
+    const secureToken = localStorage.getItem('nexusAuthToken');
+
+    if (!userId || !secureToken) {
+        executeHardLogout();
+        return;
+    }
+
+    try {
+        const response = await fetch(`/api/profile?userId=${userId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${secureToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
         
-        <aside class="hidden lg:flex flex-col w-64 bg-neutral-900 border-r border-neutral-800/60 p-5 shrink-0">
-            <div class="flex items-center gap-3 mb-8 px-2">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black shadow-md shadow-blue-600/20">N</div>
-                <span class="text-lg font-bold tracking-tight">Nexus Pro</span>
-            </div>
+        if (!response.ok) throw new Error("Security verification rejection.");
+        const result = await response.json();
+
+        if (!result.success) throw new Error(result.message);
+        const finalProfile = result;
+
+        if (finalProfile.status === 'suspended' || finalProfile.status === 'banned') {
+            alert("🔒 Access privileges revoked.");
+            executeHardLogout();
+            return;
+        }
+
+        const cleanName = sanitizeString(finalProfile.name);
+        const cleanRole = sanitizeString(finalProfile.role).toLowerCase().trim();
+
+        const welcomeHeading = document.getElementById('welcomeHeading');
+        if (welcomeHeading) welcomeHeading.innerHTML = `Welcome Back, ${cleanName}!`;
+        
+        const roleBadge = document.getElementById('roleBadge');
+        if (roleBadge) {
+            roleBadge.innerText = cleanRole;
             
-            <nav class="space-y-1.5 flex-1">
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-neutral-800 text-blue-400 rounded-xl font-medium text-sm transition-all">Workspace Dashboard</a>
-                <a href="ai_solver.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">Academic Solvers</a>
-                <a href="academy.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">E-Library Hub</a>
-                <a href="health.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">Health Research Room</a>
+            // ROLE CONTROL MATRIX VISIBILITY TOGGLE
+            if (cleanRole === 'admin') {
+                roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40";
                 
-                <div id="sidebarAdminLinks" class="hidden pt-4 border-t border-neutral-800/60 mt-4 space-y-1.5">
-                    <span class="block px-3 text-[10px] font-bold tracking-wider text-neutral-500 uppercase mb-1">Management</span>
-                    <a href="#adminSection" class="flex items-center gap-3 px-3 py-2.5 text-red-400 hover:bg-red-950/20 rounded-xl font-medium text-sm transition-all">Console Control</a>
-                    <a href="admin-users.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">User Directory</a>
-                </div>
-            </nav>
-
-            <button id="sidebarLogoutBtn" class="flex items-center gap-3 px-3 py-2.5 text-neutral-500 hover:text-red-400 rounded-xl font-medium text-sm transition-all w-full text-left cursor-pointer">
-                Sign Out System
-            </button>
-        </aside>
-
-        <main class="flex-1 min-w-0 flex flex-col">
-            
-            <header class="h-16 border-b border-neutral-800/60 flex items-center justify-between px-6 bg-neutral-900/40 backdrop-blur-md sticky top-0 z-30">
-                <div class="flex items-center gap-4">
-                    <button id="menuToggleBtn" class="lg:hidden p-2 text-neutral-400 hover:text-neutral-200 focus:outline-none cursor-pointer">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-                    </button>
-                    <h2 id="welcomeHeading" class="text-lg font-bold tracking-tight text-neutral-200">Initializing Nexus Engine...</h2>
-                </div>
+                document.getElementById('adminSection')?.classList.remove('hidden');
+                document.getElementById('sidebarAdminLinks')?.classList.remove('hidden');
+                document.getElementById('userContentSection')?.classList.add('hidden'); 
+            } else {
+                roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-blue-950 text-blue-400 border border-blue-900/40";
                 
-                <div class="flex items-center gap-3">
-                    <span id="roleBadge" class="px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-neutral-800 text-neutral-400 border border-neutral-700/40">Student</span>
-                </div>
-            </header>
+                document.getElementById('adminSection')?.classList.add('hidden');
+                document.getElementById('sidebarAdminLinks')?.classList.add('hidden');
+                document.getElementById('userContentSection')?.classList.remove('hidden');
+            }
+        }
 
-            <div id="mobileMenuOverlay" class="fixed inset-0 bg-black/60 z-40 hidden transition-opacity duration-200 opacity-0"></div>
-            <aside id="mobileSidebar" class="fixed top-0 left-0 bottom-0 w-64 bg-neutral-900 z-50 transform -translate-x-full transition-transform duration-200 ease-in-out p-5 flex flex-col border-r border-neutral-800">
-                <div class="flex items-center justify-between mb-8">
-                    <span class="text-lg font-bold tracking-tight text-blue-400">Nexus Workspace</span>
-                    <button id="menuCloseBtn" class="p-1 text-neutral-400 hover:text-neutral-200 cursor-pointer">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                    </button>
-                </div>
-                <nav class="space-y-1.5 flex-1">
-                    <a href="#" class="mobile-link block px-3 py-2.5 bg-neutral-800 text-blue-400 rounded-xl text-sm font-medium">Workspace Dashboard</a>
-                    <a href="ai_solver.html" class="mobile-link block px-3 py-2.5 text-neutral-400 rounded-xl text-sm font-medium">Academic Solvers</a>
-                    <a href="academy.html" class="mobile-link block px-3 py-2.5 text-neutral-400 rounded-xl text-sm font-medium">E-Library Hub</a>
-                    <a href="health.html" class="mobile-link block px-3 py-2.5 text-neutral-400 rounded-xl text-sm font-medium">Health Research Room</a>
-                </nav>
-                <button id="logoutBtn" class="flex items-center gap-3 px-3 py-2.5 text-neutral-500 hover:text-red-400 rounded-xl font-medium text-sm transition-all w-full text-left cursor-pointer">Sign Out</button>
-            </aside>
+        if (finalProfile.gameMetrics && cleanRole !== 'admin') {
+            const currentXp = parseInt(finalProfile.gameMetrics.totalXP || 0);
+            const currentLevel = parseInt(finalProfile.gameMetrics.currentLevel || 1);
+            if (document.getElementById('userXpText')) document.getElementById('userXpText').innerText = `${currentXp.toLocaleString()} XP`;
+            if (document.getElementById('userLevelText')) document.getElementById('userLevelText').innerText = `Level ${currentLevel}`;
+        }
 
-            <div class="p-6 space-y-6 flex-1 overflow-y-auto max-w-7xl w-full mx-auto">
-                
-                <div id="userContentSection" class="hidden space-y-6">
-                    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-neutral-900 border border-neutral-800/60 p-6 rounded-2xl">
-                            <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Academic Level Status</div>
-                            <div id="userLevelText" class="text-3xl font-extrabold mt-2 tracking-tight text-white">Level 1</div>
-                            <div class="mt-2 text-xs text-neutral-400">Senior Secondary 3 Rank Acceleration</div>
-                        </div>
-                        <div class="bg-neutral-900 border border-neutral-800/60 p-6 rounded-2xl">
-                            <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Total Experience Points</div>
-                            <div id="userXpText" class="text-3xl font-extrabold mt-2 tracking-tight bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">0 XP</div>
-                            <div class="mt-2 text-xs text-neutral-400">Earned via solver operations</div>
-                        </div>
-                    </section>
+    } catch (criticalError) {
+        console.error("Dashboard Engine Fallback Active:", criticalError.message);
+        const welcomeHeading = document.getElementById('welcomeHeading');
+        if (welcomeHeading) welcomeHeading.innerHTML = "Welcome to Nexus Workspace!";
+        
+        document.getElementById('userContentSection')?.classList.remove('hidden');
+    } finally {
+        clearPreloaderOverlay();
+    }
+}
 
-                    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-neutral-700 transition-all">
-                            <div class="space-y-2">
-                                <h3 class="text-lg font-bold tracking-tight text-neutral-100">📐 Academic Solvers</h3>
-                                <p class="text-neutral-400 text-sm">Instantly compute kinematics vectors, geometric optical refraction matrices, and standard analytical solubility product curves.</p>
-                            </div>
-                            <a href="ai_solver.html" class="w-full text-center bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all block">Launch Engineering Modules</a>
-                        </div>
+function clearPreloaderOverlay() {
+    const loaderMask = document.getElementById('nexusPreloader');
+    if (!loaderMask) return;
+    
+    loaderMask.classList.add('opacity-0', 'scale-98', 'pointer-events-none');
+    setTimeout(() => { loaderMask.remove(); }, 200);
+}
 
-                        <div class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-neutral-700 transition-all">
-                            <div class="space-y-2">
-                                <h3 class="text-lg font-bold tracking-tight text-neutral-100">📚 E-Library Hub</h3>
-                                <p class="text-neutral-400 text-sm">Access core textbooks, structured WAEC/JAMB reference syllabi, exam practice logs, and digital revision summaries.</p>
-                            </div>
-                            <a href="academy.html" class="w-full text-center bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all block">Open Library Vault</a>
-                        </div>
+function executeHardLogout() {
+    localStorage.clear();
+    window.location.replace('login.html');
+}
 
-                        <div class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-neutral-700 transition-all">
-                            <div class="space-y-2">
-                                <h3 class="text-lg font-bold tracking-tight text-neutral-100">🩺 Health Research Room</h3>
-                                <p class="text-neutral-400 text-sm">Analyze foundational physiological research documentation, surgical data architectures, and clinical system designs.</p>
-                            </div>
-                            <a href="health.html" class="w-full text-center bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all block">Enter Research Lab</a>
-                        </div>
-                    </section>
-                </div>
+document.addEventListener("DOMContentLoaded", () => {
+    const menuToggleBtn = document.getElementById('menuToggleBtn');
+    const menuCloseBtn = document.getElementById('menuCloseBtn');
+    const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
+    const mobileSidebar = document.getElementById('mobileSidebar');
 
-                <div id="adminSection" class="hidden space-y-6">
-                    <div class="border border-red-900/40 bg-red-950/10 p-6 rounded-2xl">
-                        <h3 class="text-lg font-bold tracking-tight text-red-400">🔒 System Overlord Operations Console</h3>
-                        <p class="text-neutral-400 text-sm mt-1">Review global backend node properties, adjust global application metrics, and handle user profile authorization flags.</p>
-                    </div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-2xl">
-                            <div class="text-xs font-semibold text-red-400/70 uppercase">Total System Registrations</div>
-                            <div class="text-3xl font-black text-white mt-2">1,240</div>
-                            <div class="text-xs text-neutral-500 mt-1">Active global user profiles</div>
-                        </div>
-                        <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-2xl">
-                            <div class="text-xs font-semibold text-red-400/70 uppercase">Database Sync Logs</div>
-                            <div class="text-3xl font-black text-emerald-400 mt-2">99.98%</div>
-                            <div class="text-xs text-neutral-500 mt-1">Realtime relay telemetry operational</div>
-                        </div>
-                        <div class="bg-neutral-900 border border-neutral-800 p-6 rounded-2xl">
-                            <div class="text-xs font-semibold text-red-400/70 uppercase">Active AI API Loads</div>
-                            <div class="text-3xl font-black text-blue-400 mt-2">14.2k</div>
-                            <div class="text-xs text-neutral-500 mt-1">Solvers system operations / day</div>
-                        </div>
-                    </div>
+    function openMobileMenu() {
+        mobileMenuOverlay.classList.remove('hidden');
+        setTimeout(() => {
+            mobileMenuOverlay.classList.remove('opacity-0');
+            mobileSidebar.classList.remove('-translate-x-full');
+        }, 10);
+    }
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                        <div class="bg-neutral-900 border border-red-900/20 rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-red-900/50 transition-all">
-                            <div class="space-y-2">
-                                <h3 class="text-lg font-bold tracking-tight text-neutral-100 flex items-center gap-2">👥 User Directory Control</h3>
-                                <p class="text-neutral-400 text-sm">Manage student registrations, upgrade user permissions, audit system roles, or suspend/ban non-compliant accounts.</p>
-                            </div>
-                            <a href="admin-users.html" class="w-full text-center bg-red-950/40 hover:bg-red-900/40 text-red-400 border border-red-900/40 text-xs font-bold px-4 py-2.5 rounded-xl transition-all block">Open User Directory</a>
-                        </div>
-                    </div>
-                </div>
+    function closeMobileMenu() {
+        mobileSidebar.classList.add('-translate-x-full');
+        mobileMenuOverlay.classList.add('opacity-0');
+        setTimeout(() => { mobileMenuOverlay.classList.add('hidden'); }, 200);
+    }
 
-            </div>
-        </main>
-    </div>
+    menuToggleBtn?.addEventListener('click', openMobileMenu);
+    menuCloseBtn?.addEventListener('click', closeMobileMenu);
+    mobileMenuOverlay?.addEventListener('click', closeMobileMenu);
 
-    <script type="module" src="dashboard.js"></script>
-</body>
-</html>
+    document.querySelectorAll('.mobile-link').forEach(link => {
+        link.addEventListener('click', closeMobileMenu);
+    });
+
+    document.getElementById('logoutBtn')?.addEventListener('click', () => { if (confirm("Sign out of Nexus Pro?")) executeHardLogout(); });
+    document.getElementById('sidebarLogoutBtn')?.addEventListener('click', () => { if (confirm("Sign out of Nexus Pro?")) executeHardLogout(); });
+
+    verifyAndInitializeDashboard();
+});
