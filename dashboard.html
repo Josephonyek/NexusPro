@@ -6,13 +6,18 @@
     <title>Nexus Pro | Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        .animate-fast-pulse { animation: pulse 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
+        .animate-fast-pulse {
+            animation: pulse 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: .4; }
+        }
     </style>
 </head>
 <body class="bg-neutral-950 text-neutral-100 min-h-screen antialiased scroll-smooth">
 
-    <div id="nexusPreloader" class="fixed inset-0 bg-neutral-950 z-50 flex flex-col justify-center items-center p-6 transition-all duration-300 ease-out">
+    <div id="nexusPreloader" class="fixed inset-0 bg-neutral-950 z-50 flex flex-col justify-center items-center p-6 transition-all duration-300 ease-out will-change-transform">
         <div class="w-full max-w-4xl space-y-6 animate-fast-pulse">
             <div class="h-10 bg-neutral-900 rounded-xl w-1/4"></div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -24,34 +29,41 @@
     </div>
 
     <div class="flex min-h-screen">
+        
         <aside class="hidden lg:flex flex-col w-64 bg-neutral-900 border-r border-neutral-800/60 p-5 shrink-0">
             <div class="flex items-center gap-3 mb-8 px-2">
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black shadow-md shadow-blue-600/20">N</div>
                 <span class="text-lg font-bold tracking-tight">Nexus Pro</span>
             </div>
+            
             <nav class="space-y-1.5 flex-1">
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-neutral-800 text-blue-400 rounded-xl font-medium text-sm">Workspace Dashboard</a>
-                <a href="ai_solver.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm">Academic Solvers</a>
-                <a href="academy.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm">E-Library Hub</a>
-                <a href="health.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm">Health Research Room</a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-neutral-800 text-blue-400 rounded-xl font-medium text-sm transition-all">Workspace Dashboard</a>
+                <a href="ai_solver.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">Academic Solvers</a>
+                <a href="academy.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">E-Library Hub</a>
+                <a href="health.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">Health Research Room</a>
                 
                 <div id="sidebarAdminLinks" class="hidden pt-4 border-t border-neutral-800/60 mt-4 space-y-1.5">
                     <span class="block px-3 text-[10px] font-bold tracking-wider text-neutral-500 uppercase mb-1">Management</span>
-                    <a href="#adminSection" class="flex items-center gap-3 px-3 py-2.5 text-red-400 hover:bg-red-950/20 rounded-xl font-medium text-sm">Console Control</a>
+                    <a href="#adminSection" class="flex items-center gap-3 px-3 py-2.5 text-red-400 hover:bg-red-950/20 rounded-xl font-medium text-sm transition-all">Console Control</a>
                 </div>
             </nav>
-            <button id="sidebarLogoutBtn" class="flex items-center gap-3 px-3 py-2.5 text-neutral-500 hover:text-red-400 rounded-xl font-medium text-sm w-full text-left cursor-pointer">Sign Out System</button>
+
+            <button id="sidebarLogoutBtn" class="flex items-center gap-3 px-3 py-2.5 text-neutral-500 hover:text-red-400 rounded-xl font-medium text-sm transition-all w-full text-left cursor-pointer">
+                Sign Out System
+            </button>
         </aside>
 
         <main class="flex-1 min-w-0 flex flex-col">
+            
             <header class="h-16 border-b border-neutral-800/60 flex items-center justify-between px-6 bg-neutral-900/40 backdrop-blur-md sticky top-0 z-30">
                 <div class="flex items-center gap-4">
-                    <button id="menuToggleBtn" class="lg:hidden p-2 text-neutral-400 hover:text-neutral-200 cursor-pointer">
+                    <button id="menuToggleBtn" class="lg:hidden p-2 text-neutral-400 hover:text-neutral-200 focus:outline-none cursor-pointer">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
                     </button>
                     <h2 id="welcomeHeading" class="text-lg font-bold tracking-tight text-neutral-200">Initializing Nexus Engine...</h2>
                 </div>
-                <div>
+                
+                <div class="flex items-center gap-3">
                     <span id="roleBadge" class="px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-neutral-800 text-neutral-400 border border-neutral-700/40">Student</span>
                 </div>
             </header>
@@ -70,12 +82,12 @@
                     <a href="academy.html" class="mobile-link block px-3 py-2.5 text-neutral-400 rounded-xl text-sm font-medium">E-Library Hub</a>
                     <a href="health.html" class="mobile-link block px-3 py-2.5 text-neutral-400 rounded-xl text-sm font-medium">Health Research Room</a>
                 </nav>
-                <button id="logoutBtn" class="flex items-center gap-3 px-3 py-2.5 text-neutral-500 hover:text-red-400 rounded-xl font-medium text-sm w-full text-left cursor-pointer">Sign Out</button>
+                <button id="logoutBtn" class="flex items-center gap-3 px-3 py-2.5 text-neutral-500 hover:text-red-400 rounded-xl font-medium text-sm transition-all w-full text-left cursor-pointer">Sign Out</button>
             </aside>
 
             <div class="p-6 space-y-6 flex-1 overflow-y-auto max-w-7xl w-full mx-auto">
                 
-                <div id="userContentSection" class="space-y-6">
+                <div id="userContentSection" class="hidden space-y-6">
                     <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-neutral-900 border border-neutral-800/60 p-6 rounded-2xl">
                             <div class="text-xs font-semibold text-neutral-500 uppercase tracking-wider">Academic Level Status</div>
@@ -90,7 +102,7 @@
                     </section>
 
                     <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div id="solvers" class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-neutral-700 transition-all">
+                        <div class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-neutral-700 transition-all">
                             <div class="space-y-2">
                                 <h3 class="text-lg font-bold tracking-tight text-neutral-100">📐 Academic Solvers</h3>
                                 <p class="text-neutral-400 text-sm">Instantly compute kinematics vectors, geometric optical refraction matrices, and standard analytical solubility product curves.</p>
@@ -98,7 +110,7 @@
                             <a href="ai_solver.html" class="w-full text-center bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all block">Launch Engineering Modules</a>
                         </div>
 
-                        <div id="elibrary" class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-neutral-700 transition-all">
+                        <div class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-neutral-700 transition-all">
                             <div class="space-y-2">
                                 <h3 class="text-lg font-bold tracking-tight text-neutral-100">📚 E-Library Hub</h3>
                                 <p class="text-neutral-400 text-sm">Access core textbooks, structured WAEC/JAMB reference syllabi, exam practice logs, and digital revision summaries.</p>
@@ -106,7 +118,7 @@
                             <a href="academy.html" class="w-full text-center bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold px-4 py-2.5 rounded-xl transition-all block">Open Library Vault</a>
                         </div>
 
-                        <div id="research" class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-neutral-700 transition-all">
+                        <div class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 flex flex-col justify-between space-y-4 hover:border-neutral-700 transition-all">
                             <div class="space-y-2">
                                 <h3 class="text-lg font-bold tracking-tight text-neutral-100">🩺 Health Research Room</h3>
                                 <p class="text-neutral-400 text-sm">Analyze foundational physiological research documentation, surgical data architectures, and clinical system designs.</p>
@@ -116,7 +128,7 @@
                     </section>
                 </div>
 
-                <section id="adminSection" class="hidden space-y-6">
+                <div id="adminSection" class="hidden space-y-6">
                     <div class="border border-red-900/40 bg-red-950/10 p-6 rounded-2xl">
                         <h3 class="text-lg font-bold tracking-tight text-red-400">🔒 System Overlord Operations Console</h3>
                         <p class="text-neutral-400 text-sm mt-1">Review global backend node properties, adjust global application metrics, and handle user profile authorization flags.</p>
@@ -139,7 +151,7 @@
                             <div class="text-xs text-neutral-500 mt-1">Solvers system operations / day</div>
                         </div>
                     </div>
-                </section>
+                </div>
 
             </div>
         </main>
@@ -147,4 +159,4 @@
 
     <script type="module" src="dashboard.js"></script>
 </body>
-                            </html>
+                                                                                                       </html>
