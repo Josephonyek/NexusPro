@@ -1,11 +1,6 @@
 /**
- * Nexus Pro 2.0 - Core Dashboard Management Engine (Optimized Stack)
+ * Nexus Pro 2.0 - Core Dashboard Management Engine (Secured Backend Mapping)
  */
-
-const FIREBASE_CONFIG = {
-    apiKey: "AIzaSyDbt1wfOLhRls_JG2ysysfHvqRBL8LRpBI",
-    databaseURL: "https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app"
-};
 
 function sanitizeString(str) {
     if (!str) return '';
@@ -17,7 +12,6 @@ function sanitizeString(str) {
 async function verifyAndInitializeDashboard() {
     const userId = localStorage.getItem('nexusUserId');
     const secureToken = localStorage.getItem('nexusAuthToken');
-    const cachedRole = localStorage.getItem('nexusUserRole') || 'student';
 
     if (!userId || !secureToken) {
         executeHardLogout();
@@ -25,18 +19,20 @@ async function verifyAndInitializeDashboard() {
     }
 
     try {
-        const dbUrl = FIREBASE_CONFIG.databaseURL.replace(/\/$/, "");
-        const response = await fetch(`${dbUrl}/users/${userId}.json?auth=${secureToken}`);
+        // SECURE ARCHITECTURE REROUTE: Instead of parsing keys on client-side, hit our private endpoint
+        const response = await fetch(`/api/profile?userId=${userId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${secureToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
         
-        if (!response.ok) throw new Error(`Database authentication failure`);
-        const profileData = await response.json();
+        if (!response.ok) throw new Error("Security verification rejection.");
+        const result = await response.json();
 
-        const finalProfile = profileData || {
-            name: "Scholar",
-            role: cachedRole,
-            status: "active",
-            gameMetrics: { totalXP: 0, currentLevel: 1 }
-        };
+        if (!result.success) throw new Error(result.message);
+        const finalProfile = result;
 
         if (finalProfile.status === 'suspended' || finalProfile.status === 'banned') {
             alert("🔒 Access privileges revoked.");
@@ -53,12 +49,21 @@ async function verifyAndInitializeDashboard() {
         const roleBadge = document.getElementById('roleBadge');
         if (roleBadge) {
             roleBadge.innerText = cleanRole;
+            
+            // STRICT ROLE CHECKS & PANEL CONTENT ROUTING
             if (cleanRole === 'admin') {
                 roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40";
+                
+                // Show Admin Controls, Hide standard student blocks if desired
                 document.getElementById('adminSection')?.classList.remove('hidden');
                 document.getElementById('sidebarAdminLinks')?.classList.remove('hidden');
+                document.getElementById('userContentSection')?.classList.add('hidden');
             } else {
                 roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-blue-950 text-blue-400 border border-blue-900/40";
+                
+                document.getElementById('adminSection')?.classList.add('hidden');
+                document.getElementById('sidebarAdminLinks')?.classList.add('hidden');
+                document.getElementById('userContentSection')?.classList.remove('hidden');
             }
         }
 
@@ -83,9 +88,7 @@ function clearPreloaderOverlay() {
     if (!loaderMask) return;
     
     loaderMask.classList.add('opacity-0', 'scale-98', 'pointer-events-none');
-    setTimeout(() => { 
-        loaderMask.remove(); 
-    }, 200);
+    setTimeout(() => { loaderMask.remove(); }, 200);
 }
 
 function executeHardLogout() {
@@ -110,9 +113,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function closeMobileMenu() {
         mobileSidebar.classList.add('-translate-x-full');
         mobileMenuOverlay.classList.add('opacity-0');
-        setTimeout(() => {
-            mobileMenuOverlay.classList.add('hidden');
-        }, 200);
+        setTimeout(() => { mobileMenuOverlay.classList.add('hidden'); }, 200);
     }
 
     menuToggleBtn?.addEventListener('click', openMobileMenu);
