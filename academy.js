@@ -10,41 +10,56 @@ async function initializeAcademyCatalog() {
     const userId = localStorage.getItem('nexusUserId');
     const secureToken = localStorage.getItem('nexusAuthToken');
 
+    // Verification check: Redirect to login if tokens are missing completely
     if (!userId || !secureToken) {
+        console.error("Missing local session authentication tokens.");
         localStorage.clear();
         window.location.replace('login.html');
         return;
     }
 
     try {
-        // Direct fetch request to read the library catalog node
-        const response = await fetch(`${DB_BASE_URL}/library.json?auth=${secureToken}`);
-        if (!response.ok) throw new Error("Catalog telemetry transmission denied.");
+        // Appends the active security token to pass the strict Firebase Rules validation checks
+        const targetUrl = `${DB_BASE_URL}/library.json?auth=${secureToken}`;
+        const response = await fetch(targetUrl);
+        
+        if (!response.ok) {
+            const errBody = await response.text();
+            throw new Error(`Server returned code ${response.status}: ${errBody || 'Forbidden Access'}`);
+        }
         
         const libraryData = await response.json();
         
         if (libraryData) {
-            // Convert indexed object nodes into sequential layout arrays
+            // Unpack Firebase objects into an ordered array list
             localCatalogCache = Object.keys(libraryData).map(key => ({
                 id: key,
                 ...libraryData[key]
             })).sort((a, b) => b.timestamp - a.timestamp);
+        } else {
+            localCatalogCache = [];
         }
 
         renderLibraryGrid("all");
 
     } catch (err) {
-        console.error("Library load sequence exception:", err.message);
+        console.error("Critical Catalog Fetch Failure Details:", err);
         document.getElementById('libraryContainer').innerHTML = `
-            <div class="col-span-full border border-neutral-800 p-6 rounded-2xl text-center text-xs text-neutral-500">
-                Failed to sync with library data node: ${err.message}
+            <div class="col-span-full border border-red-900/40 bg-red-950/10 p-6 rounded-2xl text-center text-xs text-red-400 max-w-md mx-auto">
+                <p class="font-bold mb-1">⚠️ System Sync Failure</p>
+                <p class="text-neutral-400 mb-2">${err.message}</p>
+                <p class="text-[10px] text-neutral-500">Verify your Firebase Rules block or try re-logging to refresh your user auth token state.</p>
             </div>`;
     } finally {
-        const preloader = document.getElementById('nexusPreloader');
-        if (preloader) {
-            preloader.classList.add('opacity-0', 'pointer-events-none');
-            setTimeout(() => preloader.remove(), 200);
-        }
+        clearPreloaderMask();
+    }
+}
+
+function clearPreloaderMask() {
+    const preloader = document.getElementById('nexusPreloader');
+    if (preloader) {
+        preloader.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => preloader.remove(), 200);
     }
 }
 
@@ -56,7 +71,7 @@ function renderLibraryGrid(selectedSubject) {
     if (!container) return;
     container.innerHTML = "";
 
-    // Filter local memory cache arrays based on user choice
+    // Process client-side caching filters fast
     const filteredDataset = selectedSubject === "all" 
         ? localCatalogCache 
         : localCatalogCache.filter(item => item.subject === selectedSubject);
@@ -72,31 +87,29 @@ function renderLibraryGrid(selectedSubject) {
         emptyBox?.classList.add('hidden');
     }
 
-    // Process and construct individual interactive item card shells
     filteredDataset.forEach(item => {
         const cardShell = document.createElement('div');
         cardShell.className = "bg-neutral-900 border border-neutral-800/80 hover:border-neutral-700/60 p-5 rounded-2xl flex flex-col justify-between space-y-4 transition-all";
 
-        // Build specific download/view trigger anchor loops based on storage configurations
-       // Old logic let them download; this updated block forces online browser viewing
-let interactionButtonHtml = "";
-if (item.uploadType === "file") {
-    // Forces the Base64 file or PDF asset to open inside a new browser tab for viewing only
-    interactionButtonHtml = `
-        <a href="${item.assetAddress}" target="_blank" rel="noopener noreferrer" 
-           class="flex-1 text-center bg-blue-950 text-blue-400 hover:bg-blue-900/60 border border-blue-900/40 text-xs font-bold px-3 py-2.5 rounded-xl transition-all">
-           📖 Read Material Online
-        </a>`;
-} else {
-    // Standard web links open safely in a new tab
-    interactionButtonHtml = `
-        <a href="${item.assetAddress}" target="_blank" rel="noopener noreferrer" 
-           class="flex-1 text-center bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold px-3 py-2.5 rounded-xl transition-all">
-           🌐 Open Material Link
-        </a>`;
-}
+        // Premium Online-Only Logic: Forces assets to open inside a browser frame securely instead of local download
+        let interactionButtonHtml = "";
+        const finalAssetUrl = item.assetAddress || "#";
 
-        // Check if a video lecture reference accompanies this textbook node
+        if (item.uploadType === "file") {
+            interactionButtonHtml = `
+                <a href="${finalAssetUrl}" target="_blank" rel="noopener noreferrer" 
+                   class="flex-1 text-center bg-blue-950 text-blue-400 hover:bg-blue-900/60 border border-blue-900/40 text-xs font-bold px-3 py-2.5 rounded-xl transition-all">
+                   📖 Read Material Online
+                </a>`;
+        } else {
+            interactionButtonHtml = `
+                <a href="${finalAssetUrl}" target="_blank" rel="noopener noreferrer" 
+                   class="flex-1 text-center bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold px-3 py-2.5 rounded-xl transition-all">
+                   🌐 Open Material Link
+                </a>`;
+        }
+
+        // Render complementary video references if attached to database entry nodes
         let videoReferenceHtml = "";
         if (item.videoReference && item.videoReference.link) {
             videoReferenceHtml = `
@@ -127,15 +140,12 @@ if (item.uploadType === "file") {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Connect subject filter click events
     const buttons = document.querySelectorAll('.filter-btn');
     buttons.forEach(btn => {
         btn.addEventListener('click', (e) => {
-            // Clean dynamic active badge properties across elements
             buttons.forEach(b => {
                 b.className = "filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200 whitespace-nowrap cursor-pointer transition-all";
             });
-            // Elevate targeted selection class properties
             e.target.className = "filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-blue-900/40 bg-blue-950 text-blue-400 whitespace-nowrap cursor-pointer transition-all";
             
             const targetSubject = e.target.getAttribute('data-subject');
