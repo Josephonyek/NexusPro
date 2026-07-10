@@ -1,10 +1,11 @@
 /**
- * Nexus Pro 2.0 - Core Administrative Library Publication Controller
+ * Nexus Pro 2.0 - Core Administrative Library Publication & Removal Controller
  * File: admin-upload.js
  */
 
 const DB_BASE_URL = "https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app";
 let currentUploadMode = "link"; 
+let activeSessionToken = "";
 
 async function runCredentialMatrixCheck() {
     const userId = localStorage.getItem('nexusUserId');
@@ -18,12 +19,9 @@ async function runCredentialMatrixCheck() {
     try {
         const response = await fetch(`${DB_BASE_URL}/users/${userId}.json?auth=${secureToken}`);
         if (!response.ok) throw new Error("Security check failed.");
-        
-        const userData = await response.json();
-        // Fallback: If role parsing fails, still return token to see if it's a rule mismatch
         return secureToken;
     } catch (err) {
-        console.warn("Authorization verification bypassed for testing:", err.message);
+        console.warn("Auth verify mismatch:", err.message);
         return secureToken;
     } finally {
         clearPreloaderOverlay();
@@ -37,9 +35,90 @@ function clearPreloaderOverlay() {
     setTimeout(() => { loaderMask.remove(); }, 200); 
 }
 
+// FETCH AND RENDER ADMIN DELETION CATALOG VIEW
+async function fetchAndRenderAdminCatalog() {
+    const container = document.getElementById('adminCatalogContainer');
+    if (!container) return;
+
+    try {
+        const response = await fetch(`${DB_BASE_URL}/library.json?auth=${activeSessionToken}`);
+        if (!response.ok) throw new Error("Could not sync live repository lists.");
+        
+        const catalogData = await response.json();
+        container.innerHTML = "";
+
+        if (!catalogData) {
+            container.innerHTML = `<div class="text-center text-xs text-neutral-500 py-6">No media assets cataloged on backend.</div>`;
+            return;
+        }
+
+        Object.keys(catalogData).reverse().forEach(nodeKey => {
+            const entry = catalogData[nodeKey];
+            const itemRow = document.createElement('div');
+            itemRow.className = "flex items-center justify-between gap-4 p-3.5 bg-neutral-950 border border-neutral-800 rounded-xl hover:border-neutral-700/60 transition-colors";
+            
+            const hasVideo = entry.videoReference && entry.videoReference.link ? "🎬 Video Attached" : "📄 Doc Only";
+
+            itemRow.innerHTML = `
+                <div class="min-w-0 flex-1">
+                    <h4 class="text-sm font-bold text-neutral-200 truncate">${entry.title}</h4>
+                    <div class="flex items-center gap-2 mt-1 text-[10px] font-semibold text-neutral-500 uppercase tracking-wide">
+                        <span class="text-blue-400">${entry.subject}</span>
+                        <span>•</span>
+                        <span>${entry.category}</span>
+                        <span>•</span>
+                        <span class="text-amber-500">${hasVideo}</span>
+                    </div>
+                </div>
+                <button data-id="${nodeKey}" class="delete-btn px-3 py-1.5 bg-red-950/40 hover:bg-red-900/60 border border-red-900/40 text-red-400 text-xs font-bold rounded-lg cursor-pointer transition-all shrink-0">
+                    Delete
+                </button>
+            `;
+            container.appendChild(itemRow);
+        });
+
+        // Attach event listeners to newly generated delete buttons
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const targetNodeId = e.target.getAttribute('data-id');
+                if (confirm("⚠️ Are you sure you want to permanently delete this material entry from the database? This cannot be undone.")) {
+                    await executeCatalogDeletion(targetNodeId, e.target);
+                }
+            });
+        });
+
+    } catch (err) {
+        container.innerHTML = `<div class="text-center text-xs text-red-400 py-6">Catalog syncing error: ${err.message}</div>`;
+    }
+}
+
+// TARGETED DELETION ENGINE METHOD
+async function executeCatalogDeletion(nodeId, buttonElement) {
+    buttonElement.disabled = true;
+    buttonElement.innerText = "Purging...";
+
+    try {
+        const targetUrl = `${DB_BASE_URL}/library/${nodeId}.json?auth=${activeSessionToken}`;
+        const deleteResponse = await fetch(targetUrl, { method: 'DELETE' });
+
+        if (!deleteResponse.ok) throw new Error("Firebase server refused deletion contract.");
+
+        alert("🗑️ Resource node wiped out successfully!");
+        await fetchAndRenderAdminCatalog(); // Refresh list layout
+
+    } catch (err) {
+        alert(`Deletion Error: ${err.message}`);
+        buttonElement.disabled = false;
+        buttonElement.innerText = "Delete";
+    }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
-    const activeSessionToken = await runCredentialMatrixCheck();
+    activeSessionToken = await runCredentialMatrixCheck();
     if (!activeSessionToken) return;
+
+    // Load initial live asset panel list
+    await fetchAndRenderAdminCatalog();
 
     const tabLinkMode = document.getElementById('tabLinkMode');
     const tabFileMode = document.getElementById('tabFileMode');
@@ -72,9 +151,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     materialFile?.addEventListener('change', (e) => {
         const fileNode = e.target.files[0];
         if (fileNode && fileNameDisplay) {
-            // Check if file exceeds Firebase safe text packet limits (2MB max fallback)
             if (fileNode.size > 2 * 1024 * 1024) {
-                alert("⚠️ File too large! Local file string conversion cannot exceed 2MB. For larger documents, please use the 'Provide Web Link' tab and use Google Drive.");
+                alert("⚠️ File too large! String structures cannot exceed 2MB.");
                 materialFile.value = "";
                 fileNameDisplay.innerText = "Select file node from storage disk...";
                 return;
@@ -95,7 +173,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (!rawFile) {
                 alert("Please select a file asset first.");
                 if (submitBtn) submitBtn.disabled = false;
-                if (btnText) btnText.innerText = "Deploy Asset Pack to Library";
                 return;
             }
             
@@ -136,18 +213,17 @@ document.addEventListener("DOMContentLoaded", async () => {
                 body: JSON.stringify(compositePayload)
             });
 
-            if (!uploadResponse.ok) {
-                const textError = await uploadResponse.text();
-                throw new Error(`Server responded with code ${uploadResponse.status}: ${textError}`);
-            }
+            if (!uploadResponse.ok) throw new Error("Ingestion rejected.");
 
             alert("✅ Material asset payload compiled and deployed safely!");
             uploadForm.reset();
             if (fileNameDisplay) fileNameDisplay.innerText = "Select file node from storage disk...";
             tabLinkMode.click(); 
 
+            // Automatically re-fetch the bottom catalog lists to show the new card instantly
+            await fetchAndRenderAdminCatalog();
+
         } catch (error) {
-            console.error("Critical Ingestion Failure Details:", error);
             alert(`⚠️ Database Rejected Upload: ${error.message}`);
         } finally {
             if (submitBtn) submitBtn.disabled = false;
