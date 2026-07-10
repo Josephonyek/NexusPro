@@ -78,22 +78,23 @@ function renderLibraryGrid(selectedSubject) {
         cardShell.className = "bg-neutral-900 border border-neutral-800/80 hover:border-neutral-700/60 p-5 rounded-2xl flex flex-col justify-between space-y-4 transition-all";
 
         // Build specific download/view trigger anchor loops based on storage configurations
-        let interactionButtonHtml = "";
-        if (item.uploadType === "file") {
-            // If raw data string, map a browser data down-pipe trigger
-            interactionButtonHtml = `
-                <a href="${item.assetAddress}" download="${item.title.replace(/\s+/g, '_')}" 
-                   class="flex-1 text-center bg-blue-950 text-blue-400 hover:bg-blue-900/60 border border-blue-900/40 text-xs font-bold px-3 py-2.5 rounded-xl transition-all">
-                   📥 Download Attached File
-                </a>`;
-        } else {
-            // Standard hyperlinks simply route outward safely to a new browser tab
-            interactionButtonHtml = `
-                <a href="${item.assetAddress}" target="_blank" rel="noopener noreferrer" 
-                   class="flex-1 text-center bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold px-3 py-2.5 rounded-xl transition-all">
-                   🌐 Open Material Resource Link
-                </a>`;
-        }
+       // Old logic let them download; this updated block forces online browser viewing
+let interactionButtonHtml = "";
+if (item.uploadType === "file") {
+    // Forces the Base64 file or PDF asset to open inside a new browser tab for viewing only
+    interactionButtonHtml = `
+        <a href="${item.assetAddress}" target="_blank" rel="noopener noreferrer" 
+           class="flex-1 text-center bg-blue-950 text-blue-400 hover:bg-blue-900/60 border border-blue-900/40 text-xs font-bold px-3 py-2.5 rounded-xl transition-all">
+           📖 Read Material Online
+        </a>`;
+} else {
+    // Standard web links open safely in a new tab
+    interactionButtonHtml = `
+        <a href="${item.assetAddress}" target="_blank" rel="noopener noreferrer" 
+           class="flex-1 text-center bg-neutral-800 hover:bg-neutral-700 text-neutral-200 text-xs font-bold px-3 py-2.5 rounded-xl transition-all">
+           🌐 Open Material Link
+        </a>`;
+}
 
         // Check if a video lecture reference accompanies this textbook node
         let videoReferenceHtml = "";
