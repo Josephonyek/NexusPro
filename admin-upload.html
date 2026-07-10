@@ -1,274 +1,87 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro 2.0 - Media Content Desk</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Anti-Flash Shield: Keeps layout hidden until admin identity is verified */
-        body { opacity: 0; transition: opacity 0.4s ease-in-out; }
-        body.access-granted { opacity: 1; }
-    </style>
-</head>
-<body class="bg-gray-950 text-white min-h-screen font-sans">
+/**
+ * Nexus Pro 2.0 - Core Administrative Library Publication Controller
+ * File: admin-upload.js
+ */
 
-    <div id="uploadPreloader" class="fixed inset-0 bg-gray-950 z-[9999] flex flex-col items-center justify-center">
-        <div class="w-10 h-10 border-4 border-red-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-        <p class="text-xs font-bold tracking-widest text-red-400 uppercase animate-pulse">Verifying Management Clearances...</p>
-    </div>
+const DB_BASE_URL = "https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app";
 
-    <nav class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center space-x-3">
-            <button onclick="window.location.href='dashboard.html'" class="text-gray-400 hover:text-white transition text-sm">&larr; Back to Dashboard</button>
-            <span class="text-gray-700">|</span>
-            <h1 class="text-md font-black tracking-widest text-red-500 uppercase">Academy Content Ingestion Desk</h1>
-        </div>
-        <span class="px-2.5 py-1 text-[10px] font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40 tracking-wider">
-            Clearance: Level 1 Admin
-        </span>
-    </nav>
+async function verifyAdminCredentials() {
+    const userId = localStorage.getItem('nexusUserId');
+    const secureToken = localStorage.getItem('nexusAuthToken');
 
-    <main class="max-w-5xl mx-auto px-4 py-10">
-        <div class="mb-8">
-            <h2 class="text-2xl font-extrabold tracking-tight">Resource Inventory Uplink</h2>
-            <p class="text-gray-400 text-sm mt-0.5">Upload local document files directly or append video tutorials dynamically to user academy dashboards.</p>
-        </div>
+    if (!userId || !secureToken) {
+        window.location.replace('login.html');
+        return null;
+    }
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            
-            <section class="bg-gray-900 border border-gray-800 rounded-3xl p-6 shadow-xl relative overflow-hidden">
-                <div class="flex items-center gap-2.5 mb-6 pb-4 border-b border-gray-800/60">
-                    <span class="text-2xl">📚</span>
-                    <div>
-                        <h3 class="font-bold text-base">E-Library Document Register</h3>
-                        <p class="text-[11px] text-gray-400">Upload document files directly into storage arrays with live metrics.</p>
-                    </div>
-                </div>
-
-                <form id="ebookUploadForm" class="space-y-4 text-xs">
-                    <div>
-                        <label class="block font-bold text-gray-400 uppercase tracking-wider mb-1.5">Book or Document Title</label>
-                        <input type="text" id="bookTitle" placeholder="e.g., Senior Secondary Physics - Volume 2" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-blue-500 text-white transition" required>
-                    </div>
-                    <div>
-                        <label class="block font-bold text-gray-400 uppercase tracking-wider mb-1.5">Custom Subject or Course Track Name</label>
-                        <input type="text" id="bookCategory" placeholder="e.g., Further Mathematics, Technical Drawing" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-blue-500 text-white transition" required>
-                    </div>
-                    <div>
-                        <label class="block font-bold text-gray-400 uppercase tracking-wider mb-1.5">Upload E-Book File (PDF, EPUB)</label>
-                        <input type="file" id="bookFile" accept=".pdf,.epub" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-blue-500 text-gray-400 transition file:mr-4 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-gray-800 file:text-blue-400 hover:file:bg-gray-700 file:cursor-pointer" required>
-                    </div>
-                    <div>
-                        <label class="block font-bold text-gray-400 uppercase tracking-wider mb-1.5">Default Homework Assignment Prompt (Optional)</label>
-                        <textarea id="bookHomeworkPrompt" rows="3" placeholder="Read Chapter 3, page 45, and complete review questions 1-5 inside the learning arcade panels." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-blue-500 text-white transition"></textarea>
-                    </div>
-
-                    <button type="submit" id="ebookSubmitBtn" class="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition shadow-md shadow-blue-900/20 mt-2 flex flex-col items-center justify-center min-h-[44px]">
-                        <span>Upload and Publish Document</span>
-                    </button>
-                </form>
-            </section>
-
-            <section class="bg-gray-900 border border-gray-800 rounded-3xl p-6 shadow-xl relative overflow-hidden">
-                <div class="flex items-center gap-2.5 mb-6 pb-4 border-b border-gray-800/60">
-                    <span class="text-2xl">🎥</span>
-                    <div>
-                        <h3 class="font-bold text-base">Video Stream Reference Map</h3>
-                        <p class="text-[11px] text-gray-400">Bind YouTube reference channels to custom course streams.</p>
-                    </div>
-                </div>
-
-                <form id="videoUploadForm" class="space-y-4 text-xs">
-                    <div>
-                        <label class="block font-bold text-gray-400 uppercase tracking-wider mb-1.5">Tutorial Video Header Name</label>
-                        <input type="text" id="videoTitle" placeholder="e.g., Understanding Projectile Motion Step-by-Step" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-emerald-500 text-white transition" required>
-                    </div>
-                    <div>
-                        <label class="block font-bold text-gray-400 uppercase tracking-wider mb-1.5">Custom Subject Stream Reference</label>
-                        <input type="text" id="videoSubject" placeholder="e.g., Further Mathematics, Anatomy" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-emerald-500 text-white transition" required>
-                    </div>
-                    <div>
-                        <label class="block font-bold text-gray-400 uppercase tracking-wider mb-1.5">YouTube Embed URL Pathway</label>
-                        <input type="url" id="videoEmbedUrl" placeholder="https://www.youtube.com/embed/VIDEO_ID" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-3 outline-none focus:border-emerald-500 text-white transition" required>
-                        <p class="text-[9px] text-gray-500 mt-1">⚠️ Links must use the /embed/ path layout format so it plays inside the academy frame canvas maps.</p>
-                    </div>
-
-                    <button type="submit" class="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition shadow-md shadow-emerald-900/20 mt-8">Mount Reference Stream</button>
-                </form>
-            </section>
-
-        </div>
-    </main>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-        import { getDatabase, ref, push, set, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-        import { getStorage, ref as sRef, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-storage.js";
-
-        let db;
-        let storage;
-
-        async function runSecurityAuditHandshake() {
-            const token = localStorage.getItem('nexusAuthToken');
-            const uid = localStorage.getItem('nexusUserId');
-
-            if (!token || !uid) {
-                localStorage.clear();
-                window.location.replace('login.html');
-                return;
-            }
-
-            try {
-                const configResponse = await fetch('./api/firebaseConfig');
-                if (!configResponse.ok) throw new Error("Could not download system config map.");
-                const firebaseConfig = await configResponse.json();
-
-                const app = initializeApp(firebaseConfig);
-                db = getDatabase(app);
-                storage = getStorage(app); 
-
-                const userSnapshot = await get(ref(db, `users/${uid}`));
-                const userProfile = userSnapshot.val();
-
-                if (!userProfile || userProfile.role !== 'admin' || userProfile.status === 'banned') {
-                    alert("Security Exception: Access Denied.");
-                    window.location.replace('dashboard.html');
-                    return;
-                }
-
-                document.body.classList.add('access-granted');
-                document.getElementById('uploadPreloader').remove();
-
-                bindUploaderSubmissionForms();
-
-            } catch (err) {
-                console.error("Content desk security fault:", err);
-                alert("Security handshake abort: " + err.message);
-                window.location.replace('dashboard.html');
-            }
+    try {
+        // Double check permissions directly with the profile configuration schema
+        const response = await fetch(`${DB_BASE_URL}/users/${userId}.json?auth=${secureToken}`);
+        if (!response.ok) throw new Error("Security verification communication fault.");
+        
+        const userData = await response.json();
+        if (!userData || (userData.role || '').toLowerCase().trim() !== 'admin') {
+            alert("🔒 Access violation detected. Administrative credentials required.");
+            window.location.replace('dashboard.html');
+            return null;
         }
+        
+        return secureToken; // Valid session confirmed
+    } catch (err) {
+        console.error("Authorization check failure:", err.message);
+        window.location.replace('dashboard.html');
+        return null;
+    }
+}
 
-        function bindUploaderSubmissionForms() {
-            // E-Book Publishing Submission Handler with Resumable Progress Tracking
-            document.getElementById('ebookUploadForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const submitBtn = document.getElementById('ebookSubmitBtn');
+document.addEventListener("DOMContentLoaded", async () => {
+    // Run verification immediately on entry
+    const confirmedAuthToken = await verifyAdminCredentials();
+    if (!confirmedAuthToken) return;
 
-                const title = document.getElementById('bookTitle').value.trim();
-                const category = document.getElementById('bookCategory').value.trim().toLowerCase();
-                const fileHandle = document.getElementById('bookFile').files[0];
-                const homeworkPrompt = document.getElementById('bookHomeworkPrompt').value.trim();
+    const uploadForm = document.getElementById('uploadForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const btnText = document.getElementById('btnText');
 
-                if (!fileHandle) {
-                    alert("Please select a physical document file block first.");
-                    return;
-                }
+    uploadForm?.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-                try {
-                    submitBtn.disabled = true;
+        // Assemble structural data package
+        const payload = {
+            title: document.getElementById('materialTitle').value.trim(),
+            subject: document.getElementById('materialSubject').value,
+            category: document.getElementById('materialCategory').value,
+            url: document.getElementById('materialLink').value.trim(),
+            timestamp: Date.now()
+        };
 
-                    // Establish isolated storage path node name
-                    const uniqueFileName = `${Date.now()}_${fileHandle.name.replace(/\s+/g, '_')}`;
-                    const storageBucketRef = sRef(storage, `elibrary/${uniqueFileName}`);
+        // UI Loading state update
+        if (submitBtn) submitBtn.disabled = true;
+        if (btnText) btnText.innerText = "Transmitting Resource...";
 
-                    // 1. LAUNCH THE RESUMABLE DATA STREAM PIPELINE
-                    const uploadTask = uploadBytesResumable(storageBucketRef, fileHandle);
-
-                    // 2. LISTEN TO PROGRESS PERCENTAGE METRICS IN REAL-TIME
-                    uploadTask.on('state_changed', 
-                        (snapshot) => {
-                            const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                            
-                            // Inject tracking string and a mini progress bar inside the button
-                            submitBtn.innerHTML = `
-                                <span class="inline-block animate-pulse text-amber-400">⏳ Uploading: ${Math.round(progress)}%</span>
-                                <div class="w-48 bg-gray-950 h-1 rounded-full mt-1 overflow-hidden border border-gray-800">
-                                    <div class="bg-blue-500 h-full transition-all duration-150" style="width: ${progress}%"></div>
-                                </div>
-                            `;
-                        }, 
-                        (error) => {
-                            console.error("Upload Task Interrupted:", error);
-                            alert(`Upload Interrupted: ${error.message}`);
-                            resetSubmitButton(submitBtn);
-                        }, 
-                        async () => {
-                            // 3. UPLOAD COMPLETION NODE: Triggered when progress reaches 100%
-                            submitBtn.textContent = "💾 Publishing records to database...";
-                            const publicFileUrl = await getDownloadURL(uploadTask.snapshot.ref);
-
-                            const libraryRootRef = ref(db, 'elibrary');
-                            const newBookRecordRef = push(libraryRootRef);
-
-                            await set(newBookRecordRef, {
-                                title,
-                                category,
-                                fileUrl: publicFileUrl,
-                                homeworkPrompt: homeworkPrompt || `Read core chapters inside ${title} to compile review criteria.`
-                            });
-
-                            alert(`🎉 Success! "${title}" has been safely processed and live-published.`);
-                            e.target.reset();
-                            resetSubmitButton(submitBtn);
-                        }
-                    );
-
-                } catch (err) {
-                    console.error("Storage pipeline initialization fault:", err);
-                    alert("Asset execution fault: " + err.message);
-                    resetSubmitButton(submitBtn);
-                }
+        try {
+            // Push directly to the /library list node endpoint
+            const targetUrl = `${DB_BASE_URL}/library.json?auth=${confirmedAuthToken}`;
+            const uploadResponse = await fetch(targetUrl, {
+                method: 'POST', // POST generates an auto-incremented UUID token node inside Firebase RTDB
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
             });
 
-            function resetSubmitButton(btn) {
-                btn.disabled = false;
-                btn.textContent = "Upload and Publish Document";
-            }
+            if (!uploadResponse.ok) throw new Error("Database refused transaction.");
 
-            // Video Stream Publishing Submission Handler with Custom Subject Input
-            document.getElementById('videoUploadForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const submitBtn = e.target.querySelector('button[type="submit"]');
+            alert("✅ Material successfully compiled and added to the E-Library!");
+            uploadForm.reset();
 
-                const title = document.getElementById('videoTitle').value.trim();
-                const subject = document.getElementById('videoSubject').value.trim().toLowerCase();
-                let embedUrl = document.getElementById('videoEmbedUrl').value.trim();
-
-                if (embedUrl.includes("watch?v=")) {
-                    const videoId = embedUrl.split("v=")[1]?.split("&")[0];
-                    if (videoId) embedUrl = `https://www.youtube.com/embed/${videoId}`;
-                } else if (embedUrl.includes("youtu.be/")) {
-                    const videoId = embedUrl.split("youtu.be/")[1]?.split("?")[0];
-                    if (videoId) embedUrl = `https://www.youtube.com/embed/${videoId}`;
-                }
-
-                try {
-                    submitBtn.disabled = true;
-                    submitBtn.textContent = "Streaming node address to array...";
-
-                    const videoRootRef = ref(db, 'videoReferences');
-                    const newVideoRecordRef = push(videoRootRef);
-
-                    await set(newVideoRecordRef, {
-                        title,
-                        subject,
-                        embedUrl
-                    });
-
-                    alert(`🎉 Success! Video guide mounted cleanly for the "${subject}" syllabus reference catalog.`);
-                    e.target.reset();
-
-                } catch (err) {
-                    alert("Video reference save error: " + err.message);
-                } finally {
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = "Mount Reference Stream";
-                }
-            });
+        } catch (error) {
+            console.error("Upload failure tracker node:", error.message);
+            alert(`⚠️ Upload rejected: ${error.message}`);
+        } finally {
+            // Restore button properties
+            if (submitBtn) submitBtn.disabled = false;
+            if (btnText) btnText.innerText = "Deploy to Library Catalog";
         }
-
-        runSecurityAuditHandshake();
-    </script>
-</body>
-</html>
+    });
+});
