@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro | E-Library Hub</title>
+    <title>Nexus Pro | Academy Hub</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         .animate-fast-pulse { animation: pulse 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
@@ -15,10 +15,9 @@
     <div id="nexusPreloader" class="fixed inset-0 bg-neutral-950 z-50 flex flex-col justify-center items-center p-6 transition-all duration-300">
         <div class="w-full max-w-5xl space-y-6 animate-fast-pulse">
             <div class="h-8 bg-neutral-900 rounded-xl w-1/4"></div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="h-44 bg-neutral-900 rounded-2xl"></div>
-                <div class="h-44 bg-neutral-900 rounded-2xl"></div>
-                <div class="h-44 bg-neutral-900 rounded-2xl"></div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="h-48 bg-neutral-900 rounded-2xl"></div>
+                <div class="h-48 bg-neutral-900 rounded-2xl"></div>
             </div>
         </div>
     </div>
@@ -31,32 +30,31 @@
             </div>
             <nav class="space-y-1.5 flex-1">
                 <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">← Back to Hub</a>
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-neutral-800 text-blue-400 rounded-xl font-medium text-sm transition-all">E-Library Hub</a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-neutral-800 text-blue-400 rounded-xl font-medium text-sm transition-all">Academy View</a>
             </nav>
         </aside>
 
         <main class="flex-1 min-w-0 flex flex-col">
             <header class="h-16 border-b border-neutral-800/60 flex items-center justify-between px-6 bg-neutral-900/40 backdrop-blur-md sticky top-0 z-30">
-                <h2 class="text-lg font-bold tracking-tight text-neutral-200">E-Library Central Repository</h2>
-                <div id="activeCounter" class="text-xs text-neutral-500 font-medium">Loading catalog logs...</div>
+                <h2 class="text-lg font-bold tracking-tight text-neutral-200">E-Library Viewer Portal</h2>
+                <div id="activeCounter" class="text-xs text-neutral-500 font-medium">Loading items...</div>
             </header>
 
-            <div class="p-6 space-y-6 flex-1 overflow-y-auto max-w-7xl w-full mx-auto">
+            <div class="p-6 space-y-6 flex-1 overflow-y-auto max-w-5xl w-full mx-auto">
                 
-                <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" id="subjectFilterRow">
+                <div class="flex items-center gap-2 overflow-x-auto pb-2" id="subjectFilterRow">
                     <button data-subject="all" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-blue-900/40 bg-blue-950 text-blue-400 whitespace-nowrap cursor-pointer transition-all">All Fields</button>
                     <button data-subject="Physics" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200 whitespace-nowrap cursor-pointer transition-all">Physics</button>
                     <button data-subject="Chemistry" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200 whitespace-nowrap cursor-pointer transition-all">Chemistry</button>
                     <button data-subject="Mathematics" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200 whitespace-nowrap cursor-pointer transition-all">Mathematics</button>
-                    <button data-subject="English" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200 whitespace-nowrap cursor-pointer transition-all">English Language</button>
-                    <button data-subject="Biology" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200 whitespace-nowrap cursor-pointer transition-all">Biology</button>
+                    <button data-subject="English" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200 whitespace-nowrap cursor-pointer transition-all">English</button>
                 </div>
 
-                <div id="libraryContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div id="libraryContainer" class="grid grid-cols-1 gap-6">
                     </div>
 
                 <div id="emptyStateBox" class="hidden text-center py-12 border border-neutral-800 rounded-2xl bg-neutral-900/20">
-                    <p class="text-neutral-400 text-sm font-medium">No study assets cataloged under this target tracker track yet.</p>
+                    <p class="text-neutral-400 text-sm font-medium">No learning assets active under this subject matrix yet.</p>
                 </div>
 
             </div>
@@ -65,4 +63,4 @@
 
     <script type="module" src="academy.js"></script>
 </body>
-</html>
+            </html>
