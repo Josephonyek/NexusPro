@@ -3,287 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro 2.0 - Core Study Academy</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Nexus Pro | E-Library Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        body { opacity: 0; transition: opacity 0.4s ease-in-out; }
-        body.access-granted { opacity: 1; }
-        
-        /* Custom scrollbar styling for a clean dark UI look */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #0b0f19; }
-        ::-webkit-scrollbar-thumb { background: #1f293d; rounded: 8px; }
-        ::-webkit-scrollbar-thumb:hover { background: #3b82f6; }
-
-        /* Animation for the AI Solver Button Glow */
-        @keyframes subtleGlow {
-            0% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
-            50% { box-shadow: 0 0 20px rgba(59, 130, 246, 0.6); }
-            100% { box-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
-        }
-        .ai-glow-btn { animation: subtleGlow 3s infinite ease-in-out; }
+        .animate-fast-pulse { animation: pulse 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
     </style>
 </head>
-<body class="bg-gray-950 text-white min-h-screen font-sans overflow-hidden">
+<body class="bg-neutral-950 text-neutral-100 min-h-screen antialiased">
 
-    <!-- Workspace Preloader System -->
-    <div id="academyPreloader" class="fixed inset-0 bg-gray-950 z-[9999] flex flex-col items-center justify-center transition-all duration-500">
-        <div class="flex flex-col items-center max-w-sm px-6 text-center">
-            <div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-            <p class="text-xs font-bold tracking-[0.2em] text-blue-400 uppercase animate-pulse">Syncing Academy Resources...</p>
+    <div id="nexusPreloader" class="fixed inset-0 bg-neutral-950 z-50 flex flex-col justify-center items-center p-6 transition-all duration-300">
+        <div class="w-full max-w-5xl space-y-6 animate-fast-pulse">
+            <div class="h-8 bg-neutral-900 rounded-xl w-1/4"></div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="h-44 bg-neutral-900 rounded-2xl"></div>
+                <div class="h-44 bg-neutral-900 rounded-2xl"></div>
+                <div class="h-44 bg-neutral-900 rounded-2xl"></div>
+            </div>
         </div>
     </div>
 
-    <!-- Navigation Header Matrix -->
-    <nav class="bg-gray-900 border-b border-gray-800 px-6 py-3 flex justify-between items-center h-16 relative z-40">
-        <div class="flex items-center space-x-3">
-            <button onclick="window.location.href='dashboard.html'" class="text-gray-400 hover:text-white transition font-medium text-sm">&larr; Dashboard</button>
-            <span class="text-gray-700">|</span>
-            <h1 class="text-md font-black tracking-widest text-blue-400 uppercase">Academy Console</h1>
-        </div>
-        <div class="flex items-center space-x-3">
-            <span id="academicSubjectBadge" class="px-2.5 py-1 text-[10px] font-bold uppercase rounded-md bg-blue-950 text-blue-400 border border-blue-900/40 tracking-wider">
-                Syllabus Stream: Active
-            </span>
-        </div>
-    </nav>
-
-    <!-- Main Workspace Frame split into a 3-Column Studio Grid -->
-    <main class="flex h-[calc(100vh-4rem)] w-full relative z-10">
-        
-        <!-- COLUMN 1: THE E-LIBRARY REPOSITORY RECK (LEFT SIDEBAR) -->
-        <section class="w-80 bg-gray-900/60 border-r border-gray-800 flex flex-col justify-between shrink-0">
-            <!-- Library Header & Filters -->
-            <div class="p-4 border-b border-gray-800 bg-gray-900/40">
-                <h2 class="text-sm font-black text-gray-400 tracking-wider uppercase mb-3">📚 E-Library Vault</h2>
-                <select id="libraryCategoryFilter" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-2.5 text-xs font-bold outline-none focus:border-blue-500 text-gray-300 transition">
-                    <option value="all">All Subjects</option>
-                    <option value="physics">Physics</option>
-                    <option value="chemistry">Chemistry</option>
-                    <option value="mathematics">Mathematics</option>
-                </select>
+    <div class="flex min-h-screen">
+        <aside class="hidden lg:flex flex-col w-64 bg-neutral-900 border-r border-neutral-800/60 p-5 shrink-0">
+            <div class="flex items-center gap-3 mb-8 px-2">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black shadow-md">N</div>
+                <span class="text-lg font-bold tracking-tight">Nexus Pro</span>
             </div>
+            <nav class="space-y-1.5 flex-1">
+                <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">← Back to Hub</a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-neutral-800 text-blue-400 rounded-xl font-medium text-sm transition-all">E-Library Hub</a>
+            </nav>
+        </aside>
 
-            <!-- Scrollable Document Book Cards Asset Grid -->
-            <div id="libraryBookShelf" class="flex-1 overflow-y-auto p-4 space-y-3">
-                <div class="text-center py-10 text-xs text-gray-500 animate-pulse">Loading library manifests...</div>
-            </div>
+        <main class="flex-1 min-w-0 flex flex-col">
+            <header class="h-16 border-b border-neutral-800/60 flex items-center justify-between px-6 bg-neutral-900/40 backdrop-blur-md sticky top-0 z-30">
+                <h2 class="text-lg font-bold tracking-tight text-neutral-200">E-Library Central Repository</h2>
+                <div id="activeCounter" class="text-xs text-neutral-500 font-medium">Loading catalog logs...</div>
+            </header>
 
-            <!-- Homework Objective Alert Node (Sticky Footer Left) -->
-            <div class="p-4 border-t border-gray-800 bg-gray-950/40">
-                <div class="text-[10px] font-bold uppercase tracking-wider text-amber-400 mb-1">📝 Core Homework Prompt</div>
-                <p id="homeworkSummaryText" class="text-xs text-gray-400 line-clamp-3 leading-relaxed">Select a textbook node above to overlay active course assignments here...</p>
-            </div>
-        </section>
-
-        <!-- COLUMN 2: CENTER STAGE WORKSPACE (PDF VIEW AND VIDEO LINKS) -->
-        <section class="flex-1 bg-gray-950 flex flex-col min-w-0 overflow-y-auto">
-            <!-- Dynamic Video Reference Row (Top half of Center) -->
-            <div class="min-h-[200px] h-1/3 border-b border-gray-800 bg-gray-900/20 p-4 flex flex-col shrink-0">
-                <h3 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 flex items-center gap-1.5">
-                    <span>🎥</span> Syllabus Video Reference Map
-                </h3>
-                <div id="videoReferenceGrid" class="flex-1 grid grid-cols-2 gap-4 overflow-y-auto pr-1">
-                    <div class="col-span-2 text-center py-6 text-xs text-gray-600">Select a textbook item to filter streaming video reference nodes.</div>
+            <div class="p-6 space-y-6 flex-1 overflow-y-auto max-w-7xl w-full mx-auto">
+                
+                <div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none" id="subjectFilterRow">
+                    <button data-subject="all" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-blue-900/40 bg-blue-950 text-blue-400 whitespace-nowrap cursor-pointer transition-all">All Fields</button>
+                    <button data-subject="Physics" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200 whitespace-nowrap cursor-pointer transition-all">Physics</button>
+                    <button data-subject="Chemistry" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200 whitespace-nowrap cursor-pointer transition-all">Chemistry</button>
+                    <button data-subject="Mathematics" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200 whitespace-nowrap cursor-pointer transition-all">Mathematics</button>
+                    <button data-subject="English" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200 whitespace-nowrap cursor-pointer transition-all">English Language</button>
+                    <button data-subject="Biology" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200 whitespace-nowrap cursor-pointer transition-all">Biology</button>
                 </div>
-            </div>
 
-            <!-- PDF Book Viewer Canvas Row (Bottom half of Center) -->
-            <div class="flex-1 p-4 flex flex-col bg-gray-950 min-h-[400px]">
-                <div class="flex justify-between items-center mb-2">
-                    <h3 id="activeDocumentTitle" class="text-xs font-bold text-gray-400 uppercase tracking-widest">📖 Document Viewport</h3>
-                    <span id="documentStatusTag" class="text-[10px] font-mono text-gray-600 uppercase">Idle</span>
-                </div>
-                <div id="pdfViewerWindow" class="flex-1 border border-gray-800 rounded-2xl bg-gray-900/30 overflow-hidden relative flex items-center justify-center">
-                    <div class="text-center p-6 max-w-sm">
-                        <div class="text-3xl mb-2">📥</div>
-                        <h4 class="font-bold text-sm text-gray-400">No Document Active</h4>
-                        <p class="text-xs text-gray-500 mt-1">Select a syllabus manual or textbook from the E-Library index path to load the reading pane frame.</p>
+                <div id="libraryContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     </div>
+
+                <div id="emptyStateBox" class="hidden text-center py-12 border border-neutral-800 rounded-2xl bg-neutral-900/20">
+                    <p class="text-neutral-400 text-sm font-medium">No study assets cataloged under this target tracker track yet.</p>
                 </div>
+
             </div>
-        </section>
+        </main>
+    </div>
 
-        <!-- COLUMN 3: UPDATED PERSISTENT AI TUTOR SHORTCUTS (RIGHT SIDEBAR) -->
-        <section class="w-80 bg-gray-900/60 border-l border-gray-800 flex flex-col shrink-0 overflow-y-auto">
-            <!-- AI Header Panel -->
-            <div class="p-4 border-b border-gray-800 bg-gray-900/40 flex items-center gap-2.5">
-                <div class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></div>
-                <div>
-                    <h3 class="font-extrabold text-sm text-gray-200">AI Math & Physics Solver</h3>
-                    <p class="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Persistent Tutor Gateway</p>
-                </div>
-            </div>
-
-            <!-- Descriptive Capability Info (Replaces chat log) -->
-            <div class="flex-1 p-5 space-y-5">
-                <div class="bg-gray-950 border border-gray-800/80 p-4 rounded-xl text-gray-300 leading-relaxed text-xs">
-                    Need instant clarification on the current text, or a step-by-step math solution? Launch the full <span class="font-bold text-blue-400">AI Solver Engine</span> in a dedicated window.
-                </div>
-                
-                <h4 class="text-[10px] font-bold uppercase text-gray-500 tracking-widest px-1">AI Capabilities Matrix</h4>
-                <ul class="text-xs space-y-2.5 text-gray-400 list-disc list-inside px-1">
-                    <li>Analyze complex physics mechanics problems.</li>
-                    <li>Solve step-by-step algebraic equations.</li>
-                    <li>Summarize difficult academic passages.</li>
-                    <li>Explain specific scientific terms dynamically.</li>
-                </ul>
-            </div>
-
-            <!-- STICKY LINK BUTTON (Replaces Chat Form Tray) -->
-            <div class="p-5 border-t border-gray-800 bg-gray-950/40">
-                <a href="ai-solver.html" target="_blank" class="ai-glow-btn w-full py-3 bg-blue-600 hover:bg-blue-700 font-bold rounded-xl text-xs text-white transition active:scale-95 flex items-center justify-center gap-2">
-                    <span>🤖</span> Launch Dedicated AI Solver Node
-                </a>
-                <p class="text-[9px] text-gray-600 mt-2.5 text-center">Opens the real-time tutor matrix in a new browser tab.</p>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Core Script Logic Link Injectors (E-Library Logic remains unchanged) -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-
-        let db;
-        let booksCache = {};
-
-        async function runSecurityAuditHandshake() {
-            const token = localStorage.getItem('nexusAuthToken');
-            const uid = localStorage.getItem('nexusUserId');
-
-            if (!token || !uid) {
-                localStorage.clear();
-                window.location.replace('login.html');
-                return;
-            }
-
-            try {
-                const configResponse = await fetch('./api/firebaseConfig');
-                if (!configResponse.ok) throw new Error("Database configuration error.");
-                const firebaseConfig = await configResponse.json();
-
-                const app = initializeApp(firebaseConfig);
-                db = getDatabase(app);
-
-                await loadLibraryAssets();
-                
-                document.body.classList.add('access-granted');
-                document.getElementById('academyPreloader').remove();
-
-            } catch (err) {
-                console.error("Academy startup failure:", err);
-                alert("Security handshake failed: " + err.message);
-                window.location.replace('dashboard.html');
-            }
-        }
-
-        async function loadLibraryAssets() {
-            const shelf = document.getElementById('libraryBookShelf');
-            shelf.innerHTML = `<div class="text-center py-10 text-xs text-gray-500 animate-pulse">Querying Library Vault...</div>`;
-            const dbRef = ref(db);
-            
-            try {
-                const snapshot = await get(child(dbRef, 'elibrary'));
-                if (!snapshot.exists()) {
-                    shelf.innerHTML = `<div class="text-center py-10 text-xs text-gray-600">E-Library directory empty.</div>`;
-                    return;
-                }
-
-                booksCache = snapshot.val();
-                renderShelfItems('all');
-
-                document.getElementById('libraryCategoryFilter').addEventListener('change', (e) => {
-                    renderShelfItems(e.target.value);
-                });
-
-            } catch (err) {
-                console.error("Failed to query library index:", err);
-                shelf.innerHTML = `<div class="text-xs text-red-400 text-center py-6">Database download interrupted.</div>`;
-            }
-        }
-
-        function renderShelfItems(filterCategory) {
-            const shelf = document.getElementById('libraryBookShelf');
-            shelf.innerHTML = '';
-
-            Object.keys(booksCache).forEach(bookId => {
-                const book = booksCache[bookId];
-                if (filterCategory !== 'all' && book.category?.toLowerCase() !== filterCategory) return;
-
-                const card = document.createElement('div');
-                card.className = "bg-gray-900 border border-gray-800/80 rounded-xl p-3 cursor-pointer hover:border-blue-500/40 transition group relative";
-                card.innerHTML = `
-                    <div class="font-bold text-xs text-gray-200 group-hover:text-blue-400 transition">${book.title}</div>
-                    <div class="text-[10px] text-gray-500 mt-1 flex justify-between items-center">
-                        <span class="capitalize tracking-wider font-semibold text-gray-400">${book.category || 'General'}</span>
-                        <span class="text-blue-500 font-mono text-[9px]">Open Panel &rarr;</span>
-                    </div>
-                `;
-                
-                card.addEventListener('click', () => loadActiveWorkspaceDocument(bookId, book));
-                shelf.appendChild(card);
-            });
-        }
-
-        function loadActiveWorkspaceDocument(id, book) {
-            document.getElementById('activeDocumentTitle').innerText = book.title;
-            document.getElementById('documentStatusTag').innerText = "Streaming Framework Active";
-            document.getElementById('homeworkSummaryText').innerText = book.homeworkPrompt || `Read Chapter 1 of ${book.title} and answer matching summary criteria.`;
-
-            const viewPane = document.getElementById('pdfViewerWindow');
-            if (book.fileUrl) {
-                viewPane.innerHTML = `<iframe src="${book.fileUrl}" class="w-full h-full border-none rounded-2xl" title="Academy PDF Pane View"></iframe>`;
-            } else {
-                viewPane.innerHTML = `
-                    <div class="text-center p-6">
-                        <div class="text-xs text-yellow-500 font-bold mb-1">⚠️ Cloud Asset Key Broken</div>
-                        <p class="text-[11px] text-gray-500">The file string resource URL path configuration point for this library node is invalid or empty.</p>
-                    </div>`;
-            }
-
-            loadSyllabusVideoStreams(book.category || 'all');
-        }
-
-        async function loadSyllabusVideoStreams(category) {
-            const videoGrid = document.getElementById('videoReferenceGrid');
-            videoGrid.innerHTML = `<div class="col-span-2 text-center py-4 text-xs text-gray-600 animate-pulse">Filtering relevant video feeds...</div>`;
-
-            try {
-                const snapshot = await get(child(ref(db), 'videoReferences'));
-                videoGrid.innerHTML = '';
-
-                if (!snapshot.exists()) {
-                    videoGrid.innerHTML = `<div class="col-span-2 text-center py-4 text-[11px] text-gray-600">No matching streaming guides configured under database node directory.</div>`;
-                    return;
-                }
-
-                let entriesFound = false;
-                snapshot.forEach(childSnapshot => {
-                    const video = childSnapshot.val();
-                    if (category !== 'all' && video.subject?.toLowerCase() !== category.toLowerCase()) return;
-
-                    entriesFound = true;
-                    const card = document.createElement('div');
-                    card.className = "bg-gray-900 border border-gray-800 rounded-xl overflow-hidden flex flex-col h-24 shadow-md hover:border-gray-700 transition";
-                    card.innerHTML = `
-                        <iframe src="${video.embedUrl}" class="w-full h-14 bg-black border-none pointer-events-auto" allowfullscreen></iframe>
-                        <div class="p-1.5 truncate text-[10px] font-bold text-gray-300 bg-gray-950/50">${video.title}</div>
-                    `;
-                    videoGrid.appendChild(card);
-                });
-
-                if (!entriesFound) {
-                    videoGrid.innerHTML = `<div class="col-span-2 text-center py-4 text-[11px] text-gray-600">No specific tutorials found for ${category}.</div>`;
-                }
-
-            } catch (err) {
-                videoGrid.innerHTML = `<div class="col-span-2 text-center py-4 text-xs text-red-500">Failed to pull database video strings.</div>`;
-            }
-        }
-
-        runSecurityAuditHandshake();
-    </script>
+    <script type="module" src="academy.js"></script>
 </body>
-              </html>
+</html>
