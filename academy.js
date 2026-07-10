@@ -1,10 +1,11 @@
 /**
- * Nexus Pro 2.0 - E-Library Dropdown Reader Stream Engine
+ * Nexus Pro 2.0 - E-Library Inline Content Stream Controller
  * File: academy.js
  */
 
 const DB_BASE_URL = "https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app";
 let localCatalogCache = [];
+const activeBlobUrls = new Map(); // Tracks live local binary paths to prevent memory leaks
 
 async function initializeAcademyCatalog() {
     const userId = localStorage.getItem('nexusUserId');
@@ -20,7 +21,7 @@ async function initializeAcademyCatalog() {
         const targetUrl = `${DB_BASE_URL}/library.json?auth=${secureToken}`;
         const response = await fetch(targetUrl);
         
-        if (!response.ok) throw new Error(`Access verification code error: ${response.status}`);
+        if (!response.ok) throw new Error(`Access verification error: ${response.status}`);
         
         const libraryData = await response.json();
         localCatalogCache = libraryData ? Object.keys(libraryData).map(key => ({ id: key, ...libraryData[key] })).sort((a, b) => b.timestamp - a.timestamp) : [];
@@ -36,6 +37,32 @@ async function initializeAcademyCatalog() {
     } finally {
         const preloader = document.getElementById('nexusPreloader');
         if (preloader) { preloader.classList.add('opacity-0', 'pointer-events-none'); setTimeout(() => preloader.remove(), 200); }
+    }
+}
+
+// HELPER FUNCTION: Translates base64 data packets safely into inline browser display paths
+function createInlineBlobUrl(base64DataString) {
+    try {
+        const parts = base64DataString.split(';base64,');
+        const contentType = parts[0].split(':')[1];
+        const rawByteCharacters = atob(parts[1]);
+        const byteArraysArray = [];
+
+        for (let offset = 0; offset < rawByteCharacters.length; offset += 512) {
+            const slice = rawByteCharacters.slice(offset, offset + 512);
+            const byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            byteArraysArray.push(byteArray);
+        }
+
+        const safetyBlob = new Blob(byteArraysArray, { type: contentType });
+        return URL.createObjectURL(safetyBlob); // Generates a safe local viewer pointer path
+    } catch (e) {
+        console.error("Blob translation string generation error:", e);
+        return null;
     }
 }
 
@@ -73,7 +100,6 @@ function renderLibraryGrid(selectedSubject) {
                 </div>`;
         }
 
-        // The card layout houses the header, text metadata, and a collapsed viewer console node at the bottom
         cardShell.innerHTML = `
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div class="space-y-1 flex-1">
@@ -84,42 +110,58 @@ function renderLibraryGrid(selectedSubject) {
                     <h3 class="text-base font-bold tracking-tight text-neutral-100">${item.title}</h3>
                     ${videoReferenceHtml}
                 </div>
-                <button data-url="${item.assetAddress}" data-id="${item.id}" class="toggle-reader-btn sm:w-auto text-center bg-blue-950 text-blue-400 hover:bg-blue-900/60 border border-blue-900/40 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer whitespace-nowrap">
+                <button data-id="${item.id}" class="toggle-reader-btn sm:w-auto text-center bg-blue-950 text-blue-400 hover:bg-blue-900/60 border border-blue-900/40 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer whitespace-nowrap">
                     📖 Read Online
                 </button>
             </div>
 
             <div id="viewer-${item.id}" class="hidden w-full border-t border-neutral-800/80 pt-4 transition-all">
-                <div class="w-full h-[500px] bg-neutral-950 rounded-xl border border-neutral-800 overflow-hidden relative">
-                    <iframe src="${item.assetAddress}" class="w-full h-full border-none rounded-xl" allow="autoplay"></iframe>
+                <div class="w-full h-[600px] bg-neutral-950 rounded-xl border border-neutral-800 overflow-hidden relative">
+                    <iframe id="iframe-${item.id}" src="about:blank" class="w-full h-full border-none rounded-xl" allow="autoplay"></iframe>
                 </div>
             </div>
         `;
         container.appendChild(cardShell);
     });
 
-    // BIND EVENT TRIGGER HOOKS TO DETECT DROPDOWN ACTIONS
+    // INTERACTIVE ACCORDION SLIDE TOGGLE LOGIC
     document.querySelectorAll('.toggle-reader-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const nodeId = btn.getAttribute('data-id');
             const dropdownTarget = document.getElementById(`viewer-${nodeId}`);
+            const targetFrame = document.getElementById(`iframe-${nodeId}`);
+            const recordData = localCatalogCache.find(i => i.id === nodeId);
             
-            if (!dropdownTarget) return;
+            if (!dropdownTarget || !targetFrame || !recordData) return;
 
             if (dropdownTarget.classList.contains('hidden')) {
-                // Open the reader dropdown drawer
+                // Determine source address scheme processing loops
+                let viewDestinationUrl = "";
+
+                if (recordData.uploadType === "file") {
+                    // Check if we have already built a binary blob address map for this file session
+                    if (activeBlobUrls.has(nodeId)) {
+                        viewDestinationUrl = activeBlobUrls.get(nodeId);
+                    } else {
+                        viewDestinationUrl = createInlineBlobUrl(recordData.assetAddress);
+                        if (viewDestinationUrl) activeBlobUrls.set(nodeId, viewDestinationUrl);
+                    }
+                } else {
+                    // Standard Google Drive viewer injection route
+                    viewDestinationUrl = recordData.assetAddress;
+                }
+
+                // Mount document into viewport window layout context
+                targetFrame.src = viewDestinationUrl || "about:blank";
                 dropdownTarget.classList.remove('hidden');
                 btn.innerText = "❌ Close Reader";
                 btn.className = "toggle-reader-btn sm:w-auto text-center bg-neutral-800 text-neutral-200 border border-neutral-700 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer whitespace-nowrap";
             } else {
-                // Collapse the reader dropdown drawer
+                // Collapse the viewport context and isolate frame processing safely
                 dropdownTarget.classList.add('hidden');
+                targetFrame.src = "about:blank";
                 btn.innerText = "📖 Read Online";
                 btn.className = "toggle-reader-btn sm:w-auto text-center bg-blue-950 text-blue-400 hover:bg-blue-900/60 border border-blue-900/40 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer whitespace-nowrap";
-                
-                // Refresh iframe src to kill any buffered stream processes safely on collapse
-                const frame = dropdownTarget.querySelector('iframe');
-                if (frame) { const tmp = frame.src; frame.src = ""; frame.src = tmp; }
             }
         });
     });
