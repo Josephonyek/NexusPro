@@ -5,7 +5,6 @@
 
 const DB_BASE_URL = "https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app";
 let localCatalogCache = [];
-const activeBlobUrls = new Map(); // Tracks live local binary paths to prevent memory leaks
 
 async function initializeAcademyCatalog() {
     const userId = localStorage.getItem('nexusUserId');
@@ -40,29 +39,17 @@ async function initializeAcademyCatalog() {
     }
 }
 
-// HELPER FUNCTION: Translates base64 data packets safely into inline browser display paths
-function createInlineBlobUrl(base64DataString) {
+// DECODES BASE64 TEXT SAFELY TO RENDER INLINE WITHOUT DOWNLOADS
+function decodeBase64ToText(base64DataString) {
     try {
-        const parts = base64DataString.split(';base64,');
-        const contentType = parts[0].split(':')[1];
-        const rawByteCharacters = atob(parts[1]);
-        const byteArraysArray = [];
-
-        for (let offset = 0; offset < rawByteCharacters.length; offset += 512) {
-            const slice = rawByteCharacters.slice(offset, offset + 512);
-            const byteNumbers = new Array(slice.length);
-            for (let i = 0; i < slice.length; i++) {
-                byteNumbers[i] = slice.charCodeAt(i);
-            }
-            const byteArray = new Uint8Array(byteNumbers);
-            byteArraysArray.push(byteArray);
-        }
-
-        const safetyBlob = new Blob(byteArraysArray, { type: contentType });
-        return URL.createObjectURL(safetyBlob); // Generates a safe local viewer pointer path
+        if (!base64DataString.includes(';base64,')) return base64DataString;
+        const base64Content = base64DataString.split(';base64,')[1];
+        return decodeURIComponent(atob(base64Content).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
     } catch (e) {
-        console.error("Blob translation string generation error:", e);
-        return null;
+        console.error("Error parsing document string data:", e);
+        return "⚠️ Error reading material data. Please ensure it is a valid text, document, or HTML summary.";
     }
 }
 
@@ -116,9 +103,8 @@ function renderLibraryGrid(selectedSubject) {
             </div>
 
             <div id="viewer-${item.id}" class="hidden w-full border-t border-neutral-800/80 pt-4 transition-all">
-                <div class="w-full h-[600px] bg-neutral-950 rounded-xl border border-neutral-800 overflow-hidden relative">
-                    <iframe id="iframe-${item.id}" src="about:blank" class="w-full h-full border-none rounded-xl" allow="autoplay"></iframe>
-                </div>
+                <div class="w-full max-h-[500px] min-h-[200px] bg-neutral-950 rounded-xl border border-neutral-800 p-4 overflow-y-auto text-sm text-neutral-300 relative whitespace-pre-wrap selection:bg-blue-900/50" id="content-${item.id}">
+                    </div>
             </div>
         `;
         container.appendChild(cardShell);
@@ -129,37 +115,26 @@ function renderLibraryGrid(selectedSubject) {
         btn.addEventListener('click', (e) => {
             const nodeId = btn.getAttribute('data-id');
             const dropdownTarget = document.getElementById(`viewer-${nodeId}`);
-            const targetFrame = document.getElementById(`iframe-${nodeId}`);
+            const textContentBox = document.getElementById(`content-${nodeId}`);
             const recordData = localCatalogCache.find(i => i.id === nodeId);
             
-            if (!dropdownTarget || !targetFrame || !recordData) return;
+            if (!dropdownTarget || !textContentBox || !recordData) return;
 
             if (dropdownTarget.classList.contains('hidden')) {
-                // Determine source address scheme processing loops
-                let viewDestinationUrl = "";
-
                 if (recordData.uploadType === "file") {
-                    // Check if we have already built a binary blob address map for this file session
-                    if (activeBlobUrls.has(nodeId)) {
-                        viewDestinationUrl = activeBlobUrls.get(nodeId);
-                    } else {
-                        viewDestinationUrl = createInlineBlobUrl(recordData.assetAddress);
-                        if (viewDestinationUrl) activeBlobUrls.set(nodeId, viewDestinationUrl);
-                    }
+                    // Safe injection: Decodes data base64 directly into the clean viewer container box 
+                    textContentBox.innerText = decodeBase64ToText(recordData.assetAddress);
                 } else {
-                    // Standard Google Drive viewer injection route
-                    viewDestinationUrl = recordData.assetAddress;
+                    // For links, fallback to iframe structure cleanly
+                    textContentBox.innerHTML = `<iframe src="${recordData.assetAddress}" class="w-full h-[450px] border-none rounded-xl bg-neutral-950"></iframe>`;
                 }
 
-                // Mount document into viewport window layout context
-                targetFrame.src = viewDestinationUrl || "about:blank";
                 dropdownTarget.classList.remove('hidden');
                 btn.innerText = "❌ Close Reader";
                 btn.className = "toggle-reader-btn sm:w-auto text-center bg-neutral-800 text-neutral-200 border border-neutral-700 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer whitespace-nowrap";
             } else {
-                // Collapse the viewport context and isolate frame processing safely
                 dropdownTarget.classList.add('hidden');
-                targetFrame.src = "about:blank";
+                textContentBox.innerHTML = ""; // Clear memory safely
                 btn.innerText = "📖 Read Online";
                 btn.className = "toggle-reader-btn sm:w-auto text-center bg-blue-950 text-blue-400 hover:bg-blue-900/60 border border-blue-900/40 text-xs font-bold px-4 py-2.5 rounded-xl transition-all cursor-pointer whitespace-nowrap";
             }
