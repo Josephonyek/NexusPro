@@ -3,25 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro | E-Library Upload Console</title>
+    <title>Nexus Pro | Repository Publisher</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        .animate-fast-pulse {
-            animation: pulse 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .4; }
-        }
+        .animate-fast-pulse { animation: pulse 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
     </style>
 </head>
 <body class="bg-neutral-950 text-neutral-100 min-h-screen antialiased scroll-smooth">
 
-    <div id="nexusPreloader" class="fixed inset-0 bg-neutral-950 z-50 flex flex-col justify-center items-center p-6 transition-all duration-300 ease-out will-change-transform">
+    <div id="nexusPreloader" class="fixed inset-0 bg-neutral-950 z-50 flex flex-col justify-center items-center p-6 transition-all duration-300 ease-out">
         <div class="w-full max-w-2xl space-y-6 animate-fast-pulse">
             <div class="h-8 bg-neutral-900 rounded-xl w-1/3"></div>
-            <div class="h-48 bg-neutral-900 rounded-2xl w-full"></div>
-            <div class="h-12 bg-neutral-900 rounded-xl w-full"></div>
+            <div class="h-64 bg-neutral-900 rounded-2xl w-full"></div>
         </div>
     </div>
 
@@ -32,7 +26,6 @@
                 <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-red-600 to-amber-600 flex items-center justify-center font-black shadow-md shadow-red-600/20">A</div>
                 <span class="text-lg font-bold tracking-tight">Admin Console</span>
             </div>
-            
             <nav class="space-y-1.5 flex-1">
                 <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">← Back to Dashboard</a>
                 <a href="admin-users.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">User Directory</a>
@@ -41,25 +34,23 @@
         </aside>
 
         <main class="flex-1 min-w-0 flex flex-col">
-            
             <header class="h-16 border-b border-neutral-800/60 flex items-center justify-between px-6 bg-neutral-900/40 backdrop-blur-md sticky top-0 z-30">
                 <h2 class="text-lg font-bold tracking-tight text-neutral-200">Repository Asset Publisher</h2>
-                <div class="flex items-center gap-3">
-                    <span class="px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40">Secure Access</span>
-                </div>
+                <span class="px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40">Secure Console</span>
             </header>
 
             <div class="p-6 space-y-6 flex-1 overflow-y-auto max-w-2xl w-full mx-auto">
                 <div class="bg-neutral-900 border border-neutral-800/60 rounded-2xl p-6 shadow-xl">
+                    
                     <div class="mb-6">
                         <h3 class="text-xl font-extrabold tracking-tight text-neutral-100">Publish New Study Material</h3>
-                        <p class="text-neutral-400 text-sm mt-1">Populate the metadata matrices below to broadcast core syllabus items or notes down to standard student accounts.</p>
+                        <p class="text-neutral-400 text-sm mt-1">Configure metadata matrices to deploy academic assets to students.</p>
                     </div>
 
                     <form id="uploadForm" class="space-y-5">
                         <div>
                             <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">Material Title</label>
-                            <input type="text" id="materialTitle" required placeholder="e.g., WAEC 2026/2027 Core Physics Vector Analysis Guide" 
+                            <input type="text" id="materialTitle" required placeholder="e.g., WAEC 2026/2027 Organic Chemistry Hydrocarbon Analysis Summary" 
                                 class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-neutral-100 focus:outline-none focus:border-red-900/50 transition-colors">
                         </div>
 
@@ -74,7 +65,6 @@
                                     <option value="Biology">Biology</option>
                                 </select>
                             </div>
-
                             <div>
                                 <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">Target Framework</label>
                                 <select id="materialCategory" class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-neutral-100 focus:outline-none focus:border-red-900/50 transition-colors cursor-pointer">
@@ -86,11 +76,38 @@
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1.5">Asset Document URL / Drive Link</label>
-                            <input type="url" id="materialLink" required placeholder="https://drive.google.com/file/d/..." 
-                                class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-neutral-100 focus:outline-none focus:border-red-900/50 transition-colors">
-                            <span class="text-[11px] text-neutral-500 mt-1.5 block">Ensure link configuration permissions are set to "Anyone with the link can view".</span>
+                        <div class="border-t border-neutral-800/80 pt-4">
+                            <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Asset Material Handling</label>
+                            <div class="grid grid-cols-2 gap-2 bg-neutral-950 p-1 rounded-xl border border-neutral-800 mb-3">
+                                <button type="button" id="tabLinkMode" class="py-2 text-xs font-bold rounded-lg transition-all cursor-pointer bg-neutral-800 text-red-400">Provide Web Link</button>
+                                <button type="button" id="tabFileMode" class="py-2 text-xs font-bold rounded-lg transition-all cursor-pointer text-neutral-400 hover:text-neutral-200">Upload Raw File</button>
+                            </div>
+
+                            <div id="containerLinkInput">
+                                <input type="url" id="materialLink" placeholder="https://drive.google.com/file/d/..." 
+                                    class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-neutral-100 focus:outline-none focus:border-red-900/50 transition-colors">
+                            </div>
+
+                            <div id="containerFileInput" class="hidden">
+                                <div class="border-2 border-dashed border-neutral-800 hover:border-neutral-700 rounded-xl p-4 flex flex-col items-center justify-center bg-neutral-950/40 text-center transition-colors relative">
+                                    <input type="file" id="materialFile" class="absolute inset-0 opacity-0 cursor-pointer w-full h-full">
+                                    <svg class="w-8 h-8 text-neutral-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 16v-8m0 8l-4-4m4 4l4-4M4 4h16v16H4V4z"></path></svg>
+                                    <span id="fileNameDisplay" class="text-xs text-neutral-400 font-medium">Select file node from storage disk...</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-t border-neutral-800/80 pt-4 space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Attached Video Lecture Link (Optional)</label>
+                                <input type="url" id="videoLink" placeholder="https://www.youtube.com/watch?v=... or Google Drive URL" 
+                                    class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-neutral-100 focus:outline-none focus:border-red-900/50 transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-1">Video Guide Label</label>
+                                <input type="text" id="videoTitle" placeholder="e.g., Step-by-Step Reaction Mechanism Walkthrough" 
+                                    class="w-full bg-neutral-950 border border-neutral-800 rounded-xl px-4 py-2.5 text-sm text-neutral-100 focus:outline-none focus:border-red-900/50 transition-colors">
+                            </div>
                         </div>
 
                         <div class="pt-2">
@@ -99,6 +116,7 @@
                             </button>
                         </div>
                     </form>
+
                 </div>
             </div>
         </main>
@@ -106,4 +124,4 @@
 
     <script type="module" src="admin-upload.js"></script>
 </body>
-    </html>
+                    </html>
