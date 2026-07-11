@@ -1,106 +1,180 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro | AI Study, Health Hub & Football Scores</title>
-    <meta name="description" content="Nexus Pro: Your all-in-one student hub for AI study help, health insights, and live football updates.">
-    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- PRIMARY SEARCH ENGINE OPTIMIZATION (SEO) META MATRIX -->
+    <title>Nexus Pro | Next-Gen E-Learning Platform for Core Sciences</title>
+    <meta name="description" content="Master West African senior secondary science cycles with Nexus Pro. Stream full curriculum revision notes, download syllabus guides, and view comprehensive academic video walkthroughs.">
+    <meta name="keywords" content="Nexus Pro, e-learning platform, physics syllabus, chemistry revision notes, WAEC science prep, JAMB past questions, study online nigeria">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://nexuspro.vercel.app/">
+
+    <!-- OPEN GRAPH MATRIX (SOCIAL ENGINE PREVIEWS) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Nexus Pro | Premium Digital Academic Resource Vault">
+    <meta property="og:description" content="Access elite, structured revision materials and expert video modules across essential secondary subjects online. Built securely for top-tier academic performance.">
+    <meta property="og:url" content="https://nexuspro.vercel.app/">
+    <meta property="og:site_name" content="Nexus Pro Academy">
+
+    <!-- CSS ARCHITECTURE -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        /* Fixes Layout Shift and improves image performance */
-        .slider-box { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 0.75rem; background: #000; }
-        .slide-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 0.5s ease-in-out; opacity: 0; }
-        .slide-img.active { opacity: 1; }
+        html { scroll-behavior: smooth; }
+        .text-gradient {
+            background: linear-gradient(135deg, #f3f4f6 30%, #a3a3a3 70%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
     </style>
 </head>
-<body class="bg-gray-950 text-gray-100 font-sans leading-relaxed">
+<body class="bg-neutral-950 text-neutral-100 min-h-screen antialiased selection:bg-blue-950 selection:text-blue-400">
 
-    <header class="flex justify-between items-center p-6 border-b border-gray-800 sticky top-0 bg-gray-950/90 z-50 backdrop-blur-sm">
-        <div class="text-xl font-black text-blue-500 tracking-wider">NEXUS PRO</div>
-        <button id="menu-btn" class="md:hidden text-2xl p-2" aria-label="Toggle navigation menu">☰</button>
-        <nav id="nav-menu" class="hidden md:flex space-x-6 text-sm font-medium">
-            <a href="#" class="hover:text-blue-400 focus:text-blue-400">Home</a>
-            <a href="#" class="hover:text-blue-400 focus:text-blue-400">Assignments</a>
-            <a href="#" class="hover:text-blue-400 focus:text-blue-400">Health</a>
-            <a href="#" class="hover:text-blue-400 focus:text-blue-400">Football</a>
+    <!-- ACCESSIBILITY: SKIP TO MAIN CONTENT HOOK -->
+    <a href="#mainContent" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-950 focus:text-blue-400 focus:border focus:border-blue-900/40 focus:rounded-xl">Skip to Content</a>
+
+    <!-- SEMANTIC NAVIGATION DECK -->
+    <header class="w-full h-20 border-b border-neutral-900 bg-neutral-950/80 backdrop-blur-md fixed top-0 left-0 z-40 px-6 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black shadow-lg text-white" aria-hidden="true">N</div>
+            <span class="text-xl font-extrabold tracking-tight text-neutral-100">Nexus<span class="text-blue-500">Pro</span></span>
+        </div>
+        
+        <nav class="hidden md:flex items-center gap-8" aria-label="Main Navigation Route Deck">
+            <a href="#features" class="text-sm font-semibold text-neutral-400 hover:text-neutral-200 transition-colors">Features</a>
+            <a href="#curriculum" class="text-sm font-semibold text-neutral-400 hover:text-neutral-200 transition-colors">Curriculum</a>
+            <a href="#platform" class="text-sm font-semibold text-neutral-400 hover:text-neutral-200 transition-colors">Inside the App</a>
         </nav>
+
+        <div class="flex items-center gap-3">
+            <a href="login.html" class="px-4 py-2 text-xs font-bold text-neutral-300 hover:text-neutral-100 transition-colors">Sign In</a>
+            <a href="login.html?action=register" class="px-4 py-2.5 bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-blue-400 text-xs font-bold rounded-xl shadow-sm transition-all">Create Free Account</a>
+        </div>
     </header>
 
-    <nav id="mobile-menu" class="hidden bg-gray-900 p-6 space-y-4 text-center md:hidden" aria-label="Mobile Navigation">
-        <a href="#" class="block py-2">Home</a>
-        <a href="#" class="block py-2">Assignments</a>
-        <a href="#" class="block py-2">Health</a>
-        <a href="#" class="block py-2">Football</a>
-    </nav>
+    <!-- CONTENT ELEMENT WRAP -->
+    <main id="mainContent" class="pt-20">
 
-    <main class="max-w-4xl mx-auto px-6 py-16 text-center">
-        <h1 class="text-5xl font-extrabold mb-6">Welcome to Nexus Pro</h1>
-        <p class="text-gray-300 text-lg mb-8 max-w-xl mx-auto">
-            Nexus Pro bridges the gap between academic success and personal well-being. Get AI-powered study tools, wellness insights, and live sports updates in one unified hub.
-        </p>
-        <a href="login.html" class="inline-block bg-blue-600 px-8 py-4 rounded-2xl font-bold hover:bg-blue-700 transition focus:ring-4 ring-blue-900">Explore Now →</a>
+        <!-- HERO CORE ENGINE SECTION -->
+        <section class="relative px-6 py-20 lg:py-32 max-w-6xl mx-auto flex flex-col items-center text-center space-y-8 overflow-hidden">
+            <div class="absolute inset-0 -z-10 flex items-center justify-center opacity-10">
+                <div class="w-[500px] h-[500px] rounded-full bg-gradient-to-r from-blue-700 to-indigo-700 blur-[120px]"></div>
+            </div>
+
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 border border-neutral-800/80 rounded-full">
+                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" aria-hidden="true"></span>
+                <span class="text-[10px] font-black uppercase tracking-wider text-neutral-400">Next-Gen Academic Engine Live</span>
+            </div>
+
+            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight max-w-4xl leading-[1.1] text-gradient">
+                The Ultimate Secure Digital Repository for Core Science Students
+            </h1>
+
+            <p class="text-neutral-400 text-sm sm:text-base max-w-2xl leading-relaxed">
+                Unlock high-tier academic materials built explicitly to transition secondary candidates into top-tier performers. Read curriculum summaries inline securely, watch video guides, and master your syllabus.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center gap-4 pt-4 w-full sm:w-auto">
+                <a href="login.html?action=register" class="w-full sm:w-auto text-center bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-900/20 transition-all">
+                    Launch Classroom Workspace
+                </a>
+                <a href="#features" class="w-full sm:w-auto text-center bg-neutral-900 border border-neutral-800/80 hover:border-neutral-700 text-neutral-300 text-xs font-bold px-6 py-3.5 rounded-xl transition-all">
+                    Explore Core Modules
+                </a>
+            </div>
+        </section>
+
+        <!-- VALUE PILLARS DECK (FEATURES) -->
+        <section id="features" class="px-6 py-16 max-w-6xl mx-auto border-t border-neutral-900/60 scroll-mt-20">
+            <header class="text-center space-y-2 mb-12">
+                <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-neutral-100">Engineered for Academic Mastery</h2>
+                <p class="text-xs text-neutral-500 font-bold uppercase tracking-wider">High performance learning metrics without compromise</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- FEATURE CARD 1 -->
+                <article class="bg-neutral-900/40 border border-neutral-900 rounded-2xl p-6 flex flex-col space-y-3 hover:border-neutral-800 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-blue-950 border border-blue-900/30 flex items-center justify-center text-blue-400 font-bold" aria-hidden="true">📖</div>
+                    <h3 class="text-base font-bold text-neutral-200">Secure Inline Document Viewer</h3>
+                    <p class="text-xs text-neutral-400 leading-relaxed">Study premium revision text matrices, high-resolution PDFs, and comprehensive Word documents directly in your workspace browser drawer with zero file downloads.</p>
+                </article>
+
+                <!-- FEATURE CARD 2 -->
+                <article class="bg-neutral-900/40 border border-neutral-900 rounded-2xl p-6 flex flex-col space-y-3 hover:border-neutral-800 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-950 border border-indigo-900/30 flex items-center justify-center text-indigo-400 font-bold" aria-hidden="true">🎬</div>
+                    <h3 class="text-base font-bold text-neutral-200">Integrated Video Breakdowns</h3>
+                    <p class="text-xs text-neutral-400 leading-relaxed">Bridge the gap between theoretical syllabus notes and absolute analytical core concepts via interactive video modules explicitly attached to text modules.</p>
+                </article>
+
+                <!-- FEATURE CARD 3 -->
+                <article class="bg-neutral-900/40 border border-neutral-900 rounded-2xl p-6 flex flex-col space-y-3 hover:border-neutral-800 transition-all">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-950 border border-emerald-900/30 flex items-center justify-center text-emerald-400 font-bold" aria-hidden="true">⚡</div>
+                    <h3 class="text-base font-bold text-neutral-200">Dynamic Live Subject Filtering</h3>
+                    <p class="text-xs text-neutral-400 leading-relaxed">Toggle between physics frameworks, chemistry formulas, mathematics tutorials, and english modules instantly via a fully unified, lightning-fast database core cache interface.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- SUBJECT CURRICULUM OVERVIEW METRIC -->
+        <section id="curriculum" class="px-6 py-16 bg-neutral-950 border-t border-b border-neutral-900/80 scroll-mt-20">
+            <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <div class="inline-block px-3 py-1 bg-neutral-900 border border-neutral-800 rounded-md text-[10px] font-bold uppercase tracking-wider text-blue-400">Comprehensive Core Science Vault</div>
+                    <h2 class="text-3xl font-black tracking-tight leading-tight text-neutral-100">Aligned Directly with West African Senior Secondary Syllabus Matrix Cycles</h2>
+                    <p class="text-xs text-neutral-400 leading-relaxed">
+                        Every resource inside Nexus Pro is engineered to fulfill standard examination criteria for transitioning students. We break down dense core syllabus modules into high-impact, actionable text and video modules.
+                    </p>
+                    <ul class="space-y-3 text-xs text-neutral-300 font-semibold" aria-label="Curriculum Coverage List">
+                        <li class="flex items-center gap-3"><span class="text-blue-500 font-bold">✓</span> Advanced Physics Structural Mechanics &amp; Modern Quantum Frameworks</li>
+                        <li class="flex items-center gap-3"><span class="text-blue-500 font-bold">✓</span> Analytical Organic Chemistry Reactions &amp; Stoichiometry Rules</li>
+                        <li class="flex items-center gap-3"><span class="text-blue-500 font-bold">✓</span> Core Mathematical Formulations, Calculus, &amp; Geometric Theorems</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-neutral-900 border border-neutral-800/80 rounded-2xl p-6 space-y-4 shadow-xl">
+                    <h3 class="text-sm font-bold text-neutral-400 uppercase tracking-wide">Live Material Repository Statistics</h3>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-neutral-950 border border-neutral-800/60 p-4 rounded-xl">
+                            <span class="block text-xl font-black text-neutral-100">Physics Vault</span>
+                            <span class="text-[10px] font-medium text-neutral-500">100% Syllabus Cycle Map</span>
+                        </div>
+                        <div class="bg-neutral-950 border border-neutral-800/60 p-4 rounded-xl">
+                            <span class="block text-xl font-black text-neutral-100">Chemistry Vault</span>
+                            <span class="text-[10px] font-medium text-neutral-500">Active Lab Summary Packs</span>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-blue-950/20 border border-blue-900/30 rounded-xl text-center">
+                        <span class="text-xs font-bold text-blue-400">🚀 Engineered to systematically secure A1 exam marks</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- CLOSING PERSUASION REGION (CTA) -->
+        <section id="platform" class="px-6 py-20 max-w-4xl mx-auto text-center space-y-6 scroll-mt-20">
+            <h2 class="text-3xl font-black tracking-tight text-neutral-100">Ready to Elevate Your Learning Parameters?</h2>
+            <p class="text-xs sm:text-sm text-neutral-400 max-w-xl mx-auto leading-relaxed">
+                Gain immediate entry to role-based student control dashboards, secure in-app reading modules, and unified material grids right now.
+            </p>
+            <div class="pt-2">
+                <a href="login.html?action=register" class="inline-block bg-white text-neutral-950 text-xs font-bold px-8 py-3.5 rounded-xl hover:bg-neutral-200 transition-all shadow-md">
+                    Initialize Workspace Environment
+                </a>
+            </div>
+        </section>
+
     </main>
 
-    <section class="max-w-6xl mx-auto px-6 pb-16 grid md:grid-cols-3 gap-8" aria-label="Our Services">
-        <article>
-            <div class="slider-box study-slider">
-                <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=600" alt="Student using AI study tool" class="slide-img active" loading="eager">
-                <img src="https://images.unsplash.com/photo-1509224765680-bb62702abe7b?w=600" alt="Physics math equations" class="slide-img" loading="lazy">
-            </div>
-            <h2 class="mt-4 font-bold text-lg">Study & Homework</h2>
-            <p class="text-sm text-gray-400">AI-powered solvers for complex physics and math problems.</p>
-        </article>
-        <article>
-            <div class="slider-box health-slider">
-                <img src="https://images.unsplash.com/photo-1505751172876-fa1923c5c5ad?w=600" alt="Healthy lifestyle habits" class="slide-img active" loading="eager">
-                <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600" alt="Medical health advice" class="slide-img" loading="lazy">
-            </div>
-            <h2 class="mt-4 font-bold text-lg">Health Hub</h2>
-            <p class="text-sm text-gray-400">Personalized wellness tracking and health insights.</p>
-        </article>
-        <article>
-            <div class="slider-box foot-slider">
-                <img src="https://images.unsplash.com/photo-1508098682722-e99c43a406b2?w=600" alt="Live football stadium" class="slide-img active" loading="eager">
-                <img src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=600" alt="Professional football player" class="slide-img" loading="lazy">
-            </div>
-            <h2 class="mt-4 font-bold text-lg">Football Hub</h2>
-            <p class="text-sm text-gray-400">Real-time match scores and global league news.</p>
-        </article>
-    </section>
-
-    <section class="max-w-md mx-auto p-6" aria-labelledby="contact-heading">
-        <form id="contact-form" class="bg-gray-900 p-8 rounded-3xl border border-gray-800">
-            <h3 id="contact-heading" class="font-bold mb-4 text-xl">Contact Us</h3>
-            <label for="name" class="sr-only">Name</label>
-            <input type="text" id="name" placeholder="Name" required class="w-full bg-gray-950 p-3 rounded-lg mb-4 border border-gray-800 focus:ring-2 ring-blue-500">
-            <label for="email" class="sr-only">Email</label>
-            <input type="email" id="email" placeholder="Email" required class="w-full bg-gray-950 p-3 rounded-lg mb-4 border border-gray-800 focus:ring-2 ring-blue-500">
-            <label for="message" class="sr-only">Message</label>
-            <textarea id="message" placeholder="Message" required class="w-full bg-gray-950 p-3 rounded-lg mb-4 border border-gray-800 focus:ring-2 ring-blue-500"></textarea>
-            <button type="submit" class="w-full bg-blue-600 py-3 rounded-lg font-bold hover:bg-blue-700">Send Message</button>
-        </form>
-    </section>
-
-    <footer class="border-t border-gray-900 mt-16 p-8 text-center text-gray-500 text-xs">
-        <p>&copy; 2026 Nexus Pro. All rights reserved.</p>
+    <!-- FOOTER LINK SHELL -->
+    <footer class="w-full border-t border-neutral-900 py-8 px-6 bg-neutral-950 text-center space-y-3">
+        <p class="text-xs text-neutral-500 font-semibold">&copy; 2026 Nexus Pro Academy. Built Securely. All Rights Reserved.</p>
+        <div class="text-[10px] text-neutral-600 font-medium space-x-4">
+            <a href="#" class="hover:underline">Academic Privacy Protocol</a>
+            <span>•</span>
+            <a href="#" class="hover:underline">Terms of Service</a>
+        </div>
     </footer>
 
-    <script>
-        document.getElementById('menu-btn').onclick = () => document.getElementById('mobile-menu').classList.toggle('hidden');
-
-        function startSlider(selector) {
-            const container = document.querySelector(selector);
-            const images = container.querySelectorAll('.slide-img');
-            let i = 0;
-            setInterval(() => {
-                images[i].classList.remove('active');
-                i = (i + 1) % images.length;
-                images[i].classList.add('active');
-            }, 2500);
-        }
-        startSlider('.study-slider');
-        startSlider('.health-slider');
-        startSlider('.foot-slider');
-    </script>
 </body>
-                                                                   </html>
+                    </html>
