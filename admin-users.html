@@ -3,288 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro - User Management</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Nexus Pro | Control Center</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        /* Anti-Flash Shield: Keeps administrative interface completely invisible until admin status is cryptographically verified */
-        body { opacity: 0; transition: opacity 0.4s ease-in-out; }
-        body.access-granted { opacity: 1; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(8px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
+        .animate-fast-pulse { animation: pulse 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
     </style>
 </head>
-<body class="bg-gray-950 text-white min-h-screen font-sans">
+<body class="bg-neutral-950 text-neutral-100 min-h-screen antialiased">
 
-    <nav class="bg-gray-900 border-b border-gray-800 px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center space-x-3">
-            <button onclick="window.location.href='dashboard.html'" class="text-gray-400 hover:text-white transition">&larr; Back to Dashboard</button>
-            <h1 class="text-xl font-black tracking-wider text-violet-500">NEXUS USER CONTROL</h1>
-        </div>
-        <span id="authStatusBadge" class="px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40 tracking-wider">
-            Clearance: Admin Secure
-        </span>
-    </nav>
-
-    <main id="adminMainContent" class="max-w-6xl mx-auto px-4 py-8">
-        <div class="mb-6 flex justify-between items-center">
-            <div>
-                <h2 class="text-2xl font-extrabold tracking-tight">Active Accounts Database</h2>
-                <p class="text-gray-400 text-sm">Modify registration records, suspend access credentials, or contact users securely.</p>
-            </div>
-        </div>
-
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden shadow-2xl">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="border-b border-gray-800 bg-gray-950/50 text-xs font-bold uppercase tracking-wider text-gray-400">
-                            <th class="p-4">User Details</th>
-                            <th class="p-4">Assigned Role</th>
-                            <th class="p-4">Account Status</th>
-                            <th class="p-4 text-right">Administrative Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody id="userTableBody" class="divide-y divide-gray-800/60">
-                        <tr>
-                            <td colspan="4" class="p-8 text-center text-gray-500 animate-pulse">
-                                Verifying admin administrative access tokens...
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </main>
-
-    <div id="actionModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-        <div class="bg-gray-900 border border-gray-800 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-fade-in">
-            <h3 id="modalTitle" class="text-xl font-bold mb-2 text-violet-400">Modal Header</h3>
-            <p id="modalSubtitle" class="text-xs text-gray-400 mb-4"></p>
-            
-            <div id="modalContentSlot"></div>
-
-            <div class="flex justify-end gap-3 mt-6">
-                <button id="modalCancelBtn" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-sm font-semibold rounded-xl transition">Cancel</button>
-                <button id="modalSubmitBtn" class="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-sm font-semibold rounded-xl text-white transition">Apply Changes</button>
-            </div>
+    <div id="nexusPreloader" class="fixed inset-0 bg-neutral-950 z-50 flex flex-col justify-center items-center p-6 transition-all duration-300">
+        <div class="w-full max-w-5xl space-y-4 animate-fast-pulse">
+            <div class="h-8 bg-neutral-900 rounded-xl w-1/4"></div>
+            <div class="h-64 bg-neutral-900 rounded-2xl w-full"></div>
         </div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-        import { getDatabase, ref, onValue, update, remove, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    <div class="flex min-h-screen">
+        <aside class="hidden lg:flex flex-col w-64 bg-neutral-900 border-r border-neutral-800/60 p-5 shrink-0">
+            <div class="flex items-center gap-3 mb-8 px-2">
+                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-red-600 to-amber-600 flex items-center justify-center font-black shadow-md">A</div>
+                <span class="text-lg font-bold tracking-tight">Nexus Admin</span>
+            </div>
+            <nav class="space-y-1.5 flex-1">
+                <a href="admin-dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">← Core Console</a>
+                <a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-neutral-800 text-red-400 rounded-xl font-medium text-sm transition-all">Manage Students</a>
+            </nav>
+        </aside>
 
-        let db;
-        let currentActiveTargetUid = '';
+        <main class="flex-1 min-w-0 flex flex-col">
+            <header class="h-16 border-b border-neutral-800/60 flex items-center justify-between px-6 bg-neutral-900/40 backdrop-blur-md sticky top-0 z-30">
+                <h2 class="text-lg font-bold tracking-tight text-neutral-200">Student Account Control Deck</h2>
+                <div id="userCounter" class="text-xs text-neutral-500 font-medium">Syncing database matrix...</div>
+            </header>
 
-        // Defensive XSS Sanitizer
-        function sanitize(str) {
-            const div = document.createElement('div');
-            div.textContent = str;
-            return div.innerHTML;
-        }
-
-        async function initializeAdminDashboard() {
-            const userToken = localStorage.getItem('nexusAuthToken');
-            const userId = localStorage.getItem('nexusUserId');
-
-            // 1. FAST ROUTING DEFENSE: Boot out instantly if storage profiles don't exist
-            if (!userToken || !userId) {
-                localStorage.clear();
-                window.location.replace('login.html');
-                return;
-            }
-
-            try {
-                const configResponse = await fetch('./api/firebaseConfig');
-                if (!configResponse.ok) throw new Error(`Server status ${configResponse.status}`);
-                const firebaseConfig = await configResponse.json();
-
-                const app = initializeApp(firebaseConfig);
-                db = getDatabase(app);
-
-                // 2. PRIVILEGE AUDIT: Query identity node directly to verify admin clearance status
-                const adminCheckRef = ref(db, `users/${userId}`);
-                const snapshot = await get(adminCheckRef);
-                const activeProfile = snapshot.val();
-
-                if (!activeProfile || activeProfile.role !== 'admin' || activeProfile.status === 'banned') {
-                    alert("Access Denied: Administrative Clearance Node missing.");
-                    window.location.replace('dashboard.html');
-                    return;
-                }
-
-                // ACCESS GRANTED: Reveal layout nodes and start live synchronized stream
-                document.body.classList.add('access-granted');
-                listenToUsers();
-
-            } catch (error) {
-                console.error("Initialization error:", error);
-                document.getElementById('userTableBody').innerHTML = 
-                    `<tr><td colspan="4" class="p-8 text-center text-red-400 font-medium">
-                        ⚠️ Security Error: Handshake verification failed.<br>
-                        <span class="text-xs text-gray-500 block mt-1">Reason: ${error.message}</span>
-                    </td></tr>`;
-            }
-        }
-
-        function listenToUsers() {
-            const usersRef = ref(db, 'users');
-            
-            onValue(usersRef, (snapshot) => {
-                const tableBody = document.getElementById('userTableBody');
-                tableBody.innerHTML = '';
-                
-                if (!snapshot.exists()) {
-                    tableBody.innerHTML = '<tr><td colspan="4" class="p-8 text-center text-gray-500">No active records found.</td></tr>';
-                    return;
-                }
-
-                snapshot.forEach((childSnapshot) => {
-                    const uid = childSnapshot.key;
-                    const userData = childSnapshot.val();
-
-                    // Sanitize values defensively to stop stored cross-site scripting scripts from rendering
-                    const name = sanitize(userData.name || userData.username || 'Anonymous User');
-                    const email = sanitize(userData.email || 'No Linked Email');
-                    const role = sanitize(userData.role || 'user');
-                    const isSuspended = userData.status === 'suspended';
-
-                    const row = document.createElement('tr');
-                    row.className = "hover:bg-gray-950/30 transition duration-150 animate-fade-in";
-
-                    row.innerHTML = `
-                        <td class="p-4">
-                            <div class="font-bold text-sm">${name}</div>
-                            <div class="text-xs text-gray-400 mt-0.5">${email}</div>
-                        </td>
-                        <td class="p-4">
-                            <span class="px-2 py-0.5 text-xs font-semibold rounded ${role === 'admin' ? 'bg-red-950 text-red-400 border border-red-900/30' : 'bg-blue-950 text-blue-400 border border-blue-900/30'}">
-                                ${role}
-                            </span>
-                        </td>
-                        <td class="p-4">
-                            <span class="flex items-center gap-1.5 text-xs ${isSuspended ? 'text-red-400' : 'text-green-400'}">
-                                <span class="w-2 h-2 rounded-full ${isSuspended ? 'bg-red-500' : 'bg-green-500'}"></span>
-                                ${isSuspended ? 'Suspended' : 'Active'}
-                            </span>
-                        </td>
-                        <td class="p-4 text-right space-x-1.5 flex justify-end">
-                            <button data-action="email" data-uid="${uid}" data-email="${email}" class="px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg font-medium transition">✉️ Email</button>
-                            <button data-action="edit" data-uid="${uid}" data-name="${name}" data-role="${role}" class="px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg font-medium text-blue-400 transition">✏️ Edit</button>
-                            <button data-action="suspend" data-uid="${uid}" data-suspended="${isSuspended}" class="px-2.5 py-1.5 bg-gray-800 hover:bg-gray-700 text-xs rounded-lg font-medium ${isSuspended ? 'text-green-400' : 'text-yellow-500'} transition">
-                                ${isSuspended ? '🔓 Unsuspend' : '🚫 Suspend'}
-                            </button>
-                            <button data-action="delete" data-uid="${uid}" data-name="${name}" class="px-2.5 py-1.5 bg-red-950/40 hover:bg-red-900/40 text-xs rounded-lg font-medium text-red-400 border border-red-900/30 transition">🗑️ Delete</button>
-                        </td>
-                    `;
-                    tableBody.appendChild(row);
-                });
-            });
-        }
-
-        // Global Event Listener Delegation
-        document.getElementById('userTableBody').addEventListener('click', (e) => {
-            const btn = e.target.closest('button');
-            if (!btn) return;
-            
-            const action = btn.dataset.action;
-            const uid = btn.dataset.uid;
-
-            if (action === 'email') openEmailModal(uid, btn.dataset.email);
-            if (action === 'edit') openEditModal(uid, btn.dataset.name, btn.dataset.role);
-            if (action === 'suspend') toggleSuspend(uid, btn.dataset.suspended === 'true');
-            if (action === 'delete') deleteUser(uid, btn.dataset.name);
-        });
-
-        function openEditModal(uid, name, role) {
-            currentActiveTargetUid = uid;
-            document.getElementById('modalTitle').innerText = "Edit User Attributes";
-            document.getElementById('modalSubtitle').innerText = `Editing UID: ${uid}`;
-            
-            document.getElementById('modalContentSlot').innerHTML = `
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1 font-bold uppercase">Display Name</label>
-                        <input type="text" id="editNameField" value="${name}" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-2.5 text-sm outline-none focus:border-violet-500 text-white">
+            <div class="p-6 space-y-6 flex-1 overflow-y-auto max-w-6xl w-full mx-auto">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="bg-neutral-900 border border-neutral-800/60 p-4 rounded-xl">
+                        <span class="block text-[10px] uppercase font-bold text-neutral-500 tracking-wider">Total Accounts</span>
+                        <span class="text-2xl font-black text-neutral-100" id="statTotal">0</span>
                     </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1 font-bold uppercase">Access Level Authority</label>
-                        <select id="editRoleField" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-2.5 text-sm outline-none focus:border-violet-500 text-white">
-                            <option value="user" ${role === 'user' ? 'selected' : ''}>User</option>
-                            <option value="admin" ${role === 'admin' ? 'selected' : ''}>Admin</option>
-                        </select>
+                    <div class="bg-neutral-900 border border-neutral-800/60 p-4 rounded-xl">
+                        <span class="block text-[10px] uppercase font-bold text-neutral-500 tracking-wider">Active Students</span>
+                        <span class="text-2xl font-black text-green-400" id="statActive">0</span>
+                    </div>
+                    <div class="bg-neutral-900 border border-neutral-800/60 p-4 rounded-xl">
+                        <span class="block text-[10px] uppercase font-bold text-neutral-500 tracking-wider">Suspended/Banned</span>
+                        <span class="text-2xl font-black text-red-400" id="statBanned">0</span>
                     </div>
                 </div>
-            `;
-            
-            document.getElementById('modalSubmitBtn').onclick = saveEditData;
-            document.getElementById('actionModal').classList.remove('hidden');
-        }
 
-        function saveEditData() {
-            const newName = document.getElementById('editNameField').value;
-            const newRole = document.getElementById('editRoleField').value;
-
-            update(ref(db, `users/${currentActiveTargetUid}`), {
-                name: newName,
-                role: newRole
-            }).then(() => closeModal()).catch(err => alert(err.message));
-        }
-
-        function toggleSuspend(uid, currentlySuspended) {
-            const targetStatusUpdate = currentlySuspended ? 'active' : 'suspended';
-            if (confirm(`Change status to ${targetStatusUpdate}?`)) {
-                update(ref(db, `users/${uid}`), { status: targetStatusUpdate }).catch(err => alert(err.message));
-            }
-        }
-
-        function deleteUser(uid, name) {
-            if (confirm(`Are you sure you want to delete ${name}?`)) {
-                remove(ref(db, `users/${uid}`)).catch(err => alert(err.message));
-            }
-        }
-
-        function openEmailModal(uid, email) {
-            currentActiveTargetUid = uid;
-            document.getElementById('modalTitle').innerText = "Compose Account Notification";
-            document.getElementById('modalSubtitle').innerText = `To: ${email}`;
-            
-            document.getElementById('modalContentSlot').innerHTML = `
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1 font-bold uppercase">Subject Line</label>
-                        <input type="text" id="emailSubject" value="Nexus Pro Account Update" class="w-full bg-gray-950 border border-gray-800 rounded-xl p-2.5 text-sm outline-none focus:border-violet-500 text-white">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-400 mb-1 font-bold uppercase">Message Body</label>
-                        <textarea id="emailBody" rows="4" placeholder="Type message parameters here..." class="w-full bg-gray-950 border border-gray-800 rounded-xl p-2.5 text-sm outline-none focus:border-violet-500 text-white"></textarea>
+                <div class="bg-neutral-900 border border-neutral-800/80 rounded-2xl overflow-hidden">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-neutral-800 bg-neutral-950/40 text-[11px] font-bold uppercase tracking-wider text-neutral-400">
+                                    <th class="p-4">Student Details</th>
+                                    <th class="p-4">Assigned Role</th>
+                                    <th class="p-4">Account Status</th>
+                                    <th class="p-4 text-right">Administrative Flags</th>
+                                </tr>
+                            </thead>
+                            <tbody id="studentTableBody" class="divide-y divide-neutral-800/60 text-sm">
+                                </tbody>
+                        </table>
                     </div>
                 </div>
-            `;
-            
-            document.getElementById('modalSubmitBtn').onclick = () => {
-                const subject = document.getElementById('emailSubject').value;
-                const body = document.getElementById('emailBody').value;
-                window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-                closeModal();
-            };
-            
-            document.getElementById('actionModal').classList.remove('hidden');
-        }
+            </div>
+        </main>
+    </div>
 
-        function closeModal() {
-            document.getElementById('actionModal').classList.add('hidden');
-        }
+    <div id="emailModal" class="fixed inset-0 z-50 bg-neutral-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <div class="p-5 border-b border-neutral-800 flex items-center justify-between">
+                <h3 class="text-base font-bold text-neutral-200">Compose Student Direct Dispatch</h3>
+                <button id="closeEmailModalBtn" class="text-neutral-500 hover:text-neutral-300 text-sm font-bold cursor-pointer">✕</button>
+            </div>
+            <form id="emailForm" class="p-5 space-y-4">
+                <input type="hidden" id="targetStudentId">
+                <div>
+                    <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wide mb-1">Recipient Address</label>
+                    <input type="text" id="targetStudentEmail" class="w-full bg-neutral-950 border border-neutral-800 focus:border-neutral-700 rounded-xl px-4 py-2.5 text-xs text-neutral-400 font-semibold outline-none transition-all" readonly>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wide mb-1">Message Subject</label>
+                    <input type="text" id="emailSubject" placeholder="e.g., Nexus Portal Notification / System Notice" class="w-full bg-neutral-950 border border-neutral-800 focus:border-blue-900/50 rounded-xl px-4 py-2.5 text-xs text-neutral-200 placeholder-neutral-600 outline-none transition-all" required>
+                </div>
+                <div>
+                    <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wide mb-1">Message Body</label>
+                    <textarea id="emailBody" rows="5" placeholder="Type notification instructions directly to the student here..." class="w-full bg-neutral-950 border border-neutral-800 focus:border-blue-900/50 rounded-xl px-4 py-2.5 text-xs text-neutral-200 placeholder-neutral-600 outline-none transition-all resize-none" required></textarea>
+                </div>
+                <div class="flex items-center justify-end gap-2 pt-2">
+                    <button type="button" id="cancelEmailBtn" class="px-4 py-2 bg-neutral-800 text-neutral-300 hover:text-neutral-100 text-xs font-bold rounded-xl cursor-pointer transition-all">Cancel</button>
+                    <button type="submit" id="sendEmailSubmitBtn" class="px-4 py-2 bg-blue-950 text-blue-400 hover:bg-blue-900/60 border border-blue-900/40 text-xs font-bold rounded-xl cursor-pointer transition-all">Dispatch Mail</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
-        document.getElementById('modalCancelBtn').addEventListener('click', closeModal);
-
-        // Run application setup
-        initializeAdminDashboard();
-    </script>
+    <script type="module" src="admin-users.js"></script>
 </body>
-</html>
+                </html>
