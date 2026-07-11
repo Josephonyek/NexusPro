@@ -60,9 +60,3 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
-// Drop this snippet inside the login check on your student dashboard scripts
-if (profileData && (profileData.status === "suspended" || profileData.status === "banned")) {
-    alert("❌ Your access to Nexus Pro has been suspended by an administrator.");
-    localStorage.clear();
-    window.location.replace('login.html');
-}
