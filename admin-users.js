@@ -36,7 +36,10 @@ async function syncUserDatabaseTree() {
             </tr>`;
     } finally {
         const loader = document.getElementById('nexusPreloader');
-        if (loader) { loader.classList.add('opacity-0', 'pointer-events-none'); setTimeout(() => loader.remove(), 200); }
+        if (loader) { 
+            loader.classList.add('opacity-0', 'pointer-events-none'); 
+            setTimeout(() => loader.remove(), 200); 
+        }
     }
 }
 
@@ -47,22 +50,30 @@ function renderUserControlsTable() {
 
     const userKeys = Object.keys(cachedUsersObject);
     
-    // Calculate metric cards live
-    let total = userKeys.length;
+    // CRITICAL FILTER: Drops any corrupted or unlinked system placeholder nodes automatically
+    const validUserKeys = userKeys.filter(uid => {
+        const profile = cachedUsersObject[uid];
+        return profile && (profile.email || profile.username || profile.fullName);
+    });
+    
+    let total = validUserKeys.length;
     let active = 0;
     let banned = 0;
 
-    document.getElementById('userCounter').innerText = `${total} Account nodes synced live`;
+    document.getElementById('userCounter').innerText = `${total} Valid student profiles synced live`;
 
     if (total === 0) {
-        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-xs text-neutral-500">No registered profiles located inside node.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" class="p-6 text-center text-xs text-neutral-500">No active student profiles located inside node.</td></tr>`;
+        document.getElementById('statTotal').innerText = 0;
+        document.getElementById('statActive').innerText = 0;
+        document.getElementById('statBanned').innerText = 0;
         return;
     }
 
-    userKeys.forEach(uid => {
+    validUserKeys.forEach(uid => {
         const profile = cachedUsersObject[uid];
         const currentRole = profile.role || "student";
-        const currentStatus = profile.status || "active"; // defaults to active if unset
+        const currentStatus = profile.status || "active";
 
         if (currentStatus === "active") active++;
         if (currentStatus === "suspended" || currentStatus === "banned") banned++;
@@ -72,8 +83,8 @@ function renderUserControlsTable() {
 
         row.innerHTML = `
             <td class="p-4">
-                <div class="font-bold text-neutral-100">${profile.fullName || profile.username || 'Anonymous Node'}</div>
-                <div class="text-xs text-neutral-500 font-semibold mt-0.5">${profile.email || 'No direct email address linked'}</div>
+                <div class="font-bold text-neutral-100">${profile.fullName || profile.username || 'Student User'}</div>
+                <div class="text-xs text-neutral-500 font-semibold mt-0.5">${profile.email || 'No email address registered'}</div>
             </td>
             <td class="p-4">
                 <select data-uid="${uid}" class="role-selector bg-neutral-950 border border-neutral-800 text-neutral-300 text-xs px-2.5 py-1.5 rounded-xl cursor-pointer focus:border-neutral-700 outline-none">
@@ -108,7 +119,7 @@ function renderUserControlsTable() {
 }
 
 function bindInteractiveActionHooks() {
-    // TRIGGER 1: ROLE CHANGES
+    // 1. ROLE SELECTION HANDLERS
     document.querySelectorAll('.role-selector').forEach(selectNode => {
         selectNode.addEventListener('change', async (e) => {
             const targetUid = e.target.getAttribute('data-uid');
@@ -117,23 +128,26 @@ function bindInteractiveActionHooks() {
         });
     });
 
-    // TRIGGER 2: STATUS MUTATIONS (SUSPEND/BAN/ACTIVE)
+    // 2. ACCOUNT STATUS MUTATION HANDLERS
     document.querySelectorAll('.status-selector').forEach(selectNode => {
         selectNode.addEventListener('change', async (e) => {
             const targetUid = e.target.getAttribute('data-uid');
             const targetStatusValue = e.target.value;
             await updateDatabaseNodeValue(targetUid, "status", targetStatusValue);
-            syncUserDatabaseTree(); // Re-sync to paint layout card statistics instantly
+            await syncUserDatabaseTree(); 
         });
     });
 
-    // TRIGGER 3: DISPLAY EMAIL DRAWER
+    // 3. MAIL DISPATCH HANDLERS
     document.querySelectorAll('.mail-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', () => {
             const targetUid = btn.getAttribute('data-uid');
             const targetEmail = btn.getAttribute('data-email');
             
-            if (!targetEmail) { alert("This profile doesn't possess a valid tracking email block."); return; }
+            if (!targetEmail) { 
+                alert("This profile doesn't possess a valid tracking email block."); 
+                return; 
+            }
 
             document.getElementById('targetStudentId').value = targetUid;
             document.getElementById('targetStudentEmail').value = targetEmail;
@@ -141,9 +155,9 @@ function bindInteractiveActionHooks() {
         });
     });
 
-    // TRIGGER 4: COMPLETE PROFILE PURGE DELETIONS
+    // 4. PURGE DELETION HANDLERS
     document.querySelectorAll('.purge-user-btn').forEach(btn => {
-        btn.addEventListener('click', async (e) => {
+        btn.addEventListener('click', async () => {
             const targetUid = btn.getAttribute('data-uid');
             if (confirm("⚠️ CRITICAL ACTION:\n\nAre you sure you want to completely erase this user account? They will lose access to all course suites instantly.")) {
                 await executeDirectUserPurge(targetUid);
@@ -152,7 +166,6 @@ function bindInteractiveActionHooks() {
     });
 }
 
-// PERSISTS SPECIFIC PROPERTY MODIFICATIONS TO FIREBASE REALTIME DB
 async function updateDatabaseNodeValue(uid, databaseFieldKey, targetValue) {
     try {
         const response = await fetch(`${DB_BASE_URL}/users/${uid}/${databaseFieldKey}.json?auth=${activeSessionToken}`, {
@@ -166,7 +179,6 @@ async function updateDatabaseNodeValue(uid, databaseFieldKey, targetValue) {
     }
 }
 
-// PERMANENT DELETION METHOD
 async function executeDirectUserPurge(uid) {
     try {
         const response = await fetch(`${DB_BASE_URL}/users/${uid}.json?auth=${activeSessionToken}`, { method: 'DELETE' });
@@ -185,14 +197,12 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById('closeEmailModalBtn')?.addEventListener('click', () => modal.classList.add('hidden'));
     document.getElementById('cancelEmailBtn')?.addEventListener('click', () => modal.classList.add('hidden'));
 
-    // SENDING EMAIL THROUGH NATIVE USER MAIL UTILITY STREAMS
     form?.addEventListener('submit', (e) => {
         e.preventDefault();
         const address = document.getElementById('targetStudentEmail').value;
         const subject = encodeURIComponent(document.getElementById('emailSubject').value);
         const textBody = encodeURIComponent(document.getElementById('emailBody').value);
 
-        // Uses a mailto protocol format to cleanly hook into your device/browser default messaging center safely without exposing server keys
         window.open(`mailto:${address}?subject=${subject}&body=${textBody}`, '_blank');
         
         modal.classList.add('hidden');
