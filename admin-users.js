@@ -50,10 +50,15 @@ function renderUserControlsTable() {
 
     const userKeys = Object.keys(cachedUsersObject);
     
-    // CRITICAL FILTER: Drops any corrupted or unlinked system placeholder nodes automatically
+    // COMPREHENSIVE FILTER: Catches registration data field variations (email, userEmail, name, fullName)
     const validUserKeys = userKeys.filter(uid => {
         const profile = cachedUsersObject[uid];
-        return profile && (profile.email || profile.username || profile.fullName);
+        if (!profile) return false;
+        
+        const hasEmail = profile.email || profile.userEmail || profile.emailAddress;
+        const hasName = profile.fullName || profile.name || profile.username || profile.firstName;
+        
+        return hasEmail || hasName;
     });
     
     let total = validUserKeys.length;
@@ -72,6 +77,10 @@ function renderUserControlsTable() {
 
     validUserKeys.forEach(uid => {
         const profile = cachedUsersObject[uid];
+        
+        // Dynamic Variable Mapping
+        const resolvedName = profile.fullName || profile.name || profile.username || 'New Classroom Node';
+        const resolvedEmail = profile.email || profile.userEmail || profile.emailAddress || 'No linked email address';
         const currentRole = profile.role || "student";
         const currentStatus = profile.status || "active";
 
@@ -83,8 +92,8 @@ function renderUserControlsTable() {
 
         row.innerHTML = `
             <td class="p-4">
-                <div class="font-bold text-neutral-100">${profile.fullName || profile.username || 'Student User'}</div>
-                <div class="text-xs text-neutral-500 font-semibold mt-0.5">${profile.email || 'No email address registered'}</div>
+                <div class="font-bold text-neutral-100">${resolvedName}</div>
+                <div class="text-xs text-neutral-500 font-semibold mt-0.5">${resolvedEmail}</div>
             </td>
             <td class="p-4">
                 <select data-uid="${uid}" class="role-selector bg-neutral-950 border border-neutral-800 text-neutral-300 text-xs px-2.5 py-1.5 rounded-xl cursor-pointer focus:border-neutral-700 outline-none">
@@ -100,7 +109,7 @@ function renderUserControlsTable() {
                 </select>
             </td>
             <td class="p-4 text-right space-x-1.5 whitespace-nowrap">
-                <button data-uid="${uid}" data-email="${profile.email || ''}" class="mail-btn px-2.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-neutral-200 text-xs font-bold rounded-xl cursor-pointer transition-all">
+                <button data-uid="${uid}" data-email="${resolvedEmail}" class="mail-btn px-2.5 py-1.5 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 text-neutral-200 text-xs font-bold rounded-xl cursor-pointer transition-all">
                     ✉️ Mail
                 </button>
                 <button data-uid="${uid}" class="purge-user-btn px-2.5 py-1.5 bg-red-950/40 hover:bg-red-900/60 border border-red-900/40 text-red-400 text-xs font-bold rounded-xl cursor-pointer transition-all">
@@ -144,8 +153,8 @@ function bindInteractiveActionHooks() {
             const targetUid = btn.getAttribute('data-uid');
             const targetEmail = btn.getAttribute('data-email');
             
-            if (!targetEmail) { 
-                alert("This profile doesn't possess a valid tracking email block."); 
+            if (!targetEmail || targetEmail.includes('No linked email')) { 
+                alert("This profile doesn't possess a valid tracking email address."); 
                 return; 
             }
 
