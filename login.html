@@ -10,7 +10,7 @@
     <meta name="robots" content="index, nofollow">
     <link rel="canonical" href="https://nexuspro.vercel.app/login.html">
 
-    <!-- CSS ARCHITECTURE -->
+    <!-- CSS ARCHITECTURE (With bulletproof fallback styling) -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
         .glow-box {
@@ -24,6 +24,38 @@
             border-radius: 24px;
             z-index: -1;
             pointer-events: none;
+        }
+
+        /* 100% FAIL-SAFE BACKUP STYLES FOR THE TOGGLE ROW */
+        .password-row-wrapper {
+            display: flex !important;
+            gap: 8px !important;
+            width: 100% !important;
+            align-items: stretch !important;
+        }
+        .password-input-field {
+            flex-grow: 1 !important;
+            min-width: 0 !important; /* Prevents the input from pushing the button off-screen */
+        }
+        .fallback-toggle-btn {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            background-color: #1f1f1f !important; /* Dark grey */
+            color: #ffffff !important;             /* White text */
+            border: 1px solid #333333 !important;  /* Border limit */
+            border-radius: 12px !important;        /* Rounded corners */
+            padding: 0 16px !important;            /* Side padding */
+            font-size: 12px !important;            /* Readable text size */
+            font-weight: bold !important;
+            cursor: pointer !important;
+            white-space: nowrap !important;
+            min-height: 44px !important;           /* Match standard input height exactly */
+            transition: all 0.2s ease !important;
+        }
+        .fallback-toggle-btn:hover {
+            background-color: #2e2e2e !important;
+            border-color: #555555 !important;
         }
     </style>
 </head>
@@ -66,18 +98,18 @@
                            class="w-full bg-neutral-950 border border-neutral-800 focus:border-blue-500 rounded-xl px-4 py-3 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
                 </div>
 
-                <!-- PASSWORD FIELD WITH RELIABLE TEXT OUTSIDE TOGGLE -->
+                <!-- PASSWORD FIELD WITH GUARANTEED EXTERNAL TOGGLE -->
                 <div class="space-y-1.5">
                     <label for="password" class="block text-xs font-bold uppercase tracking-wider text-neutral-400">Security Password</label>
-                    <div class="flex gap-2">
+                    <div class="password-row-wrapper">
                         <!-- Password Input -->
                         <input type="password" id="password" name="password" placeholder="••••••••" required
-                               class="flex-grow bg-neutral-950 border border-neutral-800 focus:border-blue-500 rounded-xl px-4 py-3 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
+                               class="password-input-field bg-neutral-950 border border-neutral-800 focus:border-blue-500 rounded-xl px-4 py-3 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
                         
-                        <!-- Text/Emoji Toggle Button Outside Input -->
-                        <button type="button" id="togglePasswordBtn" 
-                                class="flex items-center gap-1.5 bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 text-neutral-300 hover:text-neutral-100 transition-all rounded-xl px-4 text-xs font-bold cursor-pointer focus:outline-none whitespace-nowrap">
-                            <span id="toggleText">Show</span> <span id="toggleEmoji">👁️</span>
+                        <!-- Inline styled toggle button (Does not rely on Tailwind layout) -->
+                        <button type="button" id="togglePasswordBtn" class="fallback-toggle-btn" aria-label="Show password">
+                            <span id="toggleText" style="margin-right: 6px;">Show</span>
+                            <span id="toggleEmoji">👁️</span>
                         </button>
                     </div>
                 </div>
@@ -172,4 +204,4 @@
         });
     </script>
 </body>
-                            </html>
+</html>
