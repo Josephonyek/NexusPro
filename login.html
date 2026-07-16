@@ -10,120 +10,159 @@
     <meta name="robots" content="index, nofollow">
     <link rel="canonical" href="https://nexuspro.vercel.app/login.html">
 
-    <!-- CSS ARCHITECTURE (With bulletproof fallback styling) -->
+    <!-- TAILWIND PLAY CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    
+    <!-- COMPREHENSIVE STYLE SYSTEM -->
     <style>
-        .glow-box {
-            position: relative;
-        }
-        .glow-box::after {
-            content: '';
-            position: absolute;
-            inset: -1px;
-            background: linear-gradient(135deg, #3b82f620, transparent, #3b82f610);
-            border-radius: 24px;
-            z-index: -1;
-            pointer-events: none;
+        /* Smooth backdrop blur animation and glow patterns */
+        .glass-card {
+            background: rgba(15, 15, 15, 0.4) !important;
+            backdrop-filter: blur(24px) !important;
+            -webkit-backdrop-filter: blur(24px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
         }
 
-        /* 100% FAIL-SAFE BACKUP STYLES FOR THE TOGGLE ROW */
+        /* Floating background orbs */
+        .glow-orb-blue {
+            filter: blur(100px);
+            background: radial-gradient(circle, #2563eb 0%, transparent 70%);
+            animation: float-blue 12s infinite alternate ease-in-out;
+        }
+
+        .glow-orb-purple {
+            filter: blur(120px);
+            background: radial-gradient(circle, #4f46e5 0%, transparent 70%);
+            animation: float-purple 16s infinite alternate ease-in-out;
+        }
+
+        @keyframes float-blue {
+            0% { transform: translate(0px, 0px) scale(1); }
+            100% { transform: translate(80px, 40px) scale(1.2); }
+        }
+
+        @keyframes float-purple {
+            0% { transform: translate(0px, 0px) scale(1); }
+            100% { transform: translate(-80px, -50px) scale(1.1); }
+        }
+
+        /* Bulletproof fallback layout wrapper for the password field */
         .password-row-wrapper {
             display: flex !important;
-            gap: 8px !important;
+            gap: 10px !important;
             width: 100% !important;
-            align-items: stretch !important;
+            align-items: center !important;
         }
+
         .password-input-field {
             flex-grow: 1 !important;
-            min-width: 0 !important; /* Prevents the input from pushing the button off-screen */
+            min-width: 0 !important;
         }
-        .fallback-toggle-btn {
+
+        .modern-toggle-btn {
             display: flex !important;
             align-items: center !important;
             justify-content: center !important;
-            background-color: #1f1f1f !important; /* Dark grey */
-            color: #ffffff !important;             /* White text */
-            border: 1px solid #333333 !important;  /* Border limit */
-            border-radius: 12px !important;        /* Rounded corners */
-            padding: 0 16px !important;            /* Side padding */
-            font-size: 12px !important;            /* Readable text size */
-            font-weight: bold !important;
+            background-color: rgba(255, 255, 255, 0.04) !important;
+            color: #e5e5e5 !important;
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            border-radius: 12px !important;
+            padding: 0 16px !important;
+            font-size: 11px !important;
+            font-weight: 800 !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.05em !important;
             cursor: pointer !important;
             white-space: nowrap !important;
-            min-height: 44px !important;           /* Match standard input height exactly */
-            transition: all 0.2s ease !important;
+            height: 46px !important; /* Perfect align match to the main fields */
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
-        .fallback-toggle-btn:hover {
-            background-color: #2e2e2e !important;
-            border-color: #555555 !important;
+
+        .modern-toggle-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1) !important;
+            border-color: rgba(255, 255, 255, 0.2) !important;
+            color: #ffffff !important;
+            transform: translateY(-1px);
+        }
+
+        .modern-toggle-btn:active {
+            transform: translateY(0px);
         }
     </style>
 </head>
-<body class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col justify-between antialiased selection:bg-blue-950 selection:text-blue-400">
+<body class="bg-neutral-950 text-neutral-200 min-h-screen flex flex-col justify-between antialiased selection:bg-indigo-950 selection:text-indigo-400 overflow-x-hidden relative">
 
-    <!-- TOP DECK: MINI BRAND HEADER -->
-    <header class="w-full h-16 px-6 flex items-center">
+    <!-- FLOATING DECORATIVE BACKGROUND SYSTEM -->
+    <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] glow-orb-blue pointer-events-none z-0"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] glow-orb-purple pointer-events-none z-0"></div>
+
+    <!-- TOP DECK: BRAND HEADER -->
+    <header class="w-full h-20 px-8 flex items-center relative z-10">
         <a href="index.html" class="flex items-center gap-3 hover:opacity-90 transition-opacity">
-            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black shadow-lg text-white" aria-hidden="true">N</div>
-            <span class="text-lg font-extrabold tracking-tight text-neutral-100">Nexus<span class="text-blue-500">Pro</span></span>
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-indigo-700 flex items-center justify-center font-black shadow-[0_0_20px_rgba(37,99,235,0.3)] text-white" aria-hidden="true">N</div>
+            <span class="text-xl font-extrabold tracking-tight text-neutral-100">Nexus<span class="text-indigo-400">Pro</span></span>
         </a>
     </header>
 
-    <!-- CORE CARD MODULE -->
-    <main class="flex-grow flex items-center justify-center px-4 py-12">
-        <div class="w-full max-w-md bg-neutral-900/30 border border-neutral-900 glow-box rounded-3xl p-8 space-y-6 backdrop-blur-md">
+    <!-- MAIN CORE PANEL -->
+    <main class="flex-grow flex items-center justify-center px-4 py-8 relative z-10">
+        <div class="w-full max-w-[440px] glass-card rounded-[32px] p-8 md:p-10 space-y-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
             
-            <!-- HEADER -->
+            <!-- HEADER INFO block -->
             <div class="space-y-2 text-center">
-                <h1 id="formTitle" class="text-2xl font-black tracking-tight text-neutral-100">Welcome Back</h1>
-                <p id="formSubtitle" class="text-xs text-neutral-400 font-medium">Enter your administrative credentials to sync workspace metrics</p>
+                <div class="inline-block px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 text-[10px] text-indigo-300 font-extrabold tracking-widest uppercase rounded-full">
+                    Academic Command Console
+                </div>
+                <h1 id="formTitle" class="text-3xl font-black tracking-tight text-white pt-2">Welcome Back</h1>
+                <p id="formSubtitle" class="text-xs text-neutral-400 font-medium">Enter your credentials to access your course files</p>
             </div>
 
-            <!-- DYNAMIC ALERT CONTAINER -->
-            <div id="authAlert" class="hidden px-4 py-3 bg-red-950/40 border border-red-900/40 rounded-xl text-xs text-red-400 font-semibold leading-relaxed"></div>
+            <!-- AUTH ALERT HUB -->
+            <div id="authAlert" class="hidden px-4 py-3.5 bg-red-950/40 border border-red-900/30 rounded-xl text-xs text-red-400 font-medium leading-relaxed"></div>
 
-            <!-- AUTHENTICATION FORM WRAPPER -->
-            <form id="authForm" class="space-y-4" novalidate>
-                <!-- FULL NAME (Only shown on signup action, hidden by default) -->
-                <div id="fullNameGroup" class="hidden space-y-1.5">
-                    <label for="fullName" class="block text-xs font-bold uppercase tracking-wider text-neutral-400">Full Name</label>
+            <!-- INTERACTIVE LOGIN FORM -->
+            <form id="authForm" class="space-y-5" novalidate>
+                
+                <!-- ACCOUNT FULL NAME (Only displays in dynamic Sign Up state) -->
+                <div id="fullNameGroup" class="hidden space-y-2">
+                    <label for="fullName" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Full Name</label>
                     <input type="text" id="fullName" name="fullName" placeholder="John Doe" 
-                           class="w-full bg-neutral-950 border border-neutral-800 focus:border-blue-500 rounded-xl px-4 py-3 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
+                           class="w-full bg-neutral-900/60 border border-neutral-800/80 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl px-4 py-3.5 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
                 </div>
 
-                <!-- EMAIL FIELD -->
-                <div class="space-y-1.5">
-                    <label for="email" class="block text-xs font-bold uppercase tracking-wider text-neutral-400">Email Address</label>
+                <!-- EMAIL ADDR INPUT -->
+                <div class="space-y-2">
+                    <label for="email" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Email Address</label>
                     <input type="email" id="email" name="email" placeholder="you@domain.com" required
-                           class="w-full bg-neutral-950 border border-neutral-800 focus:border-blue-500 rounded-xl px-4 py-3 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
+                           class="w-full bg-neutral-900/60 border border-neutral-800/80 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl px-4 py-3.5 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
                 </div>
 
-                <!-- PASSWORD FIELD WITH GUARANTEED EXTERNAL TOGGLE -->
-                <div class="space-y-1.5">
-                    <label for="password" class="block text-xs font-bold uppercase tracking-wider text-neutral-400">Security Password</label>
+                <!-- EXTERNAL PASSWORD FIELD ROW -->
+                <div class="space-y-2">
+                    <label for="password" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Security Password</label>
                     <div class="password-row-wrapper">
-                        <!-- Password Input -->
+                        <!-- Password input block -->
                         <input type="password" id="password" name="password" placeholder="••••••••" required
-                               class="password-input-field bg-neutral-950 border border-neutral-800 focus:border-blue-500 rounded-xl px-4 py-3 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
+                               class="password-input-field bg-neutral-900/60 border border-neutral-800/80 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl px-4 py-3.5 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
                         
-                        <!-- Inline styled toggle button (Does not rely on Tailwind layout) -->
-                        <button type="button" id="togglePasswordBtn" class="fallback-toggle-btn" aria-label="Show password">
-                            <span id="toggleText" style="margin-right: 6px;">Show</span>
+                        <!-- Fixed External Toggle Button -->
+                        <button type="button" id="togglePasswordBtn" class="modern-toggle-btn" aria-label="Show password">
+                            <span id="toggleText" style="margin-right: 4px;">Show</span>
                             <span id="toggleEmoji">👁️</span>
                         </button>
                     </div>
                 </div>
 
-                <!-- FORM BUTTON CONTROLLER -->
-                <button type="submit" id="submitBtn" class="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-blue-900/20 transition-all cursor-pointer">
+                <!-- FORWARD SUBMIT TRIGGER -->
+                <button type="submit" id="submitBtn" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-lg shadow-indigo-950/40 hover:shadow-indigo-900/50 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer">
                     Authenticate Workspace
                 </button>
             </form>
 
-            <!-- FOOTER SWITCH ROUTE LINK -->
-            <div class="text-center pt-2">
-                <span id="routeText" class="text-xs text-neutral-500 font-semibold">Need a secure, role-based student account?</span>
-                <button type="button" id="toggleRouteBtn" class="block mx-auto mt-1 text-xs text-blue-400 hover:text-blue-300 font-bold hover:underline transition-all cursor-pointer">
+            <!-- FOOTER SWITCH TOGGLE SYSTEM -->
+            <div class="text-center pt-2 space-y-2">
+                <span id="routeText" class="text-xs text-neutral-500 font-medium block">Need an academic student account?</span>
+                <button type="button" id="toggleRouteBtn" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold hover:underline transition-all cursor-pointer">
                     Create your Free Student Profile
                 </button>
             </div>
@@ -131,12 +170,12 @@
         </div>
     </main>
 
-    <!-- FOOTER LICENSE SHELL -->
-    <footer class="w-full py-6 text-center">
-        <p class="text-[10px] text-neutral-600 font-medium">&copy; 2026 Nexus Pro Academy. Built Securely. All Rights Reserved.</p>
+    <!-- FOOTER SECTION -->
+    <footer class="w-full py-8 text-center relative z-10">
+        <p class="text-[10px] text-neutral-600 font-medium tracking-wide">&copy; 2026 Nexus Pro Academy. All Systems Operational.</p>
     </footer>
 
-    <!-- TOGGLE LOGIC SCRIPT -->
+    <!-- INTERACTIVE SCRIPTS -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const passwordField = document.getElementById("password");
@@ -144,14 +183,11 @@
             const toggleText = document.getElementById("toggleText");
             const toggleEmoji = document.getElementById("toggleEmoji");
 
-            // Simplified toggle swapping text and emojis directly
+            // Password field character peek function
             toggleBtn.addEventListener("click", () => {
                 const isPassword = passwordField.type === "password";
-                
-                // Toggle input type
                 passwordField.type = isPassword ? "text" : "password";
                 
-                // Update text, emoji, and accessibility attributes
                 if (isPassword) {
                     toggleText.innerText = "Hide";
                     toggleEmoji.innerText = "🙈";
@@ -163,7 +199,7 @@
                 }
             });
 
-            // Demo Route Toggle (Login <-> Register switch mechanism)
+            // Route switching utility (Sign In vs Register views)
             const toggleRouteBtn = document.getElementById("toggleRouteBtn");
             const formTitle = document.getElementById("formTitle");
             const formSubtitle = document.getElementById("formSubtitle");
@@ -172,7 +208,6 @@
             const routeText = document.getElementById("routeText");
             let isRegisterMode = false;
 
-            // Simple URL checking for action parameters
             const urlParams = new URLSearchParams(window.location.search);
             if (urlParams.get('action') === 'register') {
                 toggleMode(true);
@@ -194,10 +229,10 @@
                     toggleRouteBtn.innerText = "Sign In to Workspace";
                 } else {
                     formTitle.innerText = "Welcome Back";
-                    formSubtitle.innerText = "Enter your credentials to sync workspace metrics";
+                    formSubtitle.innerText = "Enter your credentials to access your course files";
                     fullNameGroup.classList.add("hidden");
                     submitBtn.innerText = "Authenticate Workspace";
-                    routeText.innerText = "Need a secure, role-based student account?";
+                    routeText.innerText = "Need an academic student account?";
                     toggleRouteBtn.innerText = "Create your Free Student Profile";
                 }
             }
