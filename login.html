@@ -3,57 +3,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro | Secure Sign In</title>
+    
+    <!-- PRIMARY SEARCH ENGINE OPTIMIZATION (SEO) META MATRIX -->
+    <title>Nexus Pro | Sign In to Your Academic Workspace</title>
+    <meta name="description" content="Secure login portal for Nexus Pro. Access your curriculum notes, customized video modules, and academic performance suites instantly.">
+    <meta name="robots" content="index, nofollow"> <!-- No need to index auth screens, but keep indexing rules clean -->
+    <link rel="canonical" href="https://nexuspro.vercel.app/login.html">
+
+    <!-- CSS ARCHITECTURE -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        .glow-box {
+            position: relative;
+        }
+        .glow-box::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(135deg, #3b82f620, transparent, #3b82f610);
+            border-radius: 24px;
+            z-index: -1;
+            pointer-events: none;
+        }
+    </style>
 </head>
-<body class="bg-neutral-950 text-neutral-100 min-h-screen flex items-center justify-center p-4 antialiased selection:bg-blue-600/30 selection:text-blue-400">
+<body class="bg-neutral-950 text-neutral-100 min-h-screen flex flex-col justify-between antialiased selection:bg-blue-950 selection:text-blue-400">
 
-    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-indigo-600/10 rounded-full blur-[128px]"></div>
-        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[160px]"></div>
-    </div>
+    <!-- TOP DECK: MINI BRAND HEADER -->
+    <header class="w-full h-16 px-6 flex items-center">
+        <a href="index.html" class="flex items-center gap-3 hover:opacity-90 transition-opacity">
+            <div class="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black shadow-lg text-white" aria-hidden="true">N</div>
+            <span class="text-lg font-extrabold tracking-tight text-neutral-100">Nexus<span class="text-blue-500">Pro</span></span>
+        </a>
+    </header>
 
-    <div class="w-full max-w-md bg-neutral-900/60 border border-neutral-800/80 rounded-2xl p-8 shadow-2xl relative z-10 backdrop-blur-xl">
-        
-        <div class="mb-8 text-center">
-            <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 mb-4 shadow-lg shadow-blue-600/20">
-                <span class="text-xl font-black text-white tracking-tighter">N</span>
+    <!-- CORE CARD MODULE -->
+    <main class="flex-grow flex items-center justify-center px-4 py-12">
+        <div class="w-full max-w-md bg-neutral-900/30 border border-neutral-900 glow-box rounded-3xl p-8 space-y-6 backdrop-blur-md">
+            
+            <!-- HEADER -->
+            <div class="space-y-2 text-center">
+                <h1 id="formTitle" class="text-2xl font-black tracking-tight text-neutral-100">Welcome Back</h1>
+                <p id="formSubtitle" class="text-xs text-neutral-400 font-medium">Enter your administrative credentials to sync workspace metrics</p>
             </div>
-            <h1 class="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-neutral-50 via-neutral-200 to-neutral-400 bg-clip-text text-transparent">
-                Welcome Back
-            </h1>
-            <p class="text-neutral-400 text-sm mt-1.5">Sign in to resume access authorizations</p>
-        </div>
 
-        <form id="loginForm" class="space-y-5">
-            <div>
-                <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Email Address</label>
-                <div class="relative">
-                    <input type="email" id="loginEmail" required placeholder="you@example.com" 
-                        class="w-full bg-neutral-950/80 border border-neutral-800/80 focus:border-blue-500/80 rounded-xl px-4 py-3.5 text-neutral-200 placeholder-neutral-600 outline-none transition-all duration-200 text-sm focus:ring-4 focus:ring-blue-500/10">
+            <!-- DYNAMIC ALERT CONTAINER (For Firebase/Authentication feedback messages) -->
+            <div id="authAlert" class="hidden px-4 py-3 bg-red-950/40 border border-red-900/40 rounded-xl text-xs text-red-400 font-semibold leading-relaxed">
+                <!-- Injected via Script -->
+            </div>
+
+            <!-- AUTHENTICATION FORM WRAPPER -->
+            <form id="authForm" class="space-y-4" novalidate>
+                <!-- FULL NAME (Only shown on signup action, hidden by default) -->
+                <div id="fullNameGroup" class="hidden space-y-1.5">
+                    <label for="fullName" class="block text-xs font-bold uppercase tracking-wider text-neutral-400">Full Name</label>
+                    <input type="text" id="fullName" name="fullName" placeholder="John Doe" 
+                           class="w-full bg-neutral-950 border border-neutral-800 focus:border-blue-500 rounded-xl px-4 py-3 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
                 </div>
-            </div>
 
-            <div>
-                <label class="block text-xs font-semibold text-neutral-400 uppercase tracking-wider mb-2">Password</label>
-                <div class="relative">
-                    <input type="password" id="loginPassword" required placeholder="••••••••" 
-                        class="w-full bg-neutral-950/80 border border-neutral-800/80 focus:border-blue-500/80 rounded-xl px-4 py-3.5 text-neutral-200 placeholder-neutral-600 outline-none transition-all duration-200 text-sm focus:ring-4 focus:ring-blue-500/10">
+                <!-- EMAIL FIELD -->
+                <div class="space-y-1.5">
+                    <label for="email" class="block text-xs font-bold uppercase tracking-wider text-neutral-400">Email Address</label>
+                    <input type="email" id="email" name="email" placeholder="you@domain.com" required
+                           class="w-full bg-neutral-950 border border-neutral-800 focus:border-blue-500 rounded-xl px-4 py-3 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
                 </div>
+
+                <!-- PASSWORD FIELD WITH INTERACTIVE VISIBILITY TOGGLE -->
+                <div class="space-y-1.5">
+                    <label for="password" class="block text-xs font-bold uppercase tracking-wider text-neutral-400">Security Password</label>
+                    <div class="relative w-full">
+                        <input type="password" id="password" name="password" placeholder="••••••••" required
+                               class="w-full bg-neutral-950 border border-neutral-800 focus:border-blue-500 rounded-xl pl-4 pr-12 py-3 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
+                        
+                        <!-- Toggle Password Visibility Button -->
+                        <button type="button" id="togglePasswordBtn" aria-label="Show password"
+                                class="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-500 hover:text-neutral-300 transition-colors focus:outline-none p-1 cursor-pointer">
+                            <!-- Eye icon SVG (Default state: Hidden Password) -->
+                            <svg id="eyeIcon" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- FORM BUTTON CONTROLLER -->
+                <button type="submit" id="submitBtn" class="w-full py-3.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold rounded-xl shadow-lg shadow-blue-900/20 transition-all cursor-pointer">
+                    Authenticate Workspace
+                </button>
+            </form>
+
+            <!-- FOOTER SWITCH ROUTE LINK -->
+            <div class="text-center pt-2">
+                <span id="routeText" class="text-xs text-neutral-500 font-semibold">Need a secure, role-based student account?</span>
+                <button type="button" id="toggleRouteBtn" class="block mx-auto mt-1 text-xs text-blue-400 hover:text-blue-300 font-bold hover:underline transition-all cursor-pointer">
+                    Create your Free Student Profile
+                </button>
             </div>
 
-            <button type="submit" 
-                class="w-full relative group bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold py-3.5 rounded-xl transition-all duration-200 text-sm tracking-wide shadow-xl shadow-blue-600/10 active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none cursor-pointer">
-                <span class="relative z-10">Sign In to Dashboard</span>
-            </button>
-        </form>
-
-        <div class="mt-8 pt-6 border-t border-neutral-800/60 text-center text-sm">
-            <span class="text-neutral-500">New to the platform?</span>
-            <a href="signup.html" class="text-blue-400 hover:text-blue-300 ml-1 font-semibold transition-colors">Create Account</a>
         </div>
-    </div>
+    </main>
 
-    <script src="login.js"></script>
+    <!-- FOOTER LICENSE SHELL -->
+    <footer class="w-full py-6 text-center">
+        <p class="text-[10px] text-neutral-600 font-medium">&copy; 2026 Nexus Pro Academy. Built Securely. All Rights Reserved.</p>
+    </footer>
+
+    <!-- TOGGLE LOGIC SCRIPT -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const passwordField = document.getElementById("password");
+            const toggleBtn = document.getElementById("togglePasswordBtn");
+            const eyeIcon = document.getElementById("eyeIcon");
+
+            // SVG Markup Definitions for the visibility states
+            const eyeOpenSvg = `
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            `;
+
+            const eyeClosedSvg = `
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+            `;
+
+            // Toggle function
+            toggleBtn.addEventListener("click", () => {
+                const isPassword = passwordField.type === "password";
+                
+                // Toggle element type
+                passwordField.type = isPassword ? "text" : "password";
+                
+                // Update SVG graphic
+                eyeIcon.innerHTML = isPassword ? eyeClosedSvg : eyeOpenSvg;
+                
+                // Update Accessibility attributes
+                toggleBtn.setAttribute("aria-label", isPassword ? "Hide password" : "Show password");
+            });
+
+            // Demo Route Toggle (Login <-> Register switch mechanism)
+            const toggleRouteBtn = document.getElementById("toggleRouteBtn");
+            const formTitle = document.getElementById("formTitle");
+            const formSubtitle = document.getElementById("formSubtitle");
+            const fullNameGroup = document.getElementById("fullNameGroup");
+            const submitBtn = document.getElementById("submitBtn");
+            const routeText = document.getElementById("routeText");
+            let isRegisterMode = false;
+
+            // Simple URL checking for action parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('action') === 'register') {
+                toggleMode(true);
+            }
+
+            toggleRouteBtn.addEventListener("click", () => {
+                isRegisterMode = !isRegisterMode;
+                toggleMode(isRegisterMode);
+            });
+
+            function toggleMode(registerState) {
+                isRegisterMode = registerState;
+                if (isRegisterMode) {
+                    formTitle.innerText = "Register Account";
+                    formSubtitle.innerText = "Initialize your master student file to begin online classes";
+                    fullNameGroup.classList.remove("hidden");
+                    submitBtn.innerText = "Create Free Account";
+                    routeText.innerText = "Already possess an active profile?";
+                    toggleRouteBtn.innerText = "Sign In to Workspace";
+                } else {
+                    formTitle.innerText = "Welcome Back";
+                    formSubtitle.innerText = "Enter your credentials to sync workspace metrics";
+                    fullNameGroup.classList.add("hidden");
+                    submitBtn.innerText = "Authenticate Workspace";
+                    routeText.innerText = "Need a secure, role-based student account?";
+                    toggleRouteBtn.innerText = "Create your Free Student Profile";
+                }
+            }
+        });
+    </script>
 </body>
-            </html>
+    </html>
