@@ -67,16 +67,17 @@
                            class="w-full bg-neutral-950 border border-neutral-800 focus:border-blue-500 rounded-xl px-4 py-3 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
                 </div>
 
-                <!-- PASSWORD FIELD WITH INTERACTIVE VISIBILITY TOGGLE -->
+                <!-- PASSWORD FIELD WITH OUTSIDE VISIBILITY TOGGLE -->
                 <div class="space-y-1.5">
                     <label for="password" class="block text-xs font-bold uppercase tracking-wider text-neutral-400">Security Password</label>
-                    <div class="relative w-full">
+                    <div class="flex gap-2">
+                        <!-- Password Input -->
                         <input type="password" id="password" name="password" placeholder="••••••••" required
-                               class="w-full bg-neutral-950 border border-neutral-800 focus:border-blue-500 rounded-xl pl-4 pr-12 py-3 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
+                               class="flex-grow bg-neutral-950 border border-neutral-800 focus:border-blue-500 rounded-xl px-4 py-3 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
                         
-                        <!-- Toggle Password Visibility Button -->
+                        <!-- Distinct External Toggle Password Button -->
                         <button type="button" id="togglePasswordBtn" aria-label="Show password"
-                                class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-200 transition-colors focus:outline-none p-1.5 cursor-pointer z-10">
+                                class="flex items-center justify-center bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 hover:border-neutral-700 text-neutral-400 hover:text-neutral-200 transition-all rounded-xl px-4 cursor-pointer focus:outline-none">
                             
                             <!-- Eye Open SVG (Shows when password is hidden) -->
                             <svg id="eyeOpenIcon" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -122,14 +123,14 @@
             const eyeOpenIcon = document.getElementById("eyeOpenIcon");
             const eyeClosedIcon = document.getElementById("eyeClosedIcon");
 
-            // Toggle function swapping visual elements
+            // Toggle functionality to swap input types & display correct SVGs
             toggleBtn.addEventListener("click", () => {
                 const isPassword = passwordField.type === "password";
                 
                 // Toggle input type
                 passwordField.type = isPassword ? "text" : "password";
                 
-                // Swap visibility of the SVG elements directly
+                // Toggle visual state of the SVGs
                 if (isPassword) {
                     eyeOpenIcon.classList.add("hidden");
                     eyeClosedIcon.classList.remove("hidden");
