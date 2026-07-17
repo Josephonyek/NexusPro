@@ -1,161 +1,74 @@
-/**
- * Nexus Pro 2.0 - Core Dashboard Management Engine (Direct Secure Database Integration)
- * File: dashboard.js
- */
-
-const DB_BASE_URL = "https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app";
-
-function sanitizeString(str) {
-    if (!str) return '';
-    const tempDiv = document.createElement('div');
-    tempDiv.textContent = str;
-    return tempDiv.innerHTML;
-}
-
-async function verifyAndInitializeDashboard() {
-    const userId = localStorage.getItem('nexusUserId');
-    const secureToken = localStorage.getItem('nexusAuthToken');
-
-    if (!userId || !secureToken) {
-        executeHardLogout();
-        return;
-    }
-
-    // RUNTIME OPTIMIZATION: Boot view instantly using memory state tokens
-    const cachedRole = (localStorage.getItem('nexusUserRole') || 'student').toLowerCase().trim();
-    applyFastLayoutPresets(cachedRole, userId);
-
-    try {
-        const dbUrl = `${DB_BASE_URL}/users/${userId}.json?auth=${secureToken}`;
-        const response = await fetch(dbUrl);
-        
-        if (!response.ok) throw new Error("Database network communication rejection.");
-        const userData = await response.json();
-
-        if (!userData) throw new Error("User profile node does not exist.");
-
-        if (userData.status === 'suspended' || userData.status === 'banned') {
-            alert("🔒 Access privileges revoked. This account has been flagged.");
-            executeHardLogout();
-            return;
-        }
-
-        const cleanName = sanitizeString(userData.name || userId.split('@')[0] || "Scholar");
-        const cleanRole = sanitizeString(userData.role || "student").toLowerCase().trim();
-
-        localStorage.setItem('nexusUserRole', userData.role || "Student");
-
-        const welcomeHeading = document.getElementById('welcomeHeading');
-        if (welcomeHeading) welcomeHeading.innerHTML = `Welcome Back, ${cleanName}!`;
-
-        const userNameLabel = document.getElementById('userNameLabel');
-        if (userNameLabel) userNameLabel.innerText = cleanName;
-
-        const userAvatar = document.getElementById('userAvatar');
-        if (userAvatar) userAvatar.innerText = cleanRole.substring(0, 2).toUpperCase();
-
-        const userRoleLabel = document.getElementById('userRoleLabel');
-        if (userRoleLabel) userRoleLabel.innerText = userData.role || "Student";
-
-        evaluateStrictRoleRouting(cleanRole);
-
-    } catch (criticalError) {
-        console.error("Critical Dashboard Failure:", criticalError.message);
-        if (criticalError.message.includes("auth") || criticalError.message.includes("permission")) {
-            executeHardLogout();
-        }
-    }
-}
-
-function applyFastLayoutPresets(role, userId) {
-    const fallbackName = userId.split('@')[0] || "Scholar";
-    const welcomeHeading = document.getElementById('welcomeHeading');
-    if (welcomeHeading) welcomeHeading.innerHTML = `Welcome Back, ${fallbackName}...`;
-    
-    const userNameLabel = document.getElementById('userNameLabel');
-    if (userNameLabel) userNameLabel.innerText = fallbackName;
-
-    evaluateStrictRoleRouting(role);
-}
-
-function evaluateStrictRoleRouting(role) {
-    const dashboardMainTitle = document.getElementById('dashboardMainTitle');
-    const dashboardSubTitle = document.getElementById('dashboardSubTitle');
-    const systemStatusLabel = document.getElementById('systemStatusLabel');
-
-    if (role === 'admin') {
-        if (dashboardMainTitle) dashboardMainTitle.innerText = "HQ Administrative Control Console";
-        if (dashboardSubTitle) dashboardSubTitle.innerText = "Global systems tracking suites & access overrides";
-        if (systemStatusLabel) {
-            systemStatusLabel.innerText = "Root Access Online";
-            systemStatusLabel.className = "text-[10px] font-extrabold uppercase tracking-widest text-amber-400";
-        }
-        document.getElementById('sidebarStudentLinks')?.classList.add('hidden');
-        document.getElementById('sidebarAdminLinks')?.classList.remove('hidden');
-        if (typeof switchTab === 'function') switchTab('admin-suite');
-    } else {
-        if (dashboardMainTitle) dashboardMainTitle.innerText = "Command Console";
-        if (dashboardSubTitle) dashboardSubTitle.innerText = "Manage your academic pipeline and integration tools";
-        if (systemStatusLabel) {
-            systemStatusLabel.innerText = "Database Active";
-            systemStatusLabel.className = "text-[10px] font-extrabold uppercase tracking-widest text-neutral-400";
-        }
-        document.getElementById('sidebarStudentLinks')?.classList.remove('hidden');
-        document.getElementById('sidebarAdminLinks')?.classList.add('hidden');
-        if (typeof switchTab === 'function') switchTab('curriculum');
-    }
-}
-
-function clearPreloaderOverlay() {
-    const loaderMask = document.getElementById('nexusPreloader');
-    if (!loaderMask) return;
-    loaderMask.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
-    setTimeout(() => { loaderMask.remove(); }, 100);
-}
-
-function executeHardLogout() {
-    localStorage.clear();
-    window.location.replace('login.html');
-}
-
+// Execute immediately when the DOM structural tree is ready (No waiting for external media)
 document.addEventListener("DOMContentLoaded", () => {
-    clearPreloaderOverlay();
-
-    // ULTRA-RESPONSIVE HAMBURGER NAVIGATION TRIGGER
-    const hamburgerBtn = document.getElementById('hamburgerBtn');
-    const sidebarMenu = document.getElementById('sidebarMenu');
-
-    if (hamburgerBtn && sidebarMenu) {
-        hamburgerBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
-            const isOpen = sidebarMenu.classList.contains('mobile-open');
-            
-            if (isOpen) {
-                sidebarMenu.classList.remove('mobile-open');
-                sidebarMenu.style.display = 'none';
-            } else {
-                sidebarMenu.classList.add('mobile-open');
-                sidebarMenu.style.display = 'flex';
-            }
-        });
-
-        // Close sidebar on clicking ambient view targets
-        document.addEventListener('click', (event) => {
-            if (window.innerWidth < 768 && sidebarMenu.classList.contains('mobile-open')) {
-                if (!sidebarMenu.contains(event.target) && event.target !== hamburgerBtn) {
-                    sidebarMenu.classList.remove('mobile-open');
-                    sidebarMenu.style.display = 'none';
-                }
-            }
-        });
-    }
-
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => { 
-            if (confirm("Sign out of Nexus Pro?")) executeHardLogout(); 
-        });
-    }
-
-    verifyAndInitializeDashboard();
+    initPreloader();
+    initNavigationMenu();
 });
+
+/**
+ * Handles fast preloader dismissal
+ */
+function initPreloader() {
+    const preloader = document.getElementById("preloader");
+    if (preloader) {
+        // Enforce immediate class addition for a snappy layout reveal
+        preloader.classList.add("fade-out");
+        
+        // Completely clear element from DOM tree after CSS opacity transitions finish
+        setTimeout(() => {
+            preloader.remove();
+        }, 300);
+    }
+}
+
+/**
+ * Manages side navigation panel toggles and dynamic section switching
+ */
+function initNavigationMenu() {
+    const menuToggle = document.getElementById("menu-toggle");
+    const sidebar = document.getElementById("sidebar");
+    const menuLinks = document.querySelectorAll(".menu-link");
+    const tabContents = document.querySelectorAll(".tab-content");
+
+    // 1. Mobile Hamburger Toggle Handler
+    if (menuToggle && sidebar) {
+        menuToggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            sidebar.classList.toggle("active");
+        });
+
+        // Auto-close sidebar on mobile when clicking anywhere outside the menu
+        document.addEventListener("click", (e) => {
+            if (sidebar.classList.contains("active") && !sidebar.contains(e.target) && e.target !== menuToggle) {
+                sidebar.classList.remove("active");
+            }
+        });
+    }
+
+    // 2. High-Speed Tab Switching Controller
+    menuLinks.forEach(link => {
+        link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const targetTabId = link.getAttribute("data-tab");
+
+            if (!targetTabId) return;
+
+            // Update Active Link State UI
+            menuLinks.forEach(item => item.classList.remove("active"));
+            link.classList.add("active");
+
+            // Switch Visible View Content
+            tabContents.forEach(content => {
+                if (content.id === targetTabId) {
+                    content.classList.add("active");
+                } else {
+                    content.classList.remove("active");
+                }
+            });
+
+            // On mobile viewports, collapse the sidebar automatically after a selection
+            if (window.innerWidth <= 768 && sidebar) {
+                sidebar.classList.remove("active");
+            }
+        });
+    });
+}
