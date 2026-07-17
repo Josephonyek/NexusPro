@@ -45,7 +45,10 @@ async function verifyAndInitializeDashboard() {
         // Sync local storage state to remain authentic with the server
         localStorage.setItem('nexusUserRole', userData.role || "Student");
 
-        // Update Interface Labels matching HTML elements
+        // Update Welcome Banner Greeting & Profile Elements
+        const welcomeHeading = document.getElementById('welcomeHeading');
+        if (welcomeHeading) welcomeHeading.innerHTML = `Welcome Back, ${cleanName}!`;
+
         const userNameLabel = document.getElementById('userNameLabel');
         if (userNameLabel) userNameLabel.innerText = cleanName;
 
@@ -62,7 +65,7 @@ async function verifyAndInitializeDashboard() {
             userRoleLabel.innerText = userData.role || "Student";
             
             if (cleanRole === 'admin') {
-                // Adjust text tokens to Admin Context
+                // Adjust context metadata for Admin view
                 if (dashboardMainTitle) dashboardMainTitle.innerText = "HQ Administrative Control Console";
                 if (dashboardSubTitle) dashboardSubTitle.innerText = "Global systems tracking suites & access overrides";
                 if (systemStatusLabel) {
@@ -70,17 +73,15 @@ async function verifyAndInitializeDashboard() {
                     systemStatusLabel.className = "text-[10px] font-extrabold uppercase tracking-widest text-amber-400";
                 }
 
-                // Show Admin Navigation Elements & Hide Student Sections
-                document.getElementById('nav-header-student')?.classList.add('hidden');
-                document.getElementById('nav-header-admin')?.classList.remove('hidden');
-                document.getElementById('btn-admin-suite')?.classList.remove('hidden');
+                // Show Admin-specific sections/links, hide standard student grouping
+                document.getElementById('sidebarStudentLinks')?.classList.add('hidden');
+                document.getElementById('sidebarAdminLinks')?.classList.remove('hidden');
                 
-                // Route automatically to the Admin view panel
                 if (typeof switchTab === 'function') {
                     switchTab('admin-suite');
                 }
             } else {
-                // Student Context Settings
+                // Adjust context metadata back to Student context
                 if (dashboardMainTitle) dashboardMainTitle.innerText = "Command Console";
                 if (dashboardSubTitle) dashboardSubTitle.innerText = "Manage your academic pipeline and integration tools";
                 if (systemStatusLabel) {
@@ -88,9 +89,8 @@ async function verifyAndInitializeDashboard() {
                     systemStatusLabel.className = "text-[10px] font-extrabold uppercase tracking-widest text-neutral-400";
                 }
 
-                document.getElementById('nav-header-student')?.classList.remove('hidden');
-                document.getElementById('nav-header-admin')?.classList.add('hidden');
-                document.getElementById('btn-admin-suite')?.classList.add('hidden');
+                document.getElementById('sidebarStudentLinks')?.classList.remove('hidden');
+                document.getElementById('sidebarAdminLinks')?.classList.add('hidden');
                 
                 if (typeof switchTab === 'function') {
                     switchTab('curriculum');
@@ -100,7 +100,7 @@ async function verifyAndInitializeDashboard() {
 
     } catch (criticalError) {
         console.error("Critical Dashboard Initialization Failure:", criticalError.message);
-        // Direct redirect if database signals an explicit expired or altered auth token structure
+        // Security fallback: clear local variables if token permissions fail on remote database check
         if (criticalError.message.includes("auth") || criticalError.message.includes("permission")) {
             executeHardLogout();
         }
@@ -123,20 +123,20 @@ function executeHardLogout() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Failsafe backup to drop the loader if network conditions stall out completely
+    // Failsafe drop fallback loop
     setTimeout(clearPreloaderOverlay, 2500);
 
-    // HAMBURGER MENU ENGINE CONTROLS
+    // HAMBURGER MENU FUNCTIONAL CODE LOGIC
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const sidebarMenu = document.getElementById('sidebarMenu');
 
     if (hamburgerBtn && sidebarMenu) {
         hamburgerBtn.addEventListener('click', (event) => {
-            event.stopPropagation();
+            event.stopPropagation(); // Avoid triggering document hide event instantly
             sidebarMenu.classList.toggle('hidden');
         });
 
-        // Close menu automatically when clicking anywhere else on the interface workspace
+        // Click outside event handler to close navigation sidebar cleanly
         document.addEventListener('click', (event) => {
             if (window.innerWidth < 768 && !sidebarMenu.classList.contains('hidden')) {
                 if (!sidebarMenu.contains(event.target) && event.target !== hamburgerBtn) {
@@ -146,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Global Logout Binding Trigger
+    // Global Logout Trigger Execution 
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => { 
