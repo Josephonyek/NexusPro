@@ -13,7 +13,7 @@
     <!-- TAILWIND PLAY CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     
-    <!-- COMPREHENSIVE STYLE SYSTEM (Identical to login.html for design harmony) -->
+    <!-- COMPREHENSIVE STYLE SYSTEM (Identical harmony with login.html) -->
     <style>
         /* Smooth backdrop blur and glow patterns */
         .glass-card {
@@ -46,7 +46,7 @@
             100% { transform: translate(-80px, -50px) scale(1.1); }
         }
 
-        /* Fail-safe layout wrapper for the password field */
+        /* Fail-safe layout wrapper for the password field row */
         .password-row-wrapper {
             display: flex !important;
             gap: 10px !important;
@@ -74,7 +74,7 @@
             letter-spacing: 0.05em !important;
             cursor: pointer !important;
             white-space: nowrap !important;
-            height: 46px !important; /* Matches height of the email/name input fields */
+            height: 46px !important; /* Perfect align match to the email/name fields */
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
@@ -117,24 +117,24 @@
                 <p class="text-xs text-neutral-400 font-medium">Initialize your master student file to begin online classes</p>
             </div>
 
-            <!-- INTERACTIVE SIGNUP FORM -->
+            <!-- INTERACTIVE SIGNUP FORM (ID matches signup.js standard) -->
             <form id="signupForm" class="space-y-5" novalidate>
                 
-                <!-- ACCOUNT FULL NAME -->
+                <!-- ACCOUNT FULL NAME (ID matches signup.js standard) -->
                 <div class="space-y-2">
                     <label for="signupName" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Full Name</label>
                     <input type="text" id="signupName" name="fullName" placeholder="John Doe" required
                            class="w-full bg-neutral-900/60 border border-neutral-800/80 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl px-4 py-3.5 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
                 </div>
 
-                <!-- EMAIL ADDR INPUT -->
+                <!-- EMAIL ADDR INPUT (ID matches signup.js standard) -->
                 <div class="space-y-2">
                     <label for="signupEmail" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Email Address</label>
                     <input type="email" id="signupEmail" name="email" placeholder="you@domain.com" required
                            class="w-full bg-neutral-900/60 border border-neutral-800/80 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl px-4 py-3.5 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
                 </div>
 
-                <!-- EXTERNAL PASSWORD FIELD ROW -->
+                <!-- SECURITY PASSWORD ROW (ID matches signup.js standard) -->
                 <div class="space-y-2">
                     <label for="signupPassword" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Security Password</label>
                     <div class="password-row-wrapper">
@@ -142,10 +142,26 @@
                         <input type="password" id="signupPassword" name="password" placeholder="••••••••" required
                                class="password-input-field bg-neutral-900/60 border border-neutral-800/80 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl px-4 py-3.5 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
                         
-                        <!-- Fixed External Toggle Button -->
+                        <!-- Main Password Toggle Button -->
                         <button type="button" id="togglePasswordBtn" class="modern-toggle-btn" aria-label="Show password">
                             <span id="toggleText" style="margin-right: 4px;">Show</span>
                             <span id="toggleEmoji">👁️</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- *NEW* CONFIRM PASSWORD ROW (ID matches signup.js standard) -->
+                <div class="space-y-2">
+                    <label for="signupConfirmPassword" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Confirm Password</label>
+                    <div class="password-row-wrapper">
+                        <!-- Confirm Password input block -->
+                        <input type="password" id="signupConfirmPassword" name="confirmPassword" placeholder="••••••••" required
+                               class="password-input-field bg-neutral-900/60 border border-neutral-800/80 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl px-4 py-3.5 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
+                        
+                        <!-- Confirm Password Toggle Button (Separate ID for script) -->
+                        <button type="button" id="toggleConfirmPasswordBtn" class="modern-toggle-btn" aria-label="Show confirm password">
+                            <span id="toggleConfirmText" style="margin-right: 4px;">Show</span>
+                            <span id="toggleConfirmEmoji">👁️</span>
                         </button>
                     </div>
                 </div>
@@ -175,30 +191,44 @@
     <!-- LINKED SIGNUP JS ENGINE -->
     <script src="signup.js"></script>
 
-    <!-- TOGGLE LOGIC SCRIPT (Targeting the signupPassword field safely) -->
+    <!-- TOGGLE LOGIC SCRIPT (Updated to handle both toggles independently) -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            // Setup for Main Password Field
             const passwordField = document.getElementById("signupPassword");
             const toggleBtn = document.getElementById("togglePasswordBtn");
             const toggleText = document.getElementById("toggleText");
             const toggleEmoji = document.getElementById("toggleEmoji");
 
-            // Password field character peek function
-            toggleBtn.addEventListener("click", () => {
-                const isPassword = passwordField.type === "password";
-                passwordField.type = isPassword ? "text" : "password";
-                
-                if (isPassword) {
-                    toggleText.innerText = "Hide";
-                    toggleEmoji.innerText = "🙈";
-                    toggleBtn.setAttribute("aria-label", "Hide password");
-                } else {
-                    toggleText.innerText = "Show";
-                    toggleEmoji.innerText = "👁️";
-                    toggleBtn.setAttribute("aria-label", "Show password");
-                }
-            });
+            setupToggle(passwordField, toggleBtn, toggleText, toggleEmoji, "password");
+
+            // Setup for Confirm Password Field
+            const confirmPasswordField = document.getElementById("signupConfirmPassword");
+            const confirmToggleBtn = document.getElementById("toggleConfirmPasswordBtn");
+            const confirmToggleText = document.getElementById("toggleConfirmText");
+            const confirmToggleEmoji = document.getElementById("toggleConfirmEmoji");
+
+            setupToggle(confirmPasswordField, confirmToggleBtn, confirmToggleText, confirmToggleEmoji, "confirm password");
+
+
+            // Reusable toggle function for design harmony
+            function setupToggle(field, btn, text, emoji, label) {
+                btn.addEventListener("click", () => {
+                    const isPassword = field.type === "password";
+                    field.type = isPassword ? "text" : "password";
+                    
+                    if (isPassword) {
+                        text.innerText = "Hide";
+                        emoji.innerText = "🙈";
+                        btn.setAttribute("aria-label", `Hide ${label}`);
+                    } else {
+                        text.innerText = "Show";
+                        emoji.innerText = "👁️";
+                        btn.setAttribute("aria-label", `Show ${label}`);
+                    }
+                });
+            }
         });
     </script>
 </body>
-</html>
+    </html>
