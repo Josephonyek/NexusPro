@@ -8,7 +8,7 @@
     <title>Nexus Pro | Sign In to Your Academic Workspace</title>
     <meta name="description" content="Secure login portal for Nexus Pro. Access your curriculum notes, customized video modules, and academic performance suites instantly.">
     <meta name="robots" content="index, nofollow">
-    <link class="canonical" href="https://nexuspro.vercel.app/login.html">
+    <link rel="canonical" href="https://nexuspro.vercel.app/login.html">
 
     <!-- TAILWIND PLAY CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -46,7 +46,7 @@
             100% { transform: translate(-80px, -50px) scale(1.1); }
         }
 
-        /* Bulletproof fallback layout wrapper for the password field */
+        /* Fail-safe layout wrapper for the password field */
         .password-row-wrapper {
             display: flex !important;
             gap: 10px !important;
@@ -117,11 +117,11 @@
                 <p class="text-xs text-neutral-400 font-medium">Enter your credentials to access your course files</p>
             </div>
 
-            <!-- AUTH ALERT HUB -->
+            <!-- AUTH ALERT HUB (Make sure ID matches login.js error handler) -->
             <div id="authAlert" class="hidden px-4 py-3.5 bg-red-950/40 border border-red-900/30 rounded-xl text-xs text-red-400 font-medium leading-relaxed"></div>
 
-            <!-- INTERACTIVE LOGIN FORM -->
-            <form id="loginForm" class="space-y-5" novalidate>
+            <!-- INTERACTIVE LOGIN FORM (Form ID reverted to standard authForm) -->
+            <form id="authForm" class="space-y-5" novalidate>
                 
                 <!-- EMAIL ADDR INPUT -->
                 <div class="space-y-2">
@@ -146,7 +146,7 @@
                     </div>
                 </div>
 
-                <!-- FORWARD SUBMIT TRIGGER -->
+                <!-- FORWARD SUBMIT TRIGGER (Button ID is submitBtn) -->
                 <button type="submit" id="submitBtn" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-lg shadow-indigo-950/40 hover:shadow-indigo-900/50 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer">
                     Authenticate Workspace
                 </button>
@@ -155,7 +155,6 @@
             <!-- FOOTER SWITCH TOGGLE SYSTEM -->
             <div class="text-center pt-2 space-y-2">
                 <span class="text-xs text-neutral-500 font-medium block">Need an academic student account?</span>
-                <!-- Simple direct link pointing straight to your separate registration page -->
                 <a href="signup.html" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold hover:underline transition-all inline-block">
                     Create your Free Student Profile
                 </a>
@@ -169,10 +168,10 @@
         <p class="text-[10px] text-neutral-600 font-medium tracking-wide">&copy; 2026 Nexus Pro Academy. All Systems Operational.</p>
     </footer>
 
-    <!-- LINKED LOGIN JS ENGINE -->
+    <!-- LINKED LOGIN JS ENGINE (Loaded at the end so element IDs exist in DOM) -->
     <script src="login.js"></script>
 
-    <!-- TOGGLE LOGIC SCRIPT (Kept pure and isolated) -->
+    <!-- TOGGLE LOGIC SCRIPT (Isolated so it doesn't conflict with login.js) -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const passwordField = document.getElementById("password");
@@ -198,4 +197,4 @@
         });
     </script>
 </body>
-</html>
+        </html>
