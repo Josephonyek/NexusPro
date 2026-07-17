@@ -117,25 +117,22 @@
                 <p class="text-xs text-neutral-400 font-medium">Enter your credentials to access your course files</p>
             </div>
 
-            <!-- AUTH ALERT HUB (Make sure ID matches login.js error handler) -->
-            <div id="authAlert" class="hidden px-4 py-3.5 bg-red-950/40 border border-red-900/30 rounded-xl text-xs text-red-400 font-medium leading-relaxed"></div>
-
-            <!-- INTERACTIVE LOGIN FORM (Form ID reverted to standard authForm) -->
-            <form id="authForm" class="space-y-5" novalidate>
+            <!-- INTERACTIVE LOGIN FORM (ID set to loginForm for login.js match) -->
+            <form id="loginForm" class="space-y-5" novalidate>
                 
-                <!-- EMAIL ADDR INPUT -->
+                <!-- EMAIL ADDR INPUT (ID set to loginEmail for login.js match) -->
                 <div class="space-y-2">
-                    <label for="email" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Email Address</label>
-                    <input type="email" id="email" name="email" placeholder="you@domain.com" required
+                    <label for="loginEmail" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Email Address</label>
+                    <input type="email" id="loginEmail" name="email" placeholder="you@domain.com" required
                            class="w-full bg-neutral-900/60 border border-neutral-800/80 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl px-4 py-3.5 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
                 </div>
 
                 <!-- EXTERNAL PASSWORD FIELD ROW -->
                 <div class="space-y-2">
-                    <label for="password" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Security Password</label>
+                    <label for="loginPassword" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Security Password</label>
                     <div class="password-row-wrapper">
-                        <!-- Password input block -->
-                        <input type="password" id="password" name="password" placeholder="••••••••" required
+                        <!-- Password input block (ID set to loginPassword for login.js match) -->
+                        <input type="password" id="loginPassword" name="password" placeholder="••••••••" required
                                class="password-input-field bg-neutral-900/60 border border-neutral-800/80 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl px-4 py-3.5 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
                         
                         <!-- Fixed External Toggle Button -->
@@ -146,9 +143,9 @@
                     </div>
                 </div>
 
-                <!-- FORWARD SUBMIT TRIGGER (Button ID is submitBtn) -->
-                <button type="submit" id="submitBtn" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-lg shadow-indigo-950/40 hover:shadow-indigo-900/50 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer">
-                    Authenticate Workspace
+                <!-- FORWARD SUBMIT TRIGGER -->
+                <button type="submit" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-lg shadow-indigo-950/40 hover:shadow-indigo-900/50 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer">
+                    Sign In to Dashboard
                 </button>
             </form>
 
@@ -168,13 +165,13 @@
         <p class="text-[10px] text-neutral-600 font-medium tracking-wide">&copy; 2026 Nexus Pro Academy. All Systems Operational.</p>
     </footer>
 
-    <!-- LINKED LOGIN JS ENGINE (Loaded at the end so element IDs exist in DOM) -->
+    <!-- LINKED LOGIN JS ENGINE -->
     <script src="login.js"></script>
 
     <!-- TOGGLE LOGIC SCRIPT (Isolated so it doesn't conflict with login.js) -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            const passwordField = document.getElementById("password");
+            const passwordField = document.getElementById("loginPassword");
             const toggleBtn = document.getElementById("togglePasswordBtn");
             const toggleText = document.getElementById("toggleText");
             const toggleEmoji = document.getElementById("toggleEmoji");
@@ -197,4 +194,4 @@
         });
     </script>
 </body>
-        </html>
+    </html>
