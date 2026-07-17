@@ -16,18 +16,16 @@ async function verifyAndInitializeDashboard() {
     const userId = localStorage.getItem('nexusUserId');
     const secureToken = localStorage.getItem('nexusAuthToken');
 
-    // Security Check: Kick unauthenticated sessions out instantly
     if (!userId || !secureToken) {
         executeHardLogout();
         return;
     }
 
-    // SPEED OPTIMIZATION: Instant visual placeholder setup while network request runs
+    // RUNTIME OPTIMIZATION: Boot view instantly using memory state tokens
     const cachedRole = (localStorage.getItem('nexusUserRole') || 'student').toLowerCase().trim();
     applyFastLayoutPresets(cachedRole, userId);
 
     try {
-        // Direct secure fetch using the user's secret token string
         const dbUrl = `${DB_BASE_URL}/users/${userId}.json?auth=${secureToken}`;
         const response = await fetch(dbUrl);
         
@@ -36,7 +34,6 @@ async function verifyAndInitializeDashboard() {
 
         if (!userData) throw new Error("User profile node does not exist.");
 
-        // Account Status Enforcement
         if (userData.status === 'suspended' || userData.status === 'banned') {
             alert("🔒 Access privileges revoked. This account has been flagged.");
             executeHardLogout();
@@ -46,10 +43,8 @@ async function verifyAndInitializeDashboard() {
         const cleanName = sanitizeString(userData.name || userId.split('@')[0] || "Scholar");
         const cleanRole = sanitizeString(userData.role || "student").toLowerCase().trim();
 
-        // Sync local storage state to cache for next ultra-fast login
         localStorage.setItem('nexusUserRole', userData.role || "Student");
 
-        // UI Injection of finalized data assets
         const welcomeHeading = document.getElementById('welcomeHeading');
         if (welcomeHeading) welcomeHeading.innerHTML = `Welcome Back, ${cleanName}!`;
 
@@ -62,21 +57,18 @@ async function verifyAndInitializeDashboard() {
         const userRoleLabel = document.getElementById('userRoleLabel');
         if (userRoleLabel) userRoleLabel.innerText = userData.role || "Student";
 
-        // Accurate Role Checking Adjustments post-fetch
         evaluateStrictRoleRouting(cleanRole);
 
     } catch (criticalError) {
-        console.error("Critical Dashboard Initialization Failure:", criticalError.message);
+        console.error("Critical Dashboard Failure:", criticalError.message);
         if (criticalError.message.includes("auth") || criticalError.message.includes("permission")) {
             executeHardLogout();
         }
     }
 }
 
-// FAST CACHE RENDERING ENGINE: Sets basic look before fetch finishes
 function applyFastLayoutPresets(role, userId) {
     const fallbackName = userId.split('@')[0] || "Scholar";
-    
     const welcomeHeading = document.getElementById('welcomeHeading');
     if (welcomeHeading) welcomeHeading.innerHTML = `Welcome Back, ${fallbackName}...`;
     
@@ -86,7 +78,6 @@ function applyFastLayoutPresets(role, userId) {
     evaluateStrictRoleRouting(role);
 }
 
-// Separate UI adjustments logic for performance execution loops
 function evaluateStrictRoleRouting(role) {
     const dashboardMainTitle = document.getElementById('dashboardMainTitle');
     const dashboardSubTitle = document.getElementById('dashboardSubTitle');
@@ -118,9 +109,8 @@ function evaluateStrictRoleRouting(role) {
 function clearPreloaderOverlay() {
     const loaderMask = document.getElementById('nexusPreloader');
     if (!loaderMask) return;
-    
-    loaderMask.classList.add('opacity-0', 'scale-98', 'pointer-events-none');
-    setTimeout(() => { loaderMask.remove(); }, 150); // Cut timing delay down
+    loaderMask.classList.add('opacity-0', 'scale-95', 'pointer-events-none');
+    setTimeout(() => { loaderMask.remove(); }, 100);
 }
 
 function executeHardLogout() {
@@ -129,35 +119,41 @@ function executeHardLogout() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    // HIGH-SPEED INTERACTIVE PRELOADER DROP: Kill mask instantly as DOM prints
     clearPreloaderOverlay();
 
-    // HAMBURGER MENU FUNCTIONAL CODE LOGIC
+    // ULTRA-RESPONSIVE HAMBURGER NAVIGATION TRIGGER
     const hamburgerBtn = document.getElementById('hamburgerBtn');
     const sidebarMenu = document.getElementById('sidebarMenu');
 
     if (hamburgerBtn && sidebarMenu) {
         hamburgerBtn.addEventListener('click', (event) => {
             event.stopPropagation();
-            sidebarMenu.classList.toggle('hidden');
+            const isOpen = sidebarMenu.classList.contains('mobile-open');
+            
+            if (isOpen) {
+                sidebarMenu.classList.remove('mobile-open');
+                sidebarMenu.style.display = 'none';
+            } else {
+                sidebarMenu.classList.add('mobile-open');
+                sidebarMenu.style.display = 'flex';
+            }
         });
 
+        // Close sidebar on clicking ambient view targets
         document.addEventListener('click', (event) => {
-            if (window.innerWidth < 768 && !sidebarMenu.classList.contains('hidden')) {
+            if (window.innerWidth < 768 && sidebarMenu.classList.contains('mobile-open')) {
                 if (!sidebarMenu.contains(event.target) && event.target !== hamburgerBtn) {
-                    sidebarMenu.classList.add('hidden');
+                    sidebarMenu.classList.remove('mobile-open');
+                    sidebarMenu.style.display = 'none';
                 }
             }
         });
     }
 
-    // Global Logout Trigger Execution 
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => { 
-            if (confirm("Sign out of Nexus Pro?")) {
-                executeHardLogout(); 
-            }
+            if (confirm("Sign out of Nexus Pro?")) executeHardLogout(); 
         });
     }
 
