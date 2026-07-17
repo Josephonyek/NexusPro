@@ -22,6 +22,10 @@ async function verifyAndInitializeDashboard() {
         return;
     }
 
+    // SPEED OPTIMIZATION: Instant visual placeholder setup while network request runs
+    const cachedRole = (localStorage.getItem('nexusUserRole') || 'student').toLowerCase().trim();
+    applyFastLayoutPresets(cachedRole, userId);
+
     try {
         // Direct secure fetch using the user's secret token string
         const dbUrl = `${DB_BASE_URL}/users/${userId}.json?auth=${secureToken}`;
@@ -42,70 +46,72 @@ async function verifyAndInitializeDashboard() {
         const cleanName = sanitizeString(userData.name || userId.split('@')[0] || "Scholar");
         const cleanRole = sanitizeString(userData.role || "student").toLowerCase().trim();
 
-        // Sync local storage state to remain authentic with the server
+        // Sync local storage state to cache for next ultra-fast login
         localStorage.setItem('nexusUserRole', userData.role || "Student");
 
-        // Update Welcome Banner Greeting & Profile Elements
+        // UI Injection of finalized data assets
         const welcomeHeading = document.getElementById('welcomeHeading');
         if (welcomeHeading) welcomeHeading.innerHTML = `Welcome Back, ${cleanName}!`;
 
         const userNameLabel = document.getElementById('userNameLabel');
         if (userNameLabel) userNameLabel.innerText = cleanName;
 
-        const dashboardMainTitle = document.getElementById('dashboardMainTitle');
-        const dashboardSubTitle = document.getElementById('dashboardSubTitle');
-        const systemStatusLabel = document.getElementById('systemStatusLabel');
         const userAvatar = document.getElementById('userAvatar');
-
         if (userAvatar) userAvatar.innerText = cleanRole.substring(0, 2).toUpperCase();
 
-        // STRICT ROLE ENGINE AND CONTENT MATRIX INTERFACE ROUTING
         const userRoleLabel = document.getElementById('userRoleLabel');
-        if (userRoleLabel) {
-            userRoleLabel.innerText = userData.role || "Student";
-            
-            if (cleanRole === 'admin') {
-                // Adjust context metadata for Admin view
-                if (dashboardMainTitle) dashboardMainTitle.innerText = "HQ Administrative Control Console";
-                if (dashboardSubTitle) dashboardSubTitle.innerText = "Global systems tracking suites & access overrides";
-                if (systemStatusLabel) {
-                    systemStatusLabel.innerText = "Root Access Online";
-                    systemStatusLabel.className = "text-[10px] font-extrabold uppercase tracking-widest text-amber-400";
-                }
+        if (userRoleLabel) userRoleLabel.innerText = userData.role || "Student";
 
-                // Show Admin-specific sections/links, hide standard student grouping
-                document.getElementById('sidebarStudentLinks')?.classList.add('hidden');
-                document.getElementById('sidebarAdminLinks')?.classList.remove('hidden');
-                
-                if (typeof switchTab === 'function') {
-                    switchTab('admin-suite');
-                }
-            } else {
-                // Adjust context metadata back to Student context
-                if (dashboardMainTitle) dashboardMainTitle.innerText = "Command Console";
-                if (dashboardSubTitle) dashboardSubTitle.innerText = "Manage your academic pipeline and integration tools";
-                if (systemStatusLabel) {
-                    systemStatusLabel.innerText = "Database Active";
-                    systemStatusLabel.className = "text-[10px] font-extrabold uppercase tracking-widest text-neutral-400";
-                }
-
-                document.getElementById('sidebarStudentLinks')?.classList.remove('hidden');
-                document.getElementById('sidebarAdminLinks')?.classList.add('hidden');
-                
-                if (typeof switchTab === 'function') {
-                    switchTab('curriculum');
-                }
-            }
-        }
+        // Accurate Role Checking Adjustments post-fetch
+        evaluateStrictRoleRouting(cleanRole);
 
     } catch (criticalError) {
         console.error("Critical Dashboard Initialization Failure:", criticalError.message);
-        // Security fallback: clear local variables if token permissions fail on remote database check
         if (criticalError.message.includes("auth") || criticalError.message.includes("permission")) {
             executeHardLogout();
         }
-    } finally {
-        clearPreloaderOverlay();
+    }
+}
+
+// FAST CACHE RENDERING ENGINE: Sets basic look before fetch finishes
+function applyFastLayoutPresets(role, userId) {
+    const fallbackName = userId.split('@')[0] || "Scholar";
+    
+    const welcomeHeading = document.getElementById('welcomeHeading');
+    if (welcomeHeading) welcomeHeading.innerHTML = `Welcome Back, ${fallbackName}...`;
+    
+    const userNameLabel = document.getElementById('userNameLabel');
+    if (userNameLabel) userNameLabel.innerText = fallbackName;
+
+    evaluateStrictRoleRouting(role);
+}
+
+// Separate UI adjustments logic for performance execution loops
+function evaluateStrictRoleRouting(role) {
+    const dashboardMainTitle = document.getElementById('dashboardMainTitle');
+    const dashboardSubTitle = document.getElementById('dashboardSubTitle');
+    const systemStatusLabel = document.getElementById('systemStatusLabel');
+
+    if (role === 'admin') {
+        if (dashboardMainTitle) dashboardMainTitle.innerText = "HQ Administrative Control Console";
+        if (dashboardSubTitle) dashboardSubTitle.innerText = "Global systems tracking suites & access overrides";
+        if (systemStatusLabel) {
+            systemStatusLabel.innerText = "Root Access Online";
+            systemStatusLabel.className = "text-[10px] font-extrabold uppercase tracking-widest text-amber-400";
+        }
+        document.getElementById('sidebarStudentLinks')?.classList.add('hidden');
+        document.getElementById('sidebarAdminLinks')?.classList.remove('hidden');
+        if (typeof switchTab === 'function') switchTab('admin-suite');
+    } else {
+        if (dashboardMainTitle) dashboardMainTitle.innerText = "Command Console";
+        if (dashboardSubTitle) dashboardSubTitle.innerText = "Manage your academic pipeline and integration tools";
+        if (systemStatusLabel) {
+            systemStatusLabel.innerText = "Database Active";
+            systemStatusLabel.className = "text-[10px] font-extrabold uppercase tracking-widest text-neutral-400";
+        }
+        document.getElementById('sidebarStudentLinks')?.classList.remove('hidden');
+        document.getElementById('sidebarAdminLinks')?.classList.add('hidden');
+        if (typeof switchTab === 'function') switchTab('curriculum');
     }
 }
 
@@ -114,7 +120,7 @@ function clearPreloaderOverlay() {
     if (!loaderMask) return;
     
     loaderMask.classList.add('opacity-0', 'scale-98', 'pointer-events-none');
-    setTimeout(() => { loaderMask.remove(); }, 200); 
+    setTimeout(() => { loaderMask.remove(); }, 150); // Cut timing delay down
 }
 
 function executeHardLogout() {
@@ -123,8 +129,8 @@ function executeHardLogout() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Failsafe drop fallback loop
-    setTimeout(clearPreloaderOverlay, 2500);
+    // HIGH-SPEED INTERACTIVE PRELOADER DROP: Kill mask instantly as DOM prints
+    clearPreloaderOverlay();
 
     // HAMBURGER MENU FUNCTIONAL CODE LOGIC
     const hamburgerBtn = document.getElementById('hamburgerBtn');
@@ -132,11 +138,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (hamburgerBtn && sidebarMenu) {
         hamburgerBtn.addEventListener('click', (event) => {
-            event.stopPropagation(); // Avoid triggering document hide event instantly
+            event.stopPropagation();
             sidebarMenu.classList.toggle('hidden');
         });
 
-        // Click outside event handler to close navigation sidebar cleanly
         document.addEventListener('click', (event) => {
             if (window.innerWidth < 768 && !sidebarMenu.classList.contains('hidden')) {
                 if (!sidebarMenu.contains(event.target) && event.target !== hamburgerBtn) {
