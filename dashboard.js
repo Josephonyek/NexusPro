@@ -39,51 +39,72 @@ async function verifyAndInitializeDashboard() {
             return;
         }
 
-        const cleanName = sanitizeString(userData.name || "Scholar");
+        const cleanName = sanitizeString(userData.name || userId.split('@')[0] || "Scholar");
         const cleanRole = sanitizeString(userData.role || "student").toLowerCase().trim();
 
-        // Update Interface Greeting
-        const welcomeHeading = document.getElementById('welcomeHeading');
-        if (welcomeHeading) welcomeHeading.innerHTML = `Welcome Back, ${cleanName}!`;
-        
+        // Sync local storage state to remain authentic with the server
+        localStorage.setItem('nexusUserRole', userData.role || "Student");
+
+        // Update Interface Labels matching HTML elements
+        const userNameLabel = document.getElementById('userNameLabel');
+        if (userNameLabel) userNameLabel.innerText = cleanName;
+
+        const dashboardMainTitle = document.getElementById('dashboardMainTitle');
+        const dashboardSubTitle = document.getElementById('dashboardSubTitle');
+        const systemStatusLabel = document.getElementById('systemStatusLabel');
+        const userAvatar = document.getElementById('userAvatar');
+
+        if (userAvatar) userAvatar.innerText = cleanRole.substring(0, 2).toUpperCase();
+
         // STRICT ROLE ENGINE AND CONTENT MATRIX INTERFACE ROUTING
-        const roleBadge = document.getElementById('roleBadge');
-        if (roleBadge) {
-            roleBadge.innerText = cleanRole;
+        const userRoleLabel = document.getElementById('userRoleLabel');
+        if (userRoleLabel) {
+            userRoleLabel.innerText = userData.role || "Student";
             
             if (cleanRole === 'admin') {
-                roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-red-950 text-red-400 border border-red-900/40";
-                
-                // Show Admin Console & Navigation Links, Hide Student view completely
-                document.getElementById('adminSection')?.classList.remove('hidden');
-                document.getElementById('sidebarAdminLinks')?.classList.remove('hidden');
-                document.getElementById('userContentSection')?.classList.add('hidden'); 
-            } else {
-                roleBadge.className = "px-2.5 py-1 text-xs font-bold uppercase rounded-md bg-blue-950 text-blue-400 border border-blue-900/40";
-                
-                // Show standard Student metrics, Lock secure Admin views away
-                document.getElementById('adminSection')?.classList.add('hidden');
-                document.getElementById('sidebarAdminLinks')?.classList.add('hidden');
-                document.getElementById('userContentSection')?.classList.remove('hidden');
-            }
-        }
+                // Adjust text tokens to Admin Context
+                if (dashboardMainTitle) dashboardMainTitle.innerText = "HQ Administrative Control Console";
+                if (dashboardSubTitle) dashboardSubTitle.innerText = "Global systems tracking suites & access overrides";
+                if (systemStatusLabel) {
+                    systemStatusLabel.innerText = "Root Access Online";
+                    systemStatusLabel.className = "text-[10px] font-extrabold uppercase tracking-widest text-amber-400";
+                }
 
-        // Gamification Processing for Student accounts
-        if (userData.gameMetrics && cleanRole !== 'admin') {
-            const currentXp = parseInt(userData.gameMetrics.totalXP || 0);
-            const currentLevel = parseInt(userData.gameMetrics.currentLevel || 1);
-            if (document.getElementById('userXpText')) document.getElementById('userXpText').innerText = `${currentXp.toLocaleString()} XP`;
-            if (document.getElementById('userLevelText')) document.getElementById('userLevelText').innerText = `Level ${currentLevel}`;
+                // Show Admin Navigation Elements & Hide Student Sections
+                document.getElementById('nav-header-student')?.classList.add('hidden');
+                document.getElementById('nav-header-admin')?.classList.remove('hidden');
+                document.getElementById('btn-admin-suite')?.classList.remove('hidden');
+                
+                // Route automatically to the Admin view panel
+                if (typeof switchTab === 'function') {
+                    switchTab('admin-suite');
+                }
+            } else {
+                // Student Context Settings
+                if (dashboardMainTitle) dashboardMainTitle.innerText = "Command Console";
+                if (dashboardSubTitle) dashboardSubTitle.innerText = "Manage your academic pipeline and integration tools";
+                if (systemStatusLabel) {
+                    systemStatusLabel.innerText = "Database Active";
+                    systemStatusLabel.className = "text-[10px] font-extrabold uppercase tracking-widest text-neutral-400";
+                }
+
+                document.getElementById('nav-header-student')?.classList.remove('hidden');
+                document.getElementById('nav-header-admin')?.classList.add('hidden');
+                document.getElementById('btn-admin-suite')?.classList.add('hidden');
+                
+                if (typeof switchTab === 'function') {
+                    switchTab('curriculum');
+                }
+            }
         }
 
     } catch (criticalError) {
         console.error("Critical Dashboard Initialization Failure:", criticalError.message);
-        // Fallback layout protection to prevent permanent screen freezing
-        const welcomeHeading = document.getElementById('welcomeHeading');
-        if (welcomeHeading) welcomeHeading.innerHTML = "Welcome to Nexus Workspace!";
-        document.getElementById('userContentSection')?.classList.remove('hidden');
+        // Direct redirect if database signals an explicit expired or altered auth token structure
+        if (criticalError.message.includes("auth") || criticalError.message.includes("permission")) {
+            executeHardLogout();
+        }
     } finally {
-        // Drop preloader instantly now that database processing is complete
         clearPreloaderOverlay();
     }
 }
@@ -105,35 +126,35 @@ document.addEventListener("DOMContentLoaded", () => {
     // Failsafe backup to drop the loader if network conditions stall out completely
     setTimeout(clearPreloaderOverlay, 2500);
 
-    const menuToggleBtn = document.getElementById('menuToggleBtn');
-    const menuCloseBtn = document.getElementById('menuCloseBtn');
-    const mobileMenuOverlay = document.getElementById('mobileMenuOverlay');
-    const mobileSidebar = document.getElementById('mobileSidebar');
+    // HAMBURGER MENU ENGINE CONTROLS
+    const hamburgerBtn = document.getElementById('hamburgerBtn');
+    const sidebarMenu = document.getElementById('sidebarMenu');
 
-    function openMobileMenu() {
-        mobileMenuOverlay.classList.remove('hidden');
-        setTimeout(() => {
-            mobileMenuOverlay.classList.remove('opacity-0');
-            mobileSidebar.classList.remove('-translate-x-full');
-        }, 10);
+    if (hamburgerBtn && sidebarMenu) {
+        hamburgerBtn.addEventListener('click', (event) => {
+            event.stopPropagation();
+            sidebarMenu.classList.toggle('hidden');
+        });
+
+        // Close menu automatically when clicking anywhere else on the interface workspace
+        document.addEventListener('click', (event) => {
+            if (window.innerWidth < 768 && !sidebarMenu.classList.contains('hidden')) {
+                if (!sidebarMenu.contains(event.target) && event.target !== hamburgerBtn) {
+                    sidebarMenu.classList.add('hidden');
+                }
+            }
+        });
     }
 
-    function closeMobileMenu() {
-        mobileSidebar.classList.add('-translate-x-full');
-        mobileMenuOverlay.classList.add('opacity-0');
-        setTimeout(() => { mobileMenuOverlay.classList.add('hidden'); }, 200);
+    // Global Logout Binding Trigger
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => { 
+            if (confirm("Sign out of Nexus Pro?")) {
+                executeHardLogout(); 
+            }
+        });
     }
-
-    menuToggleBtn?.addEventListener('click', openMobileMenu);
-    menuCloseBtn?.addEventListener('click', closeMobileMenu);
-    mobileMenuOverlay?.addEventListener('click', closeMobileMenu);
-
-    document.querySelectorAll('.mobile-link').forEach(link => {
-        link.addEventListener('click', closeMobileMenu);
-    });
-
-    document.getElementById('logoutBtn')?.addEventListener('click', () => { if (confirm("Sign out of Nexus Pro?")) executeHardLogout(); });
-    document.getElementById('sidebarLogoutBtn')?.addEventListener('click', () => { if (confirm("Sign out of Nexus Pro?")) executeHardLogout(); });
 
     verifyAndInitializeDashboard();
 });
