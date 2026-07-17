@@ -8,14 +8,14 @@
     <title>Nexus Pro | Sign In to Your Academic Workspace</title>
     <meta name="description" content="Secure login portal for Nexus Pro. Access your curriculum notes, customized video modules, and academic performance suites instantly.">
     <meta name="robots" content="index, nofollow">
-    <link rel="canonical" href="https://nexuspro.vercel.app/login.html">
+    <link class="canonical" href="https://nexuspro.vercel.app/login.html">
 
     <!-- TAILWIND PLAY CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     
     <!-- COMPREHENSIVE STYLE SYSTEM -->
     <style>
-        /* Smooth backdrop blur animation and glow patterns */
+        /* Smooth backdrop blur and glow patterns */
         .glass-card {
             background: rgba(15, 15, 15, 0.4) !important;
             backdrop-filter: blur(24px) !important;
@@ -74,7 +74,7 @@
             letter-spacing: 0.05em !important;
             cursor: pointer !important;
             white-space: nowrap !important;
-            height: 46px !important; /* Perfect align match to the main fields */
+            height: 46px !important; /* Perfect align match to the email field */
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
 
@@ -113,23 +113,16 @@
                 <div class="inline-block px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 text-[10px] text-indigo-300 font-extrabold tracking-widest uppercase rounded-full">
                     Academic Command Console
                 </div>
-                <h1 id="formTitle" class="text-3xl font-black tracking-tight text-white pt-2">Welcome Back</h1>
-                <p id="formSubtitle" class="text-xs text-neutral-400 font-medium">Enter your credentials to access your course files</p>
+                <h1 class="text-3xl font-black tracking-tight text-white pt-2">Welcome Back</h1>
+                <p class="text-xs text-neutral-400 font-medium">Enter your credentials to access your course files</p>
             </div>
 
             <!-- AUTH ALERT HUB -->
             <div id="authAlert" class="hidden px-4 py-3.5 bg-red-950/40 border border-red-900/30 rounded-xl text-xs text-red-400 font-medium leading-relaxed"></div>
 
             <!-- INTERACTIVE LOGIN FORM -->
-            <form id="authForm" class="space-y-5" novalidate>
+            <form id="loginForm" class="space-y-5" novalidate>
                 
-                <!-- ACCOUNT FULL NAME (Only displays in dynamic Sign Up state) -->
-                <div id="fullNameGroup" class="hidden space-y-2">
-                    <label for="fullName" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Full Name</label>
-                    <input type="text" id="fullName" name="fullName" placeholder="John Doe" 
-                           class="w-full bg-neutral-900/60 border border-neutral-800/80 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl px-4 py-3.5 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
-                </div>
-
                 <!-- EMAIL ADDR INPUT -->
                 <div class="space-y-2">
                     <label for="email" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Email Address</label>
@@ -161,10 +154,11 @@
 
             <!-- FOOTER SWITCH TOGGLE SYSTEM -->
             <div class="text-center pt-2 space-y-2">
-                <span id="routeText" class="text-xs text-neutral-500 font-medium block">Need an academic student account?</span>
-                <button type="button" id="toggleRouteBtn" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold hover:underline transition-all cursor-pointer">
+                <span class="text-xs text-neutral-500 font-medium block">Need an academic student account?</span>
+                <!-- Simple direct link pointing straight to your separate registration page -->
+                <a href="signup.html" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold hover:underline transition-all inline-block">
                     Create your Free Student Profile
-                </button>
+                </a>
             </div>
 
         </div>
@@ -175,8 +169,11 @@
         <p class="text-[10px] text-neutral-600 font-medium tracking-wide">&copy; 2026 Nexus Pro Academy. All Systems Operational.</p>
     </footer>
 
-    <!-- INTERACTIVE SCRIPTS -->
-    <script  src="login.js">
+    <!-- LINKED LOGIN JS ENGINE -->
+    <script src="login.js"></script>
+
+    <!-- TOGGLE LOGIC SCRIPT (Kept pure and isolated) -->
+    <script>
         document.addEventListener("DOMContentLoaded", () => {
             const passwordField = document.getElementById("password");
             const toggleBtn = document.getElementById("togglePasswordBtn");
@@ -198,45 +195,7 @@
                     toggleBtn.setAttribute("aria-label", "Show password");
                 }
             });
-
-            // Route switching utility (Sign In vs Register views)
-            const toggleRouteBtn = document.getElementById("toggleRouteBtn");
-            const formTitle = document.getElementById("formTitle");
-            const formSubtitle = document.getElementById("formSubtitle");
-            const fullNameGroup = document.getElementById("fullNameGroup");
-            const submitBtn = document.getElementById("submitBtn");
-            const routeText = document.getElementById("routeText");
-            let isRegisterMode = false;
-
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('action') === 'register') {
-                toggleMode(true);
-            }
-
-            toggleRouteBtn.addEventListener("click", () => {
-                isRegisterMode = !isRegisterMode;
-                toggleMode(isRegisterMode);
-            });
-
-            function toggleMode(registerState) {
-                isRegisterMode = registerState;
-                if (isRegisterMode) {
-                    formTitle.innerText = "Register Account";
-                    formSubtitle.innerText = "Initialize your master student file to begin online classes";
-                    fullNameGroup.classList.remove("hidden");
-                    submitBtn.innerText = "Create Free Account";
-                    routeText.innerText = "Already possess an active profile?";
-                    toggleRouteBtn.innerText = "Sign In to Workspace";
-                } else {
-                    formTitle.innerText = "Welcome Back";
-                    formSubtitle.innerText = "Enter your credentials to access your course files";
-                    fullNameGroup.classList.add("hidden");
-                    submitBtn.innerText = "Authenticate Workspace";
-                    routeText.innerText = "Need an academic student account?";
-                    toggleRouteBtn.innerText = "Create your Free Student Profile";
-                }
-            }
         });
     </script>
 </body>
-    </html>
+</html>
