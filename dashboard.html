@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- PRIMARY SEARCH ENGINE OPTIMIZATION (SEO) META MATRIX -->
-    <title>Nexus Pro | Student Academic Dashboard</title>
-    <meta name="description" content="Access your curriculum notes, customized video modules, academic performance suites, AI solvers, libraries, health tools, and customer support.">
+    <title>Nexus Pro | Command Console</title>
+    <meta name="description" content="Access your curriculum notes, performance suites, or administrative platform systems logs smoothly.">
     <meta name="robots" content="noindex, nofollow">
 
     <!-- TAILWIND PLAY CDN -->
@@ -43,7 +43,6 @@
             100% { transform: translate(-60px, -40px) scale(1.1); }
         }
 
-        /* Nav item state transitions */
         .nav-link-active {
             background-color: rgba(79, 70, 229, 0.15) !important;
             border-color: rgba(99, 102, 241, 0.3) !important;
@@ -63,15 +62,14 @@
             <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-black text-xs text-white">N</div>
             <span class="text-md font-extrabold tracking-tight text-white">Nexus<span class="text-indigo-400">Pro</span></span>
         </a>
-        <button id="hamburgerBtn" class="p-2 text-xl text-neutral-400 hover:text-white focus:outline-none cursor-pointer" aria-label="Toggle Navigation Menu">
+        <button id="hamburgerBtn" class="p-2 text-xl text-neutral-400 hover:text-white focus:outline-none cursor-pointer">
             ☰
         </button>
     </header>
 
-    <!-- SIDEBAR NAVIGATION SYSTEM (Hidden on mobile via hidden class, controlled by script) -->
+    <!-- SIDEBAR NAVIGATION SYSTEM -->
     <aside id="sidebarMenu" class="hidden md:flex w-full md:w-64 glass-card md:min-h-screen flex-col justify-between p-6 fixed md:sticky top-16 md:top-0 left-0 h-[calc(100vh-64px)] md:h-screen z-40 border-b md:border-b-0 md:border-r border-neutral-800/80 shrink-0 overflow-y-auto">
         <div class="space-y-8">
-            <!-- Brand Space Desktop Only -->
             <div class="hidden md:flex items-center justify-between">
                 <a href="dashboard.html" class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-indigo-700 flex items-center justify-center font-black shadow-[0_0_20px_rgba(37,99,235,0.3)] text-white">N</div>
@@ -81,44 +79,45 @@
 
             <!-- Main Navigation Group -->
             <nav class="space-y-1.5">
-                <p class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 mb-2">Academic Base</p>
+                <!-- SYSTEM ADAPTIVE ROUTING SEGMENT HEADERS -->
+                <p id="nav-header-student" class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 mb-2">Academic Base</p>
+                <p id="nav-header-admin" class="hidden text-[10px] font-extrabold tracking-widest uppercase text-amber-500 px-3 mb-2">Platform Control</p>
                 
+                <!-- Student Navigation Controls -->
                 <button onclick="switchTab('curriculum')" id="btn-curriculum" class="nav-link-active w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
                     <span>📚</span> Curriculum Notes
                 </button>
-                
                 <button onclick="switchTab('videos')" id="btn-videos" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
                     <span>🎥</span> Video Modules
                 </button>
-                
                 <button onclick="switchTab('performance')" id="btn-performance" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
                     <span>📊</span> Performance Suites
                 </button>
 
-                <p class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 pt-3 mb-2">Connected Tools</p>
+                <!-- NEW: Admin Exclusive Navigation Control -->
+                <button onclick="switchTab('admin-suite')" id="btn-admin-suite" class="hidden w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
+                    <span>⚡</span> Admin Management
+                </button>
 
-                <!-- LINKED LINK MODULES -->
+                <p class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 pt-3 mb-2">Connected Tools</p>
                 <a href="ai_solver.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
                     <span>🤖</span> Ask Questions
                 </a>
-                
                 <a href="academy.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
                     <span>🏛️</span> E-Library
                 </a>
-                
                 <a href="health.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
                     <span>🩺</span> Health Hub
                 </a>
 
                 <p class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 pt-3 mb-2">Help & Systems</p>
-
                 <a href="support.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
                     <span>🛠️</span> Support Desk
                 </a>
             </nav>
         </div>
 
-        <!-- System User Quickdeck Section -->
+        <!-- User Quickdeck Profiler -->
         <div class="pt-4 border-t border-neutral-800/80 mt-6 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center font-bold text-xs text-indigo-300" id="userAvatar">ST</div>
@@ -139,18 +138,17 @@
         <!-- HEADER PROFILE BLOCK -->
         <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-neutral-900">
             <div>
-                <h1 class="text-2xl font-black tracking-tight text-white">Command Console</h1>
-                <p class="text-xs text-neutral-400 font-medium">Manage your academic pipeline and integration tools</p>
+                <h1 class="text-2xl font-black tracking-tight text-white" id="dashboardMainTitle">Command Console</h1>
+                <p class="text-xs text-neutral-400 font-medium" id="dashboardSubTitle">Manage your academic pipeline and integration tools</p>
             </div>
             <div class="flex items-center gap-2 self-start sm:self-auto bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-1.5 px-3">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-[10px] font-extrabold uppercase tracking-widest text-neutral-400">Database Active</span>
+                <span class="text-[10px] font-extrabold uppercase tracking-widest text-neutral-400" id="systemStatusLabel">Database Active</span>
             </div>
         </header>
 
-        <!-- EXTERNAL NAVIGATION TOOLS HUBCARD PANEL -->
+        <!-- STANDARD NAVIGATIONAL HUBCARD GRID -->
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <!-- Ask Questions Toolcard -->
             <a href="ai_solver.html" class="glass-card p-5 rounded-2xl hover:border-indigo-500/40 hover:scale-[1.02] active:scale-[0.99] transition-all block group space-y-3">
                 <div class="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-lg">🤖</div>
                 <div>
@@ -159,7 +157,6 @@
                 </div>
             </a>
 
-            <!-- E-Library Toolcard -->
             <a href="academy.html" class="glass-card p-5 rounded-2xl hover:border-indigo-500/40 hover:scale-[1.02] active:scale-[0.99] transition-all block group space-y-3">
                 <div class="w-10 h-10 rounded-xl bg-purple-600/10 border border-purple-500/20 flex items-center justify-center text-lg">🏛️</div>
                 <div>
@@ -168,7 +165,6 @@
                 </div>
             </a>
 
-            <!-- Health Hub Toolcard -->
             <a href="health.html" class="glass-card p-5 rounded-2xl hover:border-indigo-500/40 hover:scale-[1.02] active:scale-[0.99] transition-all block group space-y-3">
                 <div class="w-10 h-10 rounded-xl bg-emerald-600/10 border border-emerald-500/20 flex items-center justify-center text-lg">🩺</div>
                 <div>
@@ -177,7 +173,6 @@
                 </div>
             </a>
 
-            <!-- Support Desk Toolcard -->
             <a href="support.html" class="glass-card p-5 rounded-2xl hover:border-indigo-500/40 hover:scale-[1.02] active:scale-[0.99] transition-all block group space-y-3">
                 <div class="w-10 h-10 rounded-xl bg-amber-600/10 border border-amber-500/20 flex items-center justify-center text-lg">🛠️</div>
                 <div>
@@ -189,12 +184,11 @@
 
         <!-- DYNAMIC INTERNAL VIEWS BLOCK -->
         
-        <!-- TAB 1: CURRICULUM NOTES (Default panel) -->
+        <!-- TAB 1: CURRICULUM NOTES -->
         <section id="tab-curriculum" class="space-y-6">
             <div class="glass-card rounded-2xl p-6 md:p-8 space-y-4">
                 <h2 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2"><span>📚</span> Curriculum Study Notes</h2>
                 <p class="text-xs text-neutral-400 leading-relaxed">Access and read through your custom high-priority secondary school syllabi files synchronized with your examination timelines.</p>
-                
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                     <div class="p-4 bg-neutral-900/40 border border-neutral-800/60 rounded-xl space-y-1">
                         <h3 class="text-xs font-bold text-white">Senior Secondary 3 Physics Notes</h3>
@@ -208,24 +202,22 @@
             </div>
         </section>
 
-        <!-- TAB 2: VIDEO MODULES (Hidden by default) -->
+        <!-- TAB 2: VIDEO MODULES -->
         <section id="tab-videos" class="hidden space-y-6">
             <div class="glass-card rounded-2xl p-6 md:p-8 space-y-4">
                 <h2 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2"><span>🎥</span> Video Lesson Modules</h2>
                 <p class="text-xs text-neutral-400 leading-relaxed">Stream your custom class content modules to break down complex formulas and structures step-by-step.</p>
-                
                 <div class="p-8 text-center bg-neutral-900/30 border border-dashed border-neutral-800/80 rounded-xl">
                     <p class="text-xs text-neutral-500 font-medium">No video logs streamed yet. Check back following classroom scheduling updates.</p>
                 </div>
             </div>
         </section>
 
-        <!-- TAB 3: PERFORMANCE SUITES (Hidden by default) -->
+        <!-- TAB 3: PERFORMANCE SUITES -->
         <section id="tab-performance" class="hidden space-y-6">
             <div class="glass-card rounded-2xl p-6 md:p-8 space-y-4">
                 <h2 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2"><span>📊</span> Academic Performance Suites</h2>
                 <p class="text-xs text-neutral-400 leading-relaxed">Track analytics logs, system scoring records, and target metrics instantly.</p>
-                
                 <div class="p-5 bg-neutral-900/40 border border-neutral-800/60 rounded-xl max-w-sm">
                     <span class="text-[10px] font-extrabold tracking-widest uppercase text-indigo-400">Target Grade</span>
                     <h4 class="text-3xl font-black text-white pt-1">A1 Grade Rating</h4>
@@ -234,62 +226,72 @@
             </div>
         </section>
 
+        <!-- NEW: EXCLUSIVE TAB 4 FOR ADMIN PLATFORM MANAGEMENT -->
+        <section id="tab-admin-suite" class="hidden space-y-6">
+            <div class="glass-card rounded-2xl p-6 md:p-8 space-y-6">
+                <h2 class="text-lg font-extrabold tracking-tight text-amber-400 flex items-center gap-2"><span>⚡</span> Administrative Management Control</h2>
+                <p class="text-xs text-neutral-400 leading-relaxed">Global control dashboard. Monitor registered user records, system performance data logs, and manage incoming platform support metrics.</p>
+                
+                <!-- Quick Metric Track Panels -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                    <div class="p-4 bg-neutral-900/50 border border-neutral-800/80 rounded-xl">
+                        <span class="text-[9px] font-extrabold tracking-widest uppercase text-neutral-500">Total Users</span>
+                        <h4 class="text-2xl font-black text-white pt-1">1,240</h4>
+                        <p class="text-[10px] text-emerald-400 mt-1">▲ +14% This Month</p>
+                    </div>
+                    <div class="p-4 bg-neutral-900/50 border border-neutral-800/80 rounded-xl">
+                        <span class="text-[9px] font-extrabold tracking-widest uppercase text-neutral-500">API Gateway Load</span>
+                        <h4 class="text-2xl font-black text-white pt-1">0.42 ms</h4>
+                        <p class="text-[10px] text-neutral-500 mt-1">Vercel Edge Servers Stable</p>
+                    </div>
+                    <div class="p-4 bg-neutral-900/50 border border-neutral-800/80 rounded-xl">
+                        <span class="text-[9px] font-extrabold tracking-widest uppercase text-neutral-500">Open Tickets</span>
+                        <h4 class="text-2xl font-black text-amber-400 pt-1">4 Pending</h4>
+                        <p class="text-[10px] text-neutral-500 mt-1">Requires Support Review</p>
+                    </div>
+                </div>
+
+                <!-- Simulated User Administration Logs -->
+                <div class="space-y-3 pt-4">
+                    <h3 class="text-xs font-black tracking-wider uppercase text-neutral-400">Recent Operational Database Log Entries</h3>
+                    <div class="overflow-x-auto w-full bg-neutral-900/40 border border-neutral-800/80 rounded-xl text-[11px]">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="border-b border-neutral-800/80 text-neutral-500 text-[10px] uppercase font-bold tracking-wider bg-neutral-950/40">
+                                    <th class="p-3">User Target</th>
+                                    <th class="p-3">Role Log</th>
+                                    <th class="p-3">Action Processed</th>
+                                    <th class="p-3">Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-neutral-800/40 text-neutral-300 font-medium">
+                                <tr>
+                                    <td class="p-3 text-white font-bold">admin@nexuspro.com</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 bg-amber-500/10 text-amber-400 rounded border border-amber-500/20 text-[10px]">Admin</span></td>
+                                    <td class="p-3 text-neutral-400">Initialized Master Global Config Matrix</td>
+                                    <td class="p-3 text-neutral-500">Just Now</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 text-white font-bold">student@domain.com</td>
+                                    <td class="p-3"><span class="px-2 py-0.5 bg-indigo-500/10 text-indigo-400 rounded border border-indigo-500/20 text-[10px]">Student</span></td>
+                                    <td class="p-3 text-neutral-400">Dispatched Support Query Ticket #2041</td>
+                                    <td class="p-3 text-neutral-500">14 mins ago</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <!-- CORE CONTROL SCRIPTS -->
     <script>
-        // Tab switching logic router for structural panel components
         function switchTab(tabId) {
-            const segments = ['curriculum', 'videos', 'performance'];
+            const segments = ['curriculum', 'videos', 'performance', 'admin-suite'];
             segments.forEach(seg => {
-                document.getElementById(`tab-${seg}`).classList.add('hidden');
-                const btn = document.getElementById(`btn-${seg}`);
-                if(btn) btn.classList.remove('nav-link-active');
-            });
-
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            const activeBtn = document.getElementById(`btn-${tabId}`);
-            if(activeBtn) activeBtn.classList.add('nav-link-active');
-
-            // Autoclose mobile layout navigation when a selector tab fires
-            if(window.innerWidth < 768) {
-                document.getElementById('sidebarMenu').classList.add('hidden');
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", () => {
-            // HAMBURGER MENU INTERACTIVE FUNCTIONALITY
-            const hamburgerBtn = document.getElementById('hamburgerBtn');
-            const sidebarMenu = document.getElementById('sidebarMenu');
-
-            hamburgerBtn.addEventListener('click', () => {
-                sidebarMenu.classList.toggle('hidden');
-            });
-
-            // Token authorization credentials initialization guard loop
-            const token = localStorage.getItem('nexusAuthToken');
-            const userId = localStorage.getItem('nexusUserId');
-            const role = localStorage.getItem('nexusUserRole');
-
-            if (!token || !userId) {
-                console.warn("Unauthenticated workspace execution caught. Redirecting to terminal...");
-                window.location.replace('login.html');
-                return;
-            }
-
-            // Populate workspace text variables 
-            document.getElementById('userNameLabel').innerText = userId.split('@')[0] || "Active Student";
-            if(role) {
-                document.getElementById('userRoleLabel').innerText = role;
-                document.getElementById('userAvatar').innerText = role.substring(0,2).toUpperCase();
-            }
-
-            // Bind the clear out trigger actions
-            document.getElementById('logoutBtn').addEventListener('click', () => {
-                localStorage.clear();
-                window.location.replace('login.html');
-            });
-        });
-    </script>
-</body>
-                </html>
+                const element = document.getElementById(`tab-${seg}`);
+                if (element) element.classList.add('hidden');
+                
+    
