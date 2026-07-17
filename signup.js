@@ -11,13 +11,22 @@ async function hashPasswordSHA256(password) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('registerForm')?.addEventListener('submit', async (e) => {
+    // UPDATED: Targets 'signupForm' to match the redesigned HTML form ID
+    document.getElementById('signupForm')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const btn = e.target.querySelector('button[type="submit"]');
         
-        const fullName = document.getElementById('regName').value.trim();
-        const email = document.getElementById('regEmail').value.trim();
-        const plainPassword = document.getElementById('regPassword').value;
+        // UPDATED: Match newly aligned HTML element IDs
+        const fullName = document.getElementById('signupName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const plainPassword = document.getElementById('signupPassword').value;
+        const confirmPassword = document.getElementById('signupConfirmPassword').value;
+
+        // NEW: Client-side validation to ensure passwords match before hashing or fetching
+        if (plainPassword !== confirmPassword) {
+            alert("Sign Up Error: Passwords do not match. Please verify and try again.");
+            return;
+        }
 
         try {
             btn.disabled = true;
@@ -56,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(`Sign Up Error: ${err.message}`);
             if (btn) {
                 btn.disabled = false;
-                btn.textContent = "Create Account";
+                btn.textContent = "Register Profile";
             }
         }
     });
