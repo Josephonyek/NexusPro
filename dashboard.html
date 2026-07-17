@@ -3,8 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- PRIMARY SEARCH ENGINE OPTIMIZATION (SEO) META MATRIX -->
     <title>Nexus Pro | Command Console</title>
     <meta name="description" content="Access your curriculum notes, performance suites, or administrative platform systems logs smoothly.">
     <meta name="robots" content="noindex, nofollow">
@@ -12,8 +10,14 @@
     <!-- TAILWIND PLAY CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     
-    <!-- COMPREHENSIVE STYLE SYSTEM -->
     <style>
+        /* CRITICAL SPEED TRICK: Default mobile layout hiding rule prevents layout shifting */
+        @media (max-width: 767px) {
+            #sidebarMenu:not(.mobile-open) {
+                display: none !important;
+            }
+        }
+
         .glass-card {
             background: rgba(15, 15, 15, 0.4) !important;
             backdrop-filter: blur(24px) !important;
@@ -52,23 +56,22 @@
 </head>
 <body class="bg-neutral-950 text-neutral-200 min-h-screen antialiased selection:bg-indigo-950 selection:text-indigo-400 overflow-x-hidden relative flex flex-col md:flex-row">
 
-    <!-- OPTIONAL PRELOADER (Handled by JS) -->
-    <div id="nexusPreloader" class="fixed inset-0 z-50 bg-neutral-950 flex items-center justify-center transition-all duration-300">
-        <div class="w-10 h-10 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
+    <!-- LIGHTWEIGHT FAST PRELOADER -->
+    <div id="nexusPreloader" class="fixed inset-0 z-50 bg-neutral-950 flex items-center justify-center transition-all duration-100">
+        <div class="w-8 h-8 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
     </div>
 
-    <!-- FLOATING DECORATIVE BACKGROUND SYSTEM -->
+    <!-- FLOATING BACKGROUND DECORATIONS -->
     <div class="absolute top-[-10%] left-[-10%] w-[60%] h-[50%] glow-orb-blue pointer-events-none z-0"></div>
     <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[50%] glow-orb-purple pointer-events-none z-0"></div>
 
-    <!-- RESPONSIVE MOBILE TOP BAR WITH HAMBURGER MENU -->
+    <!-- RESPONSIVE MOBILE TOP BAR -->
     <header class="w-full h-16 px-6 flex md:hidden items-center justify-between glass-card sticky top-0 z-50 border-b border-neutral-800/80">
         <a href="dashboard.html" class="flex items-center gap-2">
             <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-black text-xs text-white">N</div>
             <span class="text-md font-extrabold tracking-tight text-white">Nexus<span class="text-indigo-400">Pro</span></span>
         </a>
         <div class="flex items-center gap-4">
-            <!-- Mobile Notification Bell -->
             <a href="notifications.html" class="p-2 text-neutral-400 hover:text-white relative" title="Notifications">
                 🔔
                 <span class="absolute top-1 right-1 w-2 h-2 bg-indigo-500 rounded-full"></span>
@@ -80,7 +83,7 @@
     </header>
 
     <!-- SIDEBAR NAVIGATION SYSTEM -->
-    <aside id="sidebarMenu" class="hidden md:flex w-full md:w-64 glass-card md:min-h-screen flex-col justify-between p-6 fixed md:sticky top-16 md:top-0 left-0 h-[calc(100vh-64px)] md:h-screen z-40 border-b md:border-b-0 md:border-r border-neutral-800/80 shrink-0 overflow-y-auto">
+    <aside id="sidebarMenu" class="md:flex w-full md:w-64 glass-card md:min-h-screen flex-col justify-between p-6 fixed md:sticky top-16 md:top-0 left-0 h-[calc(100vh-64px)] md:h-screen z-40 border-b md:border-b-0 md:border-r border-neutral-800/80 shrink-0 overflow-y-auto transition-all duration-150">
         <div class="space-y-8">
             <div class="hidden md:flex items-center justify-between">
                 <a href="dashboard.html" class="flex items-center gap-3">
@@ -89,9 +92,8 @@
                 </a>
             </div>
 
-            <!-- Main Navigation Group -->
             <nav class="space-y-1.5">
-                <!-- STUDENT SECTION LINKS -->
+                <!-- STUDENT CORE SECTION LINKS -->
                 <div id="sidebarStudentLinks" class="space-y-1.5">
                     <p class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 mb-2">Academic Base</p>
                     <button onclick="switchTab('curriculum')" id="btn-curriculum" class="nav-link-active w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
@@ -105,7 +107,7 @@
                     </button>
                 </div>
 
-                <!-- ADMIN PLATFORM CONTROL SECTION LINKS -->
+                <!-- ADMIN PLATFORM HUB LINKS -->
                 <div id="sidebarAdminLinks" class="hidden space-y-1.5 pt-2">
                     <p class="text-[10px] font-extrabold tracking-widest uppercase text-amber-500 px-3 mb-2">Platform HQ</p>
                     <button onclick="switchTab('admin-suite')" id="btn-admin-suite" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
@@ -122,7 +124,7 @@
                     </a>
                 </div>
 
-                <!-- CONNECTED BASE UTILITIES -->
+                <!-- GLOBAL SHARED UTILITIES -->
                 <div class="pt-2">
                     <p class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 mb-2">Connected Tools</p>
                     <a href="ai_solver.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
@@ -145,10 +147,10 @@
             </nav>
         </div>
 
-        <!-- User Profile Quickdeck -->
+        <!-- PROFILE QUICKDECK BOX -->
         <div class="pt-4 border-t border-neutral-800/80 mt-6 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-8 h-8 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center font-bold text-xs text-indigo-300" id="userAvatar">ST</div>
+                <div class="w-8 h-8 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center font-bold text-xs text-indigo-300" id="userAvatar">--</div>
                 <div class="truncate max-w-[120px]">
                     <p class="text-xs font-black text-white truncate" id="userNameLabel">Loading...</p>
                     <span id="userRoleLabel" class="text-[9px] uppercase font-bold tracking-wider text-neutral-500">Student</span>
@@ -160,17 +162,15 @@
         </div>
     </aside>
 
-    <!-- MAIN CORE PANEL WRAPPER -->
+    <!-- CONTENT MODULE VIEWPORT -->
     <main class="flex-grow p-6 md:p-10 relative z-10 max-w-5xl mx-auto w-full space-y-6">
         
-        <!-- HEADER PROFILE BLOCK -->
         <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-neutral-900">
             <div>
                 <h1 class="text-2xl font-black tracking-tight text-white" id="dashboardMainTitle">Command Console</h1>
                 <p class="text-xs text-neutral-400 font-medium" id="dashboardSubTitle">Manage your academic pipeline and integration tools</p>
             </div>
             <div class="flex items-center gap-4 self-start sm:self-auto">
-                <!-- Desktop Only Notification Bell -->
                 <a href="notifications.html" class="hidden md:block p-2 bg-neutral-900/60 border border-neutral-800/80 rounded-xl text-neutral-400 hover:text-white relative transition-all" title="View Notifications">
                     🔔
                     <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-indigo-500 rounded-full"></span>
@@ -184,13 +184,13 @@
 
         <!-- WELCOME BANNER COMPONENT -->
         <div class="p-5 bg-gradient-to-r from-neutral-900/80 to-neutral-950 border border-neutral-800/60 rounded-2xl shadow-xl">
-            <h2 id="welcomeHeading" class="text-xl font-extrabold text-white tracking-tight">Welcome Back, Loading...</h2>
+            <h2 id="welcomeHeading" class="text-xl font-extrabold text-white tracking-tight">Welcome Back...</h2>
             <p class="text-xs text-neutral-400 mt-1">Your localized session parameters are configured and active.</p>
         </div>
 
-        <!-- STANDARD NAVIGATIONAL HUBCARD GRID -->
+        <!-- QUICK HUBCARD NAV PANEL -->
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <a href="ai_solver.html" class="glass-card p-5 rounded-2xl hover:border-indigo-500/40 hover:scale-[1.02] active:scale-[0.99] transition-all block group space-y-3">
+            <a href="ai_solver.html" class="glass-card p-5 rounded-2xl hover:border-indigo-500/40 hover:scale-[1.01] transition-all block group space-y-3">
                 <div class="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-lg">🤖</div>
                 <div>
                     <h4 class="text-xs font-black text-white group-hover:text-indigo-400 transition-colors">Ask Questions</h4>
@@ -198,7 +198,7 @@
                 </div>
             </a>
 
-            <a href="academy.html" class="glass-card p-5 rounded-2xl hover:border-indigo-500/40 hover:scale-[1.02] active:scale-[0.99] transition-all block group space-y-3">
+            <a href="academy.html" class="glass-card p-5 rounded-2xl hover:border-indigo-500/40 hover:scale-[1.01] transition-all block group space-y-3">
                 <div class="w-10 h-10 rounded-xl bg-purple-600/10 border border-purple-500/20 flex items-center justify-center text-lg">🏛️</div>
                 <div>
                     <h4 class="text-xs font-black text-white group-hover:text-indigo-400 transition-colors">E-Library</h4>
@@ -206,7 +206,7 @@
                 </div>
             </a>
 
-            <a href="health.html" class="glass-card p-5 rounded-2xl hover:border-indigo-500/40 hover:scale-[1.02] active:scale-[0.99] transition-all block group space-y-3">
+            <a href="health.html" class="glass-card p-5 rounded-2xl hover:border-indigo-500/40 hover:scale-[1.01] transition-all block group space-y-3">
                 <div class="w-10 h-10 rounded-xl bg-emerald-600/10 border border-emerald-500/20 flex items-center justify-center text-lg">🩺</div>
                 <div>
                     <h4 class="text-xs font-black text-white group-hover:text-indigo-400 transition-colors">Health Hub</h4>
@@ -214,7 +214,7 @@
                 </div>
             </a>
 
-            <a href="support.html" class="glass-card p-5 rounded-2xl hover:border-indigo-500/40 hover:scale-[1.02] active:scale-[0.99] transition-all block group space-y-3">
+            <a href="support.html" class="glass-card p-5 rounded-2xl hover:border-indigo-500/40 hover:scale-[1.01] transition-all block group space-y-3">
                 <div class="w-10 h-10 rounded-xl bg-amber-600/10 border border-amber-500/20 flex items-center justify-center text-lg">🛠️</div>
                 <div>
                     <h4 class="text-xs font-black text-white group-hover:text-indigo-400 transition-colors">Support Desk</h4>
@@ -223,9 +223,9 @@
             </a>
         </section>
 
-        <!-- DYNAMIC VIEWS CONFIGURATION MODULE -->
+        <!-- SUB PANELS CONTENT MATRIX -->
         <div id="contentPanelsWrapper">
-            <!-- TAB 1: CURRICULUM NOTES -->
+            <!-- TAB 1: CURRICULUM -->
             <section id="tab-curriculum" class="space-y-6">
                 <div class="glass-card rounded-2xl p-6 md:p-8 space-y-4">
                     <h2 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2"><span>📚</span> Curriculum Study Notes</h2>
@@ -243,7 +243,7 @@
                 </div>
             </section>
 
-            <!-- TAB 2: VIDEO MODULES -->
+            <!-- TAB 2: VIDEOS -->
             <section id="tab-videos" class="hidden space-y-6">
                 <div class="glass-card rounded-2xl p-6 md:p-8 space-y-4">
                     <h2 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2"><span>🎥</span> Video Lesson Modules</h2>
@@ -254,7 +254,7 @@
                 </div>
             </section>
 
-            <!-- TAB 3: PERFORMANCE SUITES -->
+            <!-- TAB 3: PERFORMANCE -->
             <section id="tab-performance" class="hidden space-y-6">
                 <div class="glass-card rounded-2xl p-6 md:p-8 space-y-4">
                     <h2 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2"><span>📊</span> Academic Performance Suites</h2>
@@ -267,12 +267,11 @@
                 </div>
             </section>
 
-            <!-- EXCLUSIVE TAB 4: ADMIN PLATFORM MANAGEMENT -->
+            <!-- TAB 4: ADMIN SUITE -->
             <section id="tab-admin-suite" class="hidden space-y-6">
                 <div class="glass-card rounded-2xl p-6 md:p-8 space-y-6">
                     <h2 class="text-lg font-extrabold tracking-tight text-amber-400 flex items-center gap-2"><span>⚡</span> Administrative Management Control</h2>
                     <p class="text-xs text-neutral-400 leading-relaxed">Global control dashboard. Monitor registered user records, system performance data logs, and manage incoming platform support metrics.</p>
-                    
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
                         <div class="p-4 bg-neutral-900/50 border border-neutral-800/80 rounded-xl">
                             <span class="text-[9px] font-extrabold tracking-widest uppercase text-neutral-500">Total Users</span>
@@ -285,4 +284,6 @@
                             <p class="text-[10px] text-neutral-500 mt-1">Vercel Edge Servers Stable</p>
                         </div>
                         <div class="p-4 bg-neutral-900/50 border border-neutral-800/80 rounded-xl">
-                            <span class="text-[9px] font-ex
+                            <span class="text-[9px] font-extrabold tracking-widest uppercase text-neutral-500">Open Tickets</span>
+                            <h4 class="text-2xl font-black text-amber-400 pt-1">4 Pending</h4>
+                            <p class="text-[10px] text-neutral-500 mt-1">Requires 
