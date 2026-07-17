@@ -6,7 +6,7 @@
     
     <!-- PRIMARY SEARCH ENGINE OPTIMIZATION (SEO) META MATRIX -->
     <title>Nexus Pro | Student Academic Dashboard</title>
-    <meta name="description" content="Access your curriculum notes, customized video modules, academic performance suites, and contact the student support desk seamlessly.">
+    <meta name="description" content="Access your curriculum notes, customized video modules, academic performance suites, AI solvers, libraries, health tools, and customer support.">
     <meta name="robots" content="noindex, nofollow">
 
     <!-- TAILWIND PLAY CDN -->
@@ -57,48 +57,69 @@
     <div class="absolute top-[-10%] left-[-10%] w-[60%] h-[50%] glow-orb-blue pointer-events-none z-0"></div>
     <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[50%] glow-orb-purple pointer-events-none z-0"></div>
 
-    <!-- SIDEBAR NAVIGATION SYSTEM -->
-    <aside class="w-full md:w-64 glass-card md:min-h-screen flex flex-col justify-between p-6 relative z-10 border-b md:border-b-0 md:border-r border-neutral-800/80 shrink-0">
+    <!-- RESPONSIVE MOBILE TOP BAR WITH HAMBURGER MENU -->
+    <header class="w-full h-16 px-6 flex md:hidden items-center justify-between glass-card sticky top-0 z-50 border-b border-neutral-800/80">
+        <a href="dashboard.html" class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-black text-xs text-white">N</div>
+            <span class="text-md font-extrabold tracking-tight text-white">Nexus<span class="text-indigo-400">Pro</span></span>
+        </a>
+        <button id="hamburgerBtn" class="p-2 text-xl text-neutral-400 hover:text-white focus:outline-none cursor-pointer" aria-label="Toggle Navigation Menu">
+            ☰
+        </button>
+    </header>
+
+    <!-- SIDEBAR NAVIGATION SYSTEM (Hidden on mobile via hidden class, controlled by script) -->
+    <aside id="sidebarMenu" class="hidden md:flex w-full md:w-64 glass-card md:min-h-screen flex-col justify-between p-6 fixed md:sticky top-16 md:top-0 left-0 h-[calc(100vh-64px)] md:h-screen z-40 border-b md:border-b-0 md:border-r border-neutral-800/80 shrink-0 overflow-y-auto">
         <div class="space-y-8">
-            <!-- Brand Space -->
-            <div class="flex items-center justify-between">
+            <!-- Brand Space Desktop Only -->
+            <div class="hidden md:flex items-center justify-between">
                 <a href="dashboard.html" class="flex items-center gap-3">
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-indigo-700 flex items-center justify-center font-black shadow-[0_0_20px_rgba(37,99,235,0.3)] text-white">N</div>
                     <span class="text-xl font-extrabold tracking-tight text-white">Nexus<span class="text-indigo-400">Pro</span></span>
                 </a>
-                <!-- Mobile Toggle Button (Visual only for layout responsive padding) -->
-                <div class="inline-block md:hidden px-2.5 py-1 bg-neutral-900/80 border border-neutral-800 rounded-lg text-[10px] uppercase font-bold tracking-wider text-indigo-400">
-                    SS3 Hub
-                </div>
             </div>
 
             <!-- Main Navigation Group -->
-            <nav class="space-y-2">
-                <p class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 mb-3">Academic Base</p>
+            <nav class="space-y-1.5">
+                <p class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 mb-2">Academic Base</p>
                 
-                <button onclick="switchTab('curriculum')" id="btn-curriculum" class="nav-link-active w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
+                <button onclick="switchTab('curriculum')" id="btn-curriculum" class="nav-link-active w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
                     <span>📚</span> Curriculum Notes
                 </button>
                 
-                <button onclick="switchTab('videos')" id="btn-videos" class="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
+                <button onclick="switchTab('videos')" id="btn-videos" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
                     <span>🎥</span> Video Modules
                 </button>
                 
-                <button onclick="switchTab('performance')" id="btn-performance" class="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
+                <button onclick="switchTab('performance')" id="btn-performance" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
                     <span>📊</span> Performance Suites
                 </button>
 
-                <p class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 pt-4 mb-3">Help & Systems</p>
+                <p class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 pt-3 mb-2">Connected Tools</p>
 
-                <!-- NEW: Support Desk Tab Link -->
-                <button onclick="switchTab('support')" id="btn-support" class="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
+                <!-- LINKED LINK MODULES -->
+                <a href="ai_solver.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
+                    <span>🤖</span> Ask Questions
+                </a>
+                
+                <a href="academy.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
+                    <span>🏛️</span> E-Library
+                </a>
+                
+                <a href="health.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
+                    <span>🩺</span> Health Hub
+                </a>
+
+                <p class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 pt-3 mb-2">Help & Systems</p>
+
+                <a href="support.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
                     <span>🛠️</span> Support Desk
-                </button>
+                </a>
             </nav>
         </div>
 
         <!-- System User Quickdeck Section -->
-        <div class="pt-6 border-t border-neutral-800/80 mt-6 md:mt-0 flex items-center justify-between">
+        <div class="pt-4 border-t border-neutral-800/80 mt-6 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center font-bold text-xs text-indigo-300" id="userAvatar">ST</div>
                 <div class="truncate max-w-[120px]">
@@ -119,7 +140,7 @@
         <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-neutral-900">
             <div>
                 <h1 class="text-2xl font-black tracking-tight text-white">Command Console</h1>
-                <p class="text-xs text-neutral-400 font-medium">Manage your academic pipeline and tracking tools</p>
+                <p class="text-xs text-neutral-400 font-medium">Manage your academic pipeline and integration tools</p>
             </div>
             <div class="flex items-center gap-2 self-start sm:self-auto bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-1.5 px-3">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -127,15 +148,53 @@
             </div>
         </header>
 
-        <!-- CONTENT MATRICES (Controlled dynamically via switchTab tab routing) -->
+        <!-- EXTERNAL NAVIGATION TOOLS HUBCARD PANEL -->
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Ask Questions Toolcard -->
+            <a href="ai_solver.html" class="glass-card p-5 rounded-2xl hover:border-indigo-500/40 hover:scale-[1.02] active:scale-[0.99] transition-all block group space-y-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-lg">🤖</div>
+                <div>
+                    <h4 class="text-xs font-black text-white group-hover:text-indigo-400 transition-colors">Ask Questions</h4>
+                    <p class="text-[10px] text-neutral-500 mt-1">Get immediate answers and step-by-step logic from your AI engine solver.</p>
+                </div>
+            </a>
+
+            <!-- E-Library Toolcard -->
+            <a href="academy.html" class="glass-card p-5 rounded-2xl hover:border-indigo-500/40 hover:scale-[1.02] active:scale-[0.99] transition-all block group space-y-3">
+                <div class="w-10 h-10 rounded-xl bg-purple-600/10 border border-purple-500/20 flex items-center justify-center text-lg">🏛️</div>
+                <div>
+                    <h4 class="text-xs font-black text-white group-hover:text-indigo-400 transition-colors">E-Library</h4>
+                    <p class="text-[10px] text-neutral-500 mt-1">Open up reference collections, textbooks, and archived syllabi material logs.</p>
+                </div>
+            </a>
+
+            <!-- Health Hub Toolcard -->
+            <a href="health.html" class="glass-card p-5 rounded-2xl hover:border-indigo-500/40 hover:scale-[1.02] active:scale-[0.99] transition-all block group space-y-3">
+                <div class="w-10 h-10 rounded-xl bg-emerald-600/10 border border-emerald-500/20 flex items-center justify-center text-lg">🩺</div>
+                <div>
+                    <h4 class="text-xs font-black text-white group-hover:text-indigo-400 transition-colors">Health Hub</h4>
+                    <p class="text-[10px] text-neutral-500 mt-1">Access medical systems check utilities, dietary guides, and wellness trackers.</p>
+                </div>
+            </a>
+
+            <!-- Support Desk Toolcard -->
+            <a href="support.html" class="glass-card p-5 rounded-2xl hover:border-indigo-500/40 hover:scale-[1.02] active:scale-[0.99] transition-all block group space-y-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-600/10 border border-amber-500/20 flex items-center justify-center text-lg">🛠️</div>
+                <div>
+                    <h4 class="text-xs font-black text-white group-hover:text-indigo-400 transition-colors">Support Desk</h4>
+                    <p class="text-[10px] text-neutral-500 mt-1">Dispatch tickets to site administrators for troubleshooting assistance logs.</p>
+                </div>
+            </a>
+        </section>
+
+        <!-- DYNAMIC INTERNAL VIEWS BLOCK -->
         
         <!-- TAB 1: CURRICULUM NOTES (Default panel) -->
         <section id="tab-curriculum" class="space-y-6">
             <div class="glass-card rounded-2xl p-6 md:p-8 space-y-4">
                 <h2 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2"><span>📚</span> Curriculum Study Notes</h2>
-                <p class="text-xs text-neutral-400 leading-relaxed">Access and read through your custom high-priority secondary school syllabi files synchronized with your WAEC/JAMB timelines.</p>
+                <p class="text-xs text-neutral-400 leading-relaxed">Access and read through your custom high-priority secondary school syllabi files synchronized with your examination timelines.</p>
                 
-                <!-- Old Dashboard Placeholder Structure Maintained -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                     <div class="p-4 bg-neutral-900/40 border border-neutral-800/60 rounded-xl space-y-1">
                         <h3 class="text-xs font-bold text-white">Senior Secondary 3 Physics Notes</h3>
@@ -155,7 +214,6 @@
                 <h2 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2"><span>🎥</span> Video Lesson Modules</h2>
                 <p class="text-xs text-neutral-400 leading-relaxed">Stream your custom class content modules to break down complex formulas and structures step-by-step.</p>
                 
-                <!-- Old Dashboard Placeholder Structure Maintained -->
                 <div class="p-8 text-center bg-neutral-900/30 border border-dashed border-neutral-800/80 rounded-xl">
                     <p class="text-xs text-neutral-500 font-medium">No video logs streamed yet. Check back following classroom scheduling updates.</p>
                 </div>
@@ -168,7 +226,6 @@
                 <h2 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2"><span>📊</span> Academic Performance Suites</h2>
                 <p class="text-xs text-neutral-400 leading-relaxed">Track analytics logs, system scoring records, and target metrics instantly.</p>
                 
-                <!-- Old Dashboard Placeholder Structure Maintained -->
                 <div class="p-5 bg-neutral-900/40 border border-neutral-800/60 rounded-xl max-w-sm">
                     <span class="text-[10px] font-extrabold tracking-widest uppercase text-indigo-400">Target Grade</span>
                     <h4 class="text-3xl font-black text-white pt-1">A1 Grade Rating</h4>
@@ -177,94 +234,62 @@
             </div>
         </section>
 
-        <!-- NEW TAB 4: SUPPORT DESK HUB -->
-        <section id="tab-support" class="hidden space-y-6">
-            <div class="glass-card rounded-2xl p-6 md:p-8 space-y-6">
-                <div class="space-y-1">
-                    <h2 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2"><span>🛠️</span> Support Desk</h2>
-                    <p class="text-xs text-neutral-400 leading-relaxed">Encountering structural code issues, application faults, or payment problems? Open a secure help track route directly to administrators.</p>
-                </div>
-
-                <!-- Support Interaction Form Interface -->
-                <form id="supportForm" class="space-y-4 max-w-xl" novalidate>
-                    <div class="space-y-2">
-                        <label for="supportSubject" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Issue Category / Subject</label>
-                        <input type="text" id="supportSubject" placeholder="e.g., Video loader error on Physics Module 3" required
-                               class="w-full bg-neutral-900/60 border border-neutral-800/80 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl px-4 py-3 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
-                    </div>
-                    
-                    <div class="space-y-2">
-                        <label for="supportMessage" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Detailed Explanatory Log</label>
-                        <textarea id="supportMessage" rows="5" placeholder="Describe what actions triggered the bug or issue so developers can reproduce it..." required
-                                  class="w-full bg-neutral-900/60 border border-neutral-800/80 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl px-4 py-3 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600 resize-none"></textarea>
-                    </div>
-
-                    <button type="submit" class="px-6 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-md transition-all cursor-pointer">
-                        Dispatch Help Ticket
-                    </button>
-                </form>
-            </div>
-        </section>
-
     </main>
 
-    <!-- CORE PANEL ROUTING ENGINE SCRIPT -->
+    <!-- CORE CONTROL SCRIPTS -->
     <script>
-        // Tab switching logic router
+        // Tab switching logic router for structural panel components
         function switchTab(tabId) {
-            // Hide all panel sections safely
-            const segments = ['curriculum', 'videos', 'performance', 'support'];
+            const segments = ['curriculum', 'videos', 'performance'];
             segments.forEach(seg => {
                 document.getElementById(`tab-${seg}`).classList.add('hidden');
-                document.getElementById(`btn-${seg}`).classList.remove('nav-link-active');
+                const btn = document.getElementById(`btn-${seg}`);
+                if(btn) btn.classList.remove('nav-link-active');
             });
 
-            // Make active segment targets visible
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            document.getElementById(`btn-${tabId}`).classList.add('nav-link-active');
+            const activeBtn = document.getElementById(`btn-${tabId}`);
+            if(activeBtn) activeBtn.classList.add('nav-link-active');
+
+            // Autoclose mobile layout navigation when a selector tab fires
+            if(window.innerWidth < 768) {
+                document.getElementById('sidebarMenu').classList.add('hidden');
+            }
         }
 
-        // Token authorization fail-safe guard loop
         document.addEventListener("DOMContentLoaded", () => {
+            // HAMBURGER MENU INTERACTIVE FUNCTIONALITY
+            const hamburgerBtn = document.getElementById('hamburgerBtn');
+            const sidebarMenu = document.getElementById('sidebarMenu');
+
+            hamburgerBtn.addEventListener('click', () => {
+                sidebarMenu.classList.toggle('hidden');
+            });
+
+            // Token authorization credentials initialization guard loop
             const token = localStorage.getItem('nexusAuthToken');
             const userId = localStorage.getItem('nexusUserId');
             const role = localStorage.getItem('nexusUserRole');
 
-            // Force validation fail eject route back to index/login if no local keys found
             if (!token || !userId) {
-                console.warn("Unauthenticated workspace execution caught. Redirecting to access terminal...");
+                console.warn("Unauthenticated workspace execution caught. Redirecting to terminal...");
                 window.location.replace('login.html');
                 return;
             }
 
-            // Populate dashboard profile indicators securely
+            // Populate workspace text variables 
             document.getElementById('userNameLabel').innerText = userId.split('@')[0] || "Active Student";
             if(role) {
                 document.getElementById('userRoleLabel').innerText = role;
                 document.getElementById('userAvatar').innerText = role.substring(0,2).toUpperCase();
             }
 
-            // Bind the sign-out trigger action 
+            // Bind the clear out trigger actions
             document.getElementById('logoutBtn').addEventListener('click', () => {
                 localStorage.clear();
                 window.location.replace('login.html');
             });
-
-            // Bind Support Form functionality placeholder 
-            document.getElementById('supportForm').addEventListener('submit', (e) => {
-                e.preventDefault();
-                const subj = document.getElementById('supportSubject').value.trim();
-                const msg = document.getElementById('supportMessage').value.trim();
-                
-                if(!subj || !msg) {
-                    alert("Please fill in all details before submitting.");
-                    return;
-                }
-
-                alert(`Ticket Received! Our support system has logged this layout issue.\nSubject: ${subj}`);
-                document.getElementById('supportForm').reset();
-            });
         });
     </script>
 </body>
-                    </html>
+                </html>
