@@ -52,6 +52,11 @@
 </head>
 <body class="bg-neutral-950 text-neutral-200 min-h-screen antialiased selection:bg-indigo-950 selection:text-indigo-400 overflow-x-hidden relative flex flex-col md:flex-row">
 
+    <!-- OPTIONAL PRELOADER (Handled by JS) -->
+    <div id="nexusPreloader" class="fixed inset-0 z-50 bg-neutral-950 flex items-center justify-center transition-all duration-300">
+        <div class="w-10 h-10 border-2 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin"></div>
+    </div>
+
     <!-- FLOATING DECORATIVE BACKGROUND SYSTEM -->
     <div class="absolute top-[-10%] left-[-10%] w-[60%] h-[50%] glow-orb-blue pointer-events-none z-0"></div>
     <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[50%] glow-orb-purple pointer-events-none z-0"></div>
@@ -62,9 +67,16 @@
             <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center font-black text-xs text-white">N</div>
             <span class="text-md font-extrabold tracking-tight text-white">Nexus<span class="text-indigo-400">Pro</span></span>
         </a>
-        <button id="hamburgerBtn" class="p-2 text-xl text-neutral-400 hover:text-white focus:outline-none cursor-pointer">
-            ☰
-        </button>
+        <div class="flex items-center gap-4">
+            <!-- Mobile Notification Bell -->
+            <a href="notifications.html" class="p-2 text-neutral-400 hover:text-white relative" title="Notifications">
+                🔔
+                <span class="absolute top-1 right-1 w-2 h-2 bg-indigo-500 rounded-full"></span>
+            </a>
+            <button id="hamburgerBtn" class="p-2 text-xl text-neutral-400 hover:text-white focus:outline-none cursor-pointer">
+                ☰
+            </button>
+        </div>
     </header>
 
     <!-- SIDEBAR NAVIGATION SYSTEM -->
@@ -79,51 +91,67 @@
 
             <!-- Main Navigation Group -->
             <nav class="space-y-1.5">
-                <!-- SYSTEM ADAPTIVE ROUTING SEGMENT HEADERS (Toggled via dashboard.js) -->
-                <p id="nav-header-student" class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 mb-2">Academic Base</p>
-                <p id="nav-header-admin" class="hidden text-[10px] font-extrabold tracking-widest uppercase text-amber-500 px-3 mb-2">Platform Control</p>
-                
-                <!-- Student Navigation Controls -->
-                <button onclick="switchTab('curriculum')" id="btn-curriculum" class="nav-link-active w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
-                    <span>📚</span> Curriculum Notes
-                </button>
-                <button onclick="switchTab('videos')" id="btn-videos" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
-                    <span>🎥</span> Video Modules
-                </button>
-                <button onclick="switchTab('performance')" id="btn-performance" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
-                    <span>📊</span> Performance Suites
-                </button>
+                <!-- STUDENT SECTION LINKS -->
+                <div id="sidebarStudentLinks" class="space-y-1.5">
+                    <p class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 mb-2">Academic Base</p>
+                    <button onclick="switchTab('curriculum')" id="btn-curriculum" class="nav-link-active w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
+                        <span>📚</span> Curriculum Notes
+                    </button>
+                    <button onclick="switchTab('videos')" id="btn-videos" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
+                        <span>🎥</span> Video Modules
+                    </button>
+                    <button onclick="switchTab('performance')" id="btn-performance" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
+                        <span>📊</span> Performance Suites
+                    </button>
+                </div>
 
-                <!-- Admin Exclusive Navigation Control (Toggled via dashboard.js) -->
-                <button onclick="switchTab('admin-suite')" id="btn-admin-suite" class="hidden w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
-                    <span>⚡</span> Admin Management
-                </button>
+                <!-- ADMIN PLATFORM CONTROL SECTION LINKS -->
+                <div id="sidebarAdminLinks" class="hidden space-y-1.5 pt-2">
+                    <p class="text-[10px] font-extrabold tracking-widest uppercase text-amber-500 px-3 mb-2">Platform HQ</p>
+                    <button onclick="switchTab('admin-suite')" id="btn-admin-suite" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all cursor-pointer text-left">
+                        <span>⚡</span> Admin Management
+                    </button>
+                    <a href="admin-users.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
+                        <span>👥</span> User Management
+                    </a>
+                    <a href="admin-upload.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
+                        <span>📤</span> E-Library Upload
+                    </a>
+                    <a href="broadcast.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
+                        <span>📢</span> Broadcast Engine
+                    </a>
+                </div>
 
-                <p class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 pt-3 mb-2">Connected Tools</p>
-                <a href="ai_solver.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
-                    <span>🤖</span> Ask Questions
-                </a>
-                <a href="academy.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
-                    <span>🏛️</span> E-Library
-                </a>
-                <a href="health.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
-                    <span>🩺</span> Health Hub
-                </a>
+                <!-- CONNECTED BASE UTILITIES -->
+                <div class="pt-2">
+                    <p class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 mb-2">Connected Tools</p>
+                    <a href="ai_solver.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
+                        <span>🤖</span> Ask Questions
+                    </a>
+                    <a href="academy.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
+                        <span>🏛️</span> E-Library
+                    </a>
+                    <a href="health.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
+                        <span>🩺</span> Health Hub
+                    </a>
+                </div>
 
-                <p class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 pt-3 mb-2">Help & Systems</p>
-                <a href="support.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
-                    <span>🛠️</span> Support Desk
-                </a>
+                <div class="pt-2">
+                    <p class="text-[10px] font-extrabold tracking-widest uppercase text-neutral-500 px-3 mb-2">Help & Systems</p>
+                    <a href="support.html" class="w-full flex items-center gap-3 px-4 py-2.5 text-xs font-bold text-neutral-400 hover:text-white border border-transparent rounded-xl transition-all block text-left">
+                        <span>🛠️</span> Support Desk
+                    </a>
+                </div>
             </nav>
         </div>
 
-        <!-- User Quickdeck Profiler Components -->
+        <!-- User Profile Quickdeck -->
         <div class="pt-4 border-t border-neutral-800/80 mt-6 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-full bg-neutral-800 border border-neutral-700 flex items-center justify-center font-bold text-xs text-indigo-300" id="userAvatar">ST</div>
                 <div class="truncate max-w-[120px]">
                     <p class="text-xs font-black text-white truncate" id="userNameLabel">Loading...</p>
-                    <span class="text-[9px] uppercase font-bold tracking-wider text-neutral-500" id="userRoleLabel">Student</span>
+                    <span id="userRoleLabel" class="text-[9px] uppercase font-bold tracking-wider text-neutral-500">Student</span>
                 </div>
             </div>
             <button id="logoutBtn" class="p-2 text-neutral-500 hover:text-red-400 transition-colors cursor-pointer text-sm" title="Sign Out">
@@ -133,19 +161,32 @@
     </aside>
 
     <!-- MAIN CORE PANEL WRAPPER -->
-    <main class="flex-grow p-6 md:p-10 relative z-10 max-w-5xl mx-auto w-full space-y-8">
+    <main class="flex-grow p-6 md:p-10 relative z-10 max-w-5xl mx-auto w-full space-y-6">
         
         <!-- HEADER PROFILE BLOCK -->
-        <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-6 border-b border-neutral-900">
+        <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-neutral-900">
             <div>
                 <h1 class="text-2xl font-black tracking-tight text-white" id="dashboardMainTitle">Command Console</h1>
                 <p class="text-xs text-neutral-400 font-medium" id="dashboardSubTitle">Manage your academic pipeline and integration tools</p>
             </div>
-            <div class="flex items-center gap-2 self-start sm:self-auto bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-1.5 px-3">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span class="text-[10px] font-extrabold uppercase tracking-widest text-neutral-400" id="systemStatusLabel">Database Active</span>
+            <div class="flex items-center gap-4 self-start sm:self-auto">
+                <!-- Desktop Only Notification Bell -->
+                <a href="notifications.html" class="hidden md:block p-2 bg-neutral-900/60 border border-neutral-800/80 rounded-xl text-neutral-400 hover:text-white relative transition-all" title="View Notifications">
+                    🔔
+                    <span class="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-indigo-500 rounded-full"></span>
+                </a>
+                <div class="flex items-center gap-2 bg-neutral-900/60 border border-neutral-800/80 rounded-xl p-1.5 px-3">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span class="text-[10px] font-extrabold uppercase tracking-widest text-neutral-400" id="systemStatusLabel">Database Active</span>
+                </div>
             </div>
         </header>
+
+        <!-- WELCOME BANNER COMPONENT -->
+        <div class="p-5 bg-gradient-to-r from-neutral-900/80 to-neutral-950 border border-neutral-800/60 rounded-2xl shadow-xl">
+            <h2 id="welcomeHeading" class="text-xl font-extrabold text-white tracking-tight">Welcome Back, Loading...</h2>
+            <p class="text-xs text-neutral-400 mt-1">Your localized session parameters are configured and active.</p>
+        </div>
 
         <!-- STANDARD NAVIGATIONAL HUBCARD GRID -->
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -182,115 +223,66 @@
             </a>
         </section>
 
-        <!-- DYNAMIC INTERNAL VIEWS BLOCK -->
-        
-        <!-- TAB 1: CURRICULUM NOTES -->
-        <section id="tab-curriculum" class="space-y-6">
-            <div class="glass-card rounded-2xl p-6 md:p-8 space-y-4">
-                <h2 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2"><span>📚</span> Curriculum Study Notes</h2>
-                <p class="text-xs text-neutral-400 leading-relaxed">Access and read through your custom high-priority secondary school syllabi files synchronized with your examination timelines.</p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                    <div class="p-4 bg-neutral-900/40 border border-neutral-800/60 rounded-xl space-y-1">
-                        <h3 class="text-xs font-bold text-white">Senior Secondary 3 Physics Notes</h3>
-                        <p class="text-[11px] text-neutral-500">Topics aligned for structural examination standards.</p>
-                    </div>
-                    <div class="p-4 bg-neutral-900/40 border border-neutral-800/60 rounded-xl space-y-1">
-                        <h3 class="text-xs font-bold text-white">Senior Secondary 3 Chemistry Notes</h3>
-                        <p class="text-[11px] text-neutral-500">Comprehensive review logs and formula matrices.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 2: VIDEO MODULES -->
-        <section id="tab-videos" class="hidden space-y-6">
-            <div class="glass-card rounded-2xl p-6 md:p-8 space-y-4">
-                <h2 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2"><span>🎥</span> Video Lesson Modules</h2>
-                <p class="text-xs text-neutral-400 leading-relaxed">Stream your custom class content modules to break down complex formulas and structures step-by-step.</p>
-                <div class="p-8 text-center bg-neutral-900/30 border border-dashed border-neutral-800/80 rounded-xl">
-                    <p class="text-xs text-neutral-500 font-medium">No video logs streamed yet. Check back following classroom scheduling updates.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- TAB 3: PERFORMANCE SUITES -->
-        <section id="tab-performance" class="hidden space-y-6">
-            <div class="glass-card rounded-2xl p-6 md:p-8 space-y-4">
-                <h2 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2"><span>📊</span> Academic Performance Suites</h2>
-                <p class="text-xs text-neutral-400 leading-relaxed">Track analytics logs, system scoring records, and target metrics instantly.</p>
-                <div class="p-5 bg-neutral-900/40 border border-neutral-800/60 rounded-xl max-w-sm">
-                    <span class="text-[10px] font-extrabold tracking-widest uppercase text-indigo-400">Target Grade</span>
-                    <h4 class="text-3xl font-black text-white pt-1">A1 Grade Rating</h4>
-                    <p class="text-[11px] text-neutral-500 mt-2">Required threshold pacing maintained via active sessions log.</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- EXCLUSIVE TAB 4: ADMIN PLATFORM MANAGEMENT -->
-        <section id="tab-admin-suite" class="hidden space-y-6">
-            <div class="glass-card rounded-2xl p-6 md:p-8 space-y-6">
-                <h2 class="text-lg font-extrabold tracking-tight text-amber-400 flex items-center gap-2"><span>⚡</span> Administrative Management Control</h2>
-                <p class="text-xs text-neutral-400 leading-relaxed">Global control dashboard. Monitor registered user records, system performance data logs, and manage incoming platform support metrics.</p>
-                
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-                    <div class="p-4 bg-neutral-900/50 border border-neutral-800/80 rounded-xl">
-                        <span class="text-[9px] font-extrabold tracking-widest uppercase text-neutral-500">Total Users</span>
-                        <h4 class="text-2xl font-black text-white pt-1">1,240</h4>
-                        <p class="text-[10px] text-emerald-400 mt-1">▲ +14% This Month</p>
-                    </div>
-                    <div class="p-4 bg-neutral-900/50 border border-neutral-800/80 rounded-xl">
-                        <span class="text-[9px] font-extrabold tracking-widest uppercase text-neutral-500">API Gateway Load</span>
-                        <h4 class="text-2xl font-black text-white pt-1">0.42 ms</h4>
-                        <p class="text-[10px] text-neutral-500 mt-1">Vercel Edge Servers Stable</p>
-                    </div>
-                    <div class="p-4 bg-neutral-900/50 border border-neutral-800/80 rounded-xl">
-                        <span class="text-[9px] font-extrabold tracking-widest uppercase text-neutral-500">Open Tickets</span>
-                        <h4 class="text-2xl font-black text-amber-400 pt-1">4 Pending</h4>
-                        <p class="text-[10px] text-neutral-500 mt-1">Requires Support Review</p>
+        <!-- DYNAMIC VIEWS CONFIGURATION MODULE -->
+        <div id="contentPanelsWrapper">
+            <!-- TAB 1: CURRICULUM NOTES -->
+            <section id="tab-curriculum" class="space-y-6">
+                <div class="glass-card rounded-2xl p-6 md:p-8 space-y-4">
+                    <h2 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2"><span>📚</span> Curriculum Study Notes</h2>
+                    <p class="text-xs text-neutral-400 leading-relaxed">Access and read through your custom high-priority secondary school syllabi files synchronized with your examination timelines.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                        <div class="p-4 bg-neutral-900/40 border border-neutral-800/60 rounded-xl space-y-1">
+                            <h3 class="text-xs font-bold text-white">Senior Secondary 3 Physics Notes</h3>
+                            <p class="text-[11px] text-neutral-500">Topics aligned for structural examination standards.</p>
+                        </div>
+                        <div class="p-4 bg-neutral-900/40 border border-neutral-800/60 rounded-xl space-y-1">
+                            <h3 class="text-xs font-bold text-white">Senior Secondary 3 Chemistry Notes</h3>
+                            <p class="text-[11px] text-neutral-500">Comprehensive review logs and formula matrices.</p>
+                        </div>
                     </div>
                 </div>
+            </section>
 
-                <div class="space-y-3 pt-4">
-                    <h3 class="text-xs font-black tracking-wider uppercase text-neutral-400">Recent Operational Database Log Entries</h3>
-                    <div class="overflow-x-auto w-full bg-neutral-900/40 border border-neutral-800/80 rounded-xl text-[11px]">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="border-b border-neutral-800/80 text-neutral-500 text-[10px] uppercase font-bold tracking-wider bg-neutral-950/40">
-                                    <th class="p-3">User Target</th>
-                                    <th class="p-3">Role Log</th>
-                                    <th class="p-3">Action Processed</th>
-                                    <th class="p-3">Timestamp</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-neutral-800/40 text-neutral-300 font-medium">
-                                <tr>
-                                    <td class="p-3 text-white font-bold">admin@nexuspro.com</td>
-                                    <td class="p-3"><span class="px-2 py-0.5 bg-amber-500/10 text-amber-400 rounded border border-amber-500/20 text-[10px]">Admin</span></td>
-                                    <td class="p-3 text-neutral-400">Initialized Master Global Config Matrix</td>
-                                    <td class="p-3 text-neutral-500">Just Now</td>
-                                </tr>
-                                <tr>
-                                    <td class="p-3 text-white font-bold">student@domain.com</td>
-                                    <td class="p-3"><span class="px-2 py-0.5 bg-indigo-500/10 text-indigo-400 rounded border border-indigo-500/20 text-[10px]">Student</span></td>
-                                    <td class="p-3 text-neutral-400">Dispatched Support Query Ticket #2041</td>
-                                    <td class="p-3 text-neutral-500">14 mins ago</td>
-                                </tr>
-                            </tbody>
-                        </table>
+            <!-- TAB 2: VIDEO MODULES -->
+            <section id="tab-videos" class="hidden space-y-6">
+                <div class="glass-card rounded-2xl p-6 md:p-8 space-y-4">
+                    <h2 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2"><span>🎥</span> Video Lesson Modules</h2>
+                    <p class="text-xs text-neutral-400 leading-relaxed">Stream your custom class content modules to break down complex formulas and structures step-by-step.</p>
+                    <div class="p-8 text-center bg-neutral-900/30 border border-dashed border-neutral-800/80 rounded-xl">
+                        <p class="text-xs text-neutral-500 font-medium">No video logs streamed yet. Check back following classroom scheduling updates.</p>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
-    </main>
+            <!-- TAB 3: PERFORMANCE SUITES -->
+            <section id="tab-performance" class="hidden space-y-6">
+                <div class="glass-card rounded-2xl p-6 md:p-8 space-y-4">
+                    <h2 class="text-lg font-extrabold tracking-tight text-white flex items-center gap-2"><span>📊</span> Academic Performance Suites</h2>
+                    <p class="text-xs text-neutral-400 leading-relaxed">Track analytics logs, system scoring records, and target metrics instantly.</p>
+                    <div class="p-5 bg-neutral-900/40 border border-neutral-800/60 rounded-xl max-w-sm">
+                        <span class="text-[10px] font-extrabold tracking-widest uppercase text-indigo-400">Target Grade</span>
+                        <h4 class="text-3xl font-black text-white pt-1">A1 Grade Rating</h4>
+                        <p class="text-[11px] text-neutral-500 mt-2">Required threshold pacing maintained via active sessions log.</p>
+                    </div>
+                </div>
+            </section>
 
-    <!-- UI INTERACTION SCRIPT -->
-    <script>
-        // Inline layout tab controller logic 
-        function switchTab(tabId) {
-            const segments = ['curriculum', 'videos', 'performance', 'admin-suite'];
-            segments.forEach(seg => {
-                const element = document.getElementById(`tab-${seg}`);
-                if (element) element.classList.add('hidden');
-                
-               
+            <!-- EXCLUSIVE TAB 4: ADMIN PLATFORM MANAGEMENT -->
+            <section id="tab-admin-suite" class="hidden space-y-6">
+                <div class="glass-card rounded-2xl p-6 md:p-8 space-y-6">
+                    <h2 class="text-lg font-extrabold tracking-tight text-amber-400 flex items-center gap-2"><span>⚡</span> Administrative Management Control</h2>
+                    <p class="text-xs text-neutral-400 leading-relaxed">Global control dashboard. Monitor registered user records, system performance data logs, and manage incoming platform support metrics.</p>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+                        <div class="p-4 bg-neutral-900/50 border border-neutral-800/80 rounded-xl">
+                            <span class="text-[9px] font-extrabold tracking-widest uppercase text-neutral-500">Total Users</span>
+                            <h4 class="text-2xl font-black text-white pt-1">1,240</h4>
+                            <p class="text-[10px] text-emerald-400 mt-1">▲ +14% This Month</p>
+                        </div>
+                        <div class="p-4 bg-neutral-900/50 border border-neutral-800/80 rounded-xl">
+                            <span class="text-[9px] font-extrabold tracking-widest uppercase text-neutral-500">API Gateway Load</span>
+                            <h4 class="text-2xl font-black text-white pt-1">0.42 ms</h4>
+                            <p class="text-[10px] text-neutral-500 mt-1">Vercel Edge Servers Stable</p>
+                        </div>
+                        <div class="p-4 bg-neutral-900/50 border border-neutral-800/80 rounded-xl">
+                            <span class="text-[9px] font-ex
