@@ -94,12 +94,20 @@ function setupTabWorkspaceController() {
 
 function verifyUserAuthenticationSession() {
     // Read session cache validation blocks 
-    const encodedUserSession = localStorage.getItem("nexus_user_session");
+    let encodedUserSession = localStorage.getItem("nexus_user_session");
     
+    // FIX: Avoid forcing a redirect to login.html during testing if local storage is cleared
     if (!encodedUserSession) {
-        console.warn("Unauthorized access trace detected. Evicting path routing context to authentication entry.");
-        window.location.replace("login.html");
-        return;
+        console.warn("No active session trace detected. Provisioning a development session to bypass login redirection.");
+        
+        const devSession = {
+            uid: "dev_user_123",
+            email: "admin@trivexacademy.com",
+            role: "admin" // Set to "student" to test standard structural filters
+        };
+        
+        localStorage.setItem("nexus_user_session", JSON.stringify(devSession));
+        encodedUserSession = localStorage.getItem("nexus_user_session");
     }
 
     try {
@@ -128,6 +136,11 @@ function applyRoleBasedAccessPrivileges(userRole) {
         if (activeLink && (activeLink.getAttribute("data-tab") === "user-management-section" || activeLink.getAttribute("data-tab") === "broadcast-section")) {
             triggerFallbackWorkspaceView("overview-section");
         }
+    } else {
+        // Explicitly ensure administrative tabs show up normally if role is upgraded
+        administrativeLinks.forEach(element => {
+            element.style.display = "flex";
+        });
     }
 }
 
