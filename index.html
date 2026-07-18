@@ -3,178 +3,574 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Pro | Next-Gen Command Dashboard Platform</title>
+    <!-- Icon Font Library Docs -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- PRIMARY SEARCH ENGINE OPTIMIZATION (SEO) META MATRIX -->
-    <title>Nexus Pro | Next-Gen E-Learning Platform for Core Sciences</title>
-    <meta name="description" content="Master West African senior secondary science cycles with Nexus Pro. Stream full curriculum revision notes, download syllabus guides, and view comprehensive academic video walkthroughs.">
-    <meta name="keywords" content="Nexus Pro, e-learning platform, physics syllabus, chemistry revision notes, WAEC science prep, JAMB past questions, study online nigeria">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://nexuspro.vercel.app/">
-
-    <!-- OPEN GRAPH MATRIX (SOCIAL ENGINE PREVIEWS) -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Nexus Pro | Premium Digital Academic Resource Vault">
-    <meta property="og:description" content="Access elite, structured revision materials and expert video modules across essential secondary subjects online. Built securely for top-tier academic performance.">
-    <meta property="og:url" content="https://nexuspro.vercel.app/">
-    <meta property="og:site_name" content="Nexus Pro Academy">
-
-    <!-- CSS ARCHITECTURE -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        html { scroll-behavior: smooth; }
-        .text-gradient {
-            background: linear-gradient(135deg, #f3f4f6 30%, #a3a3a3 70%, #3b82f6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        :root {
+            --bg-dark: #0f172a;
+            --bg-deep: #090d16;
+            --glass-panel: rgba(30, 41, 59, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --neon-blue: #3b82f6;
+            --neon-glow: rgba(59, 130, 246, 0.2);
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f97316;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+
+        /* Utility Structure Styles */
+        .glass {
+            background: var(--glass-panel);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+        }
+
+        section {
+            padding: 90px 24px;
+            max-width: 1250px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .section-header h2 {
+            font-size: 2.2rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-top: 6px;
+        }
+
+        /* Top Navigation Header bar */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 75px;
+            padding: 0 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            z-index: 1000;
+        }
+
+        .brand-logo {
+            font-weight: 700;
+            font-size: 1.4rem;
+            letter-spacing: 0.5px;
+            text-decoration: none;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .desktop-nav {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .nav-link:hover { color: var(--neon-blue); }
+
+        .btn-portal {
+            background: var(--neon-blue);
+            color: #ffffff;
+            padding: 9px 20px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.88rem;
+            font-weight: 600;
+            box-shadow: 0 4px 12px var(--neon-glow);
+            transition: background 0.2s;
+        }
+        .btn-portal:hover { background: #2563eb; }
+
+        .mobile-hamburger {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 1.4rem;
+            cursor: pointer;
+        }
+
+        /* Mobile Flyout Menu Panel Drawer */
+        .mobile-drawer {
+            position: fixed;
+            top: 75px;
+            left: 0;
+            width: 100%;
+            background: #0f172a;
+            border-bottom: 1px solid var(--glass-border);
+            padding: 20px 40px;
+            display: none;
+            flex-direction: column;
+            gap: 15px;
+            z-index: 999;
+        }
+        .mobile-drawer.active { display: flex; }
+
+        /* Hero Engine Canvas Banner */
+        .hero-banner {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding-top: 100px;
+            background: radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.12) 0%, transparent 50%);
+        }
+
+        .hero-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 40px;
+            align-items: center;
+            width: 100%;
+        }
+
+        .hero-text h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -1.5px;
+            margin-bottom: 20px;
+        }
+
+        .hero-text p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            margin-bottom: 35px;
+            max-width: 600px;
+        }
+
+        .hero-cta-deck {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.04);
+            color: var(--text-main);
+            border: 1px solid var(--glass-border);
+            padding: 12px 24px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.08); }
+
+        .hero-graphic {
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        .hero-visual-box {
+            width: 320px;
+            height: 320px;
+            border-radius: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 5rem;
+            color: var(--neon-blue);
+            box-shadow: 0 0 50px rgba(59, 130, 246, 0.15);
+            animation: floating 4s infinite ease-in-out;
+        }
+
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        /* Services Grid Architecture Layout */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .service-card {
+            padding: 30px;
+            border-radius: 12px;
+            transition: transform 0.3s ease, border-color 0.3s;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+
+        .service-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+        }
+
+        .service-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .service-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Interactive Contact Control Form */
+        .contact-layout {
+            display: grid;
+            grid-template-columns: 0.8fr 1.2fr;
+            gap: 50px;
+            background: var(--glass-panel);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 45px;
+            backdrop-filter: blur(12px);
+        }
+
+        .contact-info-panel h3 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .contact-info-panel p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+        }
+
+        .info-details-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .info-icon-wrapper {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--neon-blue);
+        }
+
+        .form-input-group {
+            margin-bottom: 20px;
+        }
+
+        .form-input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-control {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .form-control:focus {
+            border-color: var(--neon-blue);
+        }
+
+        textarea.form-control {
+            resize: none;
+            height: 120px;
+        }
+
+        .form-feedback-msg {
+            font-size: 0.88rem;
+            margin-top: 8px;
+            display: none;
+        }
+
+        /* Structural Platform Footer */
+        footer {
+            background-color: var(--bg-deep);
+            border-top: 1px solid var(--glass-border);
+            padding: 60px 40px 30px 40px;
+        }
+
+        .footer-grid {
+            max-width: 1250px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.5fr repeat(3, 1fr);
+            gap: 40px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .footer-brand-summary p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 12px;
+            max-width: 300px;
+        }
+
+        .footer-links-column h4 {
+            font-size: 0.92rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            margin-bottom: 18px;
+        }
+
+        .footer-links-column ul {
+            list-style: none;
+        }
+
+        .footer-links-column ul li {
+            margin-bottom: 10px;
+        }
+
+        .footer-links-column ul li a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        .footer-links-column ul li a:hover { color: var(--neon-blue); }
+
+        .footer-bottom-deck {
+            max-width: 1250px;
+            margin: 25px auto 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .social-links-wrapper {
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-link {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            transition: color 0.2s;
+        }
+        .social-link:hover { color: var(--neon-blue); }
+
+        /* Responsive Breakpoint Adaptations */
+        @media (max-width: 968px) {
+            .hero-layout { grid-template-columns: 1fr; text-align: center; }
+            .hero-text p { margin-left: auto; margin-right: auto; }
+            .hero-cta-deck { justify-content: center; }
+            .hero-graphic { display: none; }
+            .contact-layout { grid-template-columns: 1fr; padding: 30px; }
+            .footer-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 640px) {
+            header { padding: 0 20px; }
+            .desktop-nav { display: none; }
+            .mobile-hamburger { display: block; }
+            .hero-text h1 { font-size: 2.4rem; }
+            .footer-grid { grid-template-columns: 1fr; gap: 30px; }
+            .footer-bottom-deck { flex-direction: column; gap: 15px; text-align: center; }
         }
     </style>
 </head>
-<body class="bg-neutral-950 text-neutral-100 min-h-screen antialiased selection:bg-blue-950 selection:text-blue-400">
+<body>
 
-    <!-- ACCESSIBILITY: SKIP TO MAIN CONTENT HOOK -->
-    <a href="#mainContent" class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-950 focus:text-blue-400 focus:border focus:border-blue-900/40 focus:rounded-xl">Skip to Content</a>
-
-    <!-- SEMANTIC NAVIGATION DECK -->
-    <header class="w-full h-20 border-b border-neutral-900 bg-neutral-950/80 backdrop-blur-md fixed top-0 left-0 z-40 px-6 flex items-center justify-between">
-        <div class="flex items-center gap-3">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black shadow-lg text-white" aria-hidden="true">N</div>
-            <span class="text-xl font-extrabold tracking-tight text-neutral-100">Nexus<span class="text-blue-500">Pro</span></span>
-        </div>
-        
-        <nav class="hidden md:flex items-center gap-8" aria-label="Main Navigation Route Deck">
-            <a href="#features" class="text-sm font-semibold text-neutral-400 hover:text-neutral-200 transition-colors">Features</a>
-            <a href="#curriculum" class="text-sm font-semibold text-neutral-400 hover:text-neutral-200 transition-colors">Curriculum</a>
-            <a href="#platform" class="text-sm font-semibold text-neutral-400 hover:text-neutral-200 transition-colors">Inside the App</a>
+    <!-- Header Navigation Shell -->
+    <header>
+        <a href="#" class="brand-logo">
+            <i class="fas fa-cubes" style="color: var(--neon-blue);"></i>Nexus<span style="color:var(--neon-blue)">Pro</span>
+        </a>
+        <nav class="desktop-nav">
+            <a href="#hero" class="nav-link">Home</a>
+            <a href="#services" class="nav-link">Modules</a>
+            <a href="#contact" class="nav-link">Contact</a>
+            <a href="login.html" class="btn-portal">Console Login</a>
         </nav>
-
-        <div class="flex items-center gap-3">
-            <a href="login.html" class="px-4 py-2 text-xs font-bold text-neutral-300 hover:text-neutral-100 transition-colors">Sign In</a>
-            <a href="login.html?action=register" class="px-4 py-2.5 bg-neutral-900 border border-neutral-800 hover:border-neutral-700 text-blue-400 text-xs font-bold rounded-xl shadow-sm transition-all">Create Free Account</a>
-        </div>
+        <button class="mobile-hamburger" id="hamburger-toggle-btn" title="Toggle Navigation Bar">
+            <i class="fas fa-bars"></i>
+        </button>
     </header>
 
-    <!-- CONTENT ELEMENT WRAP -->
-    <main id="mainContent" class="pt-20">
+    <!-- Mobile Drawer Subnavigation Overlay -->
+    <div class="mobile-drawer" id="mobile-nav-drawer">
+        <a href="#hero" class="nav-link">Home</a>
+        <a href="#services" class="nav-link">Modules</a>
+        <a href="#contact" class="nav-link">Contact</a>
+        <a href="login.html" class="btn-portal" style="text-align: center; margin-top: 5px;">Console Login</a>
+    </div>
 
-        <!-- HERO CORE ENGINE SECTION -->
-        <section class="relative px-6 py-20 lg:py-32 max-w-6xl mx-auto flex flex-col items-center text-center space-y-8 overflow-hidden">
-            <div class="absolute inset-0 -z-10 flex items-center justify-center opacity-10">
-                <div class="w-[500px] h-[500px] rounded-full bg-gradient-to-r from-blue-700 to-indigo-700 blur-[120px]"></div>
-            </div>
-
-            <div class="inline-flex items-center gap-2 px-3 py-1 bg-neutral-900 border border-neutral-800/80 rounded-full">
-                <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" aria-hidden="true"></span>
-                <span class="text-[10px] font-black uppercase tracking-wider text-neutral-400">Next-Gen Academic Engine Live</span>
-            </div>
-
-            <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight max-w-4xl leading-[1.1] text-gradient">
-                The Ultimate Secure Digital Repository for Core Science Students
-            </h1>
-
-            <p class="text-neutral-400 text-sm sm:text-base max-w-2xl leading-relaxed">
-                Unlock high-tier academic materials built explicitly to transition secondary candidates into top-tier performers. Read curriculum summaries inline securely, watch video guides, and master your syllabus.
-            </p>
-
-            <div class="flex flex-col sm:flex-row items-center gap-4 pt-4 w-full sm:w-auto">
-                <a href="login.html?action=register" class="w-full sm:w-auto text-center bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold px-6 py-3.5 rounded-xl shadow-lg shadow-blue-900/20 transition-all">
-                    Launch Classroom Workspace
-                </a>
-                <a href="#features" class="w-full sm:w-auto text-center bg-neutral-900 border border-neutral-800/80 hover:border-neutral-700 text-neutral-300 text-xs font-bold px-6 py-3.5 rounded-xl transition-all">
-                    Explore Core Modules
-                </a>
-            </div>
-        </section>
-
-        <!-- VALUE PILLARS DECK (FEATURES) -->
-        <section id="features" class="px-6 py-16 max-w-6xl mx-auto border-t border-neutral-900/60 scroll-mt-20">
-            <header class="text-center space-y-2 mb-12">
-                <h2 class="text-2xl sm:text-3xl font-black tracking-tight text-neutral-100">Engineered for Academic Mastery</h2>
-                <p class="text-xs text-neutral-500 font-bold uppercase tracking-wider">High performance learning metrics without compromise</p>
-            </header>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <!-- FEATURE CARD 1 -->
-                <article class="bg-neutral-900/40 border border-neutral-900 rounded-2xl p-6 flex flex-col space-y-3 hover:border-neutral-800 transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-blue-950 border border-blue-900/30 flex items-center justify-center text-blue-400 font-bold" aria-hidden="true">📖</div>
-                    <h3 class="text-base font-bold text-neutral-200">Secure Inline Document Viewer</h3>
-                    <p class="text-xs text-neutral-400 leading-relaxed">Study premium revision text matrices, high-resolution PDFs, and comprehensive Word documents directly in your workspace browser drawer with zero file downloads.</p>
-                </article>
-
-                <!-- FEATURE CARD 2 -->
-                <article class="bg-neutral-900/40 border border-neutral-900 rounded-2xl p-6 flex flex-col space-y-3 hover:border-neutral-800 transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-indigo-950 border border-indigo-900/30 flex items-center justify-center text-indigo-400 font-bold" aria-hidden="true">🎬</div>
-                    <h3 class="text-base font-bold text-neutral-200">Integrated Video Breakdowns</h3>
-                    <p class="text-xs text-neutral-400 leading-relaxed">Bridge the gap between theoretical syllabus notes and absolute analytical core concepts via interactive video modules explicitly attached to text modules.</p>
-                </article>
-
-                <!-- FEATURE CARD 3 -->
-                <article class="bg-neutral-900/40 border border-neutral-900 rounded-2xl p-6 flex flex-col space-y-3 hover:border-neutral-800 transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-950 border border-emerald-900/30 flex items-center justify-center text-emerald-400 font-bold" aria-hidden="true">⚡</div>
-                    <h3 class="text-base font-bold text-neutral-200">Dynamic Live Subject Filtering</h3>
-                    <p class="text-xs text-neutral-400 leading-relaxed">Toggle between physics frameworks, chemistry formulas, mathematics tutorials, and english modules instantly via a fully unified, lightning-fast database core cache interface.</p>
-                </article>
-            </div>
-        </section>
-
-        <!-- SUBJECT CURRICULUM OVERVIEW METRIC -->
-        <section id="curriculum" class="px-6 py-16 bg-neutral-950 border-t border-b border-neutral-900/80 scroll-mt-20">
-            <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div class="space-y-6">
-                    <div class="inline-block px-3 py-1 bg-neutral-900 border border-neutral-800 rounded-md text-[10px] font-bold uppercase tracking-wider text-blue-400">Comprehensive Core Science Vault</div>
-                    <h2 class="text-3xl font-black tracking-tight leading-tight text-neutral-100">Aligned Directly with West African Senior Secondary Syllabus Matrix Cycles</h2>
-                    <p class="text-xs text-neutral-400 leading-relaxed">
-                        Every resource inside Nexus Pro is engineered to fulfill standard examination criteria for transitioning students. We break down dense core syllabus modules into high-impact, actionable text and video modules.
-                    </p>
-                    <ul class="space-y-3 text-xs text-neutral-300 font-semibold" aria-label="Curriculum Coverage List">
-                        <li class="flex items-center gap-3"><span class="text-blue-500 font-bold">✓</span> Advanced Physics Structural Mechanics &amp; Modern Quantum Frameworks</li>
-                        <li class="flex items-center gap-3"><span class="text-blue-500 font-bold">✓</span> Analytical Organic Chemistry Reactions &amp; Stoichiometry Rules</li>
-                        <li class="flex items-center gap-3"><span class="text-blue-500 font-bold">✓</span> Core Mathematical Formulations, Calculus, &amp; Geometric Theorems</li>
-                    </ul>
-                </div>
-                
-                <div class="bg-neutral-900 border border-neutral-800/80 rounded-2xl p-6 space-y-4 shadow-xl">
-                    <h3 class="text-sm font-bold text-neutral-400 uppercase tracking-wide">Live Material Repository Statistics</h3>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="bg-neutral-950 border border-neutral-800/60 p-4 rounded-xl">
-                            <span class="block text-xl font-black text-neutral-100">Physics Vault</span>
-                            <span class="text-[10px] font-medium text-neutral-500">100% Syllabus Cycle Map</span>
-                        </div>
-                        <div class="bg-neutral-950 border border-neutral-800/60 p-4 rounded-xl">
-                            <span class="block text-xl font-black text-neutral-100">Chemistry Vault</span>
-                            <span class="text-[10px] font-medium text-neutral-500">Active Lab Summary Packs</span>
-                        </div>
+    <!-- Core Page Content Wrapper -->
+    <main>
+        
+        <!-- Section: Hero Canvas -->
+        <section id="hero" class="hero-banner">
+            <div class="hero-layout">
+                <div class="hero-text">
+                    <h1>Command Unified Analytics &amp; Intelligent Workspaces</h1>
+                    <p>Deploy secure workspace terminal nodes, real-time sync networks, integrated academic calculation tools, and advanced automation scripts built for seamless execution performance.</p>
+                    <div class="hero-cta-deck">
+                        <a href="login.html" class="btn-portal" style="padding: 13px 28px; font-size: 0.95rem;">Launch Dashboard</a>
+                        <a href="#services" class="btn-secondary">View Core Services</a>
                     </div>
-                    <div class="p-4 bg-blue-950/20 border border-blue-900/30 rounded-xl text-center">
-                        <span class="text-xs font-bold text-blue-400">🚀 Engineered to systematically secure A1 exam marks</span>
+                </div>
+                <div class="hero-graphic">
+                    <div class="hero-visual-box glass">
+                        <i class="fas fa-terminal"></i>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- CLOSING PERSUASION REGION (CTA) -->
-        <section id="platform" class="px-6 py-20 max-w-4xl mx-auto text-center space-y-6 scroll-mt-20">
-            <h2 class="text-3xl font-black tracking-tight text-neutral-100">Ready to Elevate Your Learning Parameters?</h2>
-            <p class="text-xs sm:text-sm text-neutral-400 max-w-xl mx-auto leading-relaxed">
-                Gain immediate entry to role-based student control dashboards, secure in-app reading modules, and unified material grids right now.
-            </p>
-            <div class="pt-2">
-                <a href="login.html?action=register" class="inline-block bg-white text-neutral-950 text-xs font-bold px-8 py-3.5 rounded-xl hover:bg-neutral-200 transition-all shadow-md">
-                    Initialize Workspace Environment
-                </a>
+        <!-- Section: Services Matrix -->
+        <section id="services">
+            <div class="section-header">
+                <h2>Integrated Module Architecture</h2>
+                <p>Powerful core systems designed to optimize application control, data processing metrics, and operations workflow.</p>
+            </div>
+            
+            <div class="services-grid">
+                <!-- Service 1: AI Assignment Solver -->
+                <article class="service-card glass">
+                    <div class="service-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--neon-blue);">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>Intelligent AI Solvers</h3>
+                    <p>Run complex text parsing queries and mathematical formulas effortlessly using automated background processor logic directly within your terminal view.</p>
+                </article>
+
+                <!-- Service 2: Premium E-Library Data -->
+                <article class="service-card glass">
+                    <div class="service-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--accent-green);">
+                        <i class="fas fa-box-archive"></i>
+                    </div>
+                    <h3>Structured Libraries</h3>
+                    <p>Instant file distribution mechanics delivering high-volume digital guides, reference textbooks, and structured curriculum databases securely.</p>
+                </article>
+
+                <!-- Service 3: Custom Web Engineering -->
+                <article class="service-card glass">
+                    <div class="service-icon" style="background: rgba(139, 92, 246, 0.1); color: var(--accent-purple);">
+                        <i class="fas fa-shield-halved"></i>
+                    </div>
+                    <h3>Role Authentication</h3>
+                    <p>Multi-tier secure identity layers isolating administrative command arrays from standard subscriber screens using high-performance state filters.</p>
+                </article>
+
+                <!-- Service 4: Visual Asset Graphics Design -->
+                <article class="service-card glass">
+                    <div class="service-icon" style="background: rgba(249, 115, 22, 0.1); color: var(--accent-orange);">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <h3>Real-Time Cloud Sync</h3>
+                    <p>Persistent storage engines executing continuous telemetry and logging tracking pipelines safely inside isolated operational database nodes.</p>
+                </article>
             </div>
         </section>
 
-    </main>
+        <!-- Section: Interactive Validated Contact Gateway -->
+        <section id="contact">
+            <div class="section-header">
+                <h2>System Communication</h2>
+                <p>Submit inquiries regarding console deployment permissions, account initialization codes, or enterprise support metrics.</p>
+            </div>
 
-    <!-- FOOTER LINK SHELL -->
-    <footer class="w-full border-t border-neutral-900 py-8 px-6 bg-neutral-950 text-center space-y-3">
-        <p class="text-xs text-neutral-500 font-semibold">&copy; 2026 Nexus Pro Academy. Built Securely. All Rights Reserved.</p>
-        <div class="text-[10px] text-neutral-600 font-medium space-x-4">
-            <a href="#" class="hover:underline">Academic Privacy Protocol</a>
-            <span>•</span>
-            <a href="#" class="hover:underline">Terms of Service</a>
-        </div>
-    </footer>
+            <div class="contact-layout">
+                <div class="contact-info-panel">
+                    <h3>Nexus Pro Networks</h3>
+                    <p>Our infrastructure management team monitors active request pipelines to maintain sustained terminal connection stability.</p>
+                    
+                    <div class="info-details-row">
+                        <div class="info-icon-wrapper"><i class="fas fa-server"></i></div>
+                        <div>
+                            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Network Operations</div>
+                            <div style="font-size:0.95rem; font-weight:600;">sysadmin@nexuspro.io</div>
+                        </div>
+                    </div>
+                    <div class="info-details-row">
+                        <div class="info-icon-wrapper"><i class="fas fa-circle-nodes"></i></div>
+                        <div>
+                            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Primary Node Coordinates</div>
+                            <div style="font-size:0.95rem; font-weight:600;">Lagos, Nigeria Hub</div>
+                        </div>
+                    </div>
+                </div>
 
-</body>
-                    </html>
+                <div class="contact-form-panel">
+                    <form id="landing-contact-form" novalidate>
+                        <div class="form-input-group">
+                            <label for="client-name">Identity Handle</label>
+                            <input type="text" id="client-name" class="form-control" placeholder="Enter name or team tag...">
+                        </div>
+                        <div class="form-input-group">
+                            <label for="client-email">Routing Email Address</label>
+                            <input type="email" id="client-email" class="form-control" placeholder="admin@nexuspro.io">
+                        </div>
+                        <div class="form-input-group">
+                            <label for="client-message">Request Description</label>
+                            <textarea id="client-message" class="form-control" placeholder="Detail your network request or system optimization target parameters..."></textarea>
+                        </div>
+                        <button type="submit" class="btn-portal" style="width:100%; padding:12px; display:flex; justify-content:center; align-items:center; ga
