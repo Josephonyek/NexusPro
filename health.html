@@ -91,76 +91,57 @@
             font-size: 1.05rem;
         }
 
-        /* Advice Search Panel */
-        .search-panel {
-            padding: 30px;
+        /* Dynamic Health Advice Showcase Banner */
+        .advice-showcase {
+            background: radial-gradient(circle at top left, rgba(6, 182, 212, 0.15), transparent 60%);
+            padding: 35px;
+            text-align: center;
             margin-bottom: 40px;
-            border-left: 4px solid var(--health-accent);
-        }
-        
-        .search-panel h2 {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .search-bar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-
-        .search-bar input {
-            flex: 1;
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--glass-border);
-            color: white;
-            padding: 14px 20px;
-            border-radius: 8px;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.3s;
-        }
-        .search-bar input:focus {
-            border-color: var(--health-accent);
-        }
-
-        .search-bar button {
-            background: var(--health-accent);
-            color: #000;
-            border: none;
-            padding: 0 25px;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: opacity 0.2s, transform 0.1s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .search-bar button:hover { opacity: 0.9; }
-        .search-bar button:active { transform: scale(0.98); }
-
-        /* Advice Results Container */
-        #advice-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .advice-card {
-            background: rgba(6, 182, 212, 0.05);
             border: 1px solid rgba(6, 182, 212, 0.2);
-            padding: 20px;
-            border-radius: 8px;
+            position: relative;
         }
-        .advice-heading { color: var(--text-main); font-size: 1.1rem; margin-bottom: 8px; }
-        .advice-text { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 12px; }
-        .advice-link { color: var(--health-accent); text-decoration: none; font-size: 0.9rem; font-weight: 600; }
-        .advice-link:hover { text-decoration: underline; }
+
+        .advice-tag {
+            background: rgba(6, 182, 212, 0.2);
+            color: #22d3ee;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        #live-advice-text {
+            font-size: 1.4rem;
+            font-weight: 600;
+            line-height: 1.4;
+            max-width: 850px;
+            margin: 0 auto 20px auto;
+            color: var(--text-main);
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .btn-refresh-advice {
+            background: transparent;
+            border: 1px solid var(--glass-border);
+            color: var(--text-main);
+            padding: 8px 18px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .btn-refresh-advice:hover {
+            background: rgba(255,255,255,0.05);
+            border-color: var(--text-muted);
+        }
 
         /* Main Grid Layout */
         .content-grid {
@@ -171,8 +152,6 @@
 
         @media (max-width: 900px) {
             .content-grid { grid-template-columns: 1fr; }
-            .search-bar { flex-direction: column; }
-            .search-bar button { padding: 14px; justify-content: center; }
         }
 
         .section-header {
@@ -264,6 +243,7 @@
             padding: 20px;
             border-radius: 12px;
             border-left: 4px solid var(--accent-green);
+            animation: fadeIn 0.5s ease-in-out;
         }
 
         .nutrition-badge {
@@ -296,6 +276,11 @@
             padding: 30px;
             font-style: italic;
         }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -314,15 +299,14 @@
             <p>Access live clinical advisories, global health journalism, and structural nutrition for peak cognitive performance.</p>
         </div>
 
-        <!-- Health Advice Search API Interface -->
-        <div class="search-panel glass">
-            <h2><i class="fas fa-stethoscope"></i> Clinical Advice & Condition Directory</h2>
-            <div class="search-bar">
-                <input type="text" id="search-keyword" placeholder="Search conditions (e.g., Asthma, Diabetes, Malaria...)">
-                <button onclick="searchConditions()"><i class="fas fa-search"></i> Search</button>
-            </div>
-            <div id="advice-container"></div>
-        </div>
+        <!-- Dynamic Clinical Advice Node Banner -->
+        <section class="advice-showcase glass">
+            <div class="advice-tag">Live Health Directive</div>
+            <div id="live-advice-text">Initializing wellness recommendation infrastructure...</div>
+            <button class="btn-refresh-advice" onclick="rotateHealthAdvice()">
+                <i class="fas fa-rotate"></i> Next Directive
+            </button>
+        </section>
 
         <!-- Main Content Grid -->
         <div class="content-grid">
@@ -335,35 +319,11 @@
                 </div>
             </div>
 
-            <!-- Column 2: Nutritional Tips -->
+            <!-- Column 2: Nutritional Tips (Dynamic Rotation) -->
             <div>
-                <h3 class="section-header"><i class="fas fa-apple-whole" style="color: var(--accent-green);"></i> Nutritional Scaffolding</h3>
-                <div class="nutrition-sidebar">
-                    
-                    <div class="nutrition-card">
-                        <span class="nutrition-badge">Cognitive Output</span>
-                        <h4>Omega-3 Fatty Acids</h4>
-                        <p>Essential for brain cell membranes. Incorporating fish (like mackerel or sardines), walnuts, and chia seeds maximizes neural plasticity during intense study and coding sessions.</p>
-                    </div>
-
-                    <div class="nutrition-card">
-                        <span class="nutrition-badge">Sustained Energy</span>
-                        <h4>Complex Carbohydrates</h4>
-                        <p>Avoid processed sugar crashes. Rely on oats, brown rice, and whole grains to deliver a stable glucose pipeline to the prefrontal cortex for hours of uninterrupted focus.</p>
-                    </div>
-
-                    <div class="nutrition-card">
-                        <span class="nutrition-badge">Ocular Defense</span>
-                        <h4>Vitamin A & Hydration</h4>
-                        <p>Protect your eyes from screen fatigue. Consume leafy greens and carrots, and maintain a strict hydration baseline of 3+ liters of water daily to prevent ocular tissue degradation.</p>
-                    </div>
-
-                    <div class="nutrition-card">
-                        <span class="nutrition-badge">System Recovery</span>
-                        <h4>Magnesium Nodes</h4>
-                        <p>Crucial for sleep-wake synchronization and stress regulation. Dark chocolate, spinach, and pumpkin seeds naturally down-regulate nervous system stress metrics after exams.</p>
-                    </div>
-
+                <h3 class="section-header"><i class="fas fa-apple-whole" style="color: var(--accent-green);"></i> Dynamic Nutrition Grid</h3>
+                <div class="nutrition-sidebar" id="nutrition-container">
+                    <!-- Loaded dynamically via javascript matrix -->
                 </div>
             </div>
 
@@ -372,61 +332,90 @@
 
     <!-- Interactive Scripts -->
     <script>
-        const adviceContainer = document.getElementById('advice-container');
         const newsContainer = document.getElementById('news-container');
+        const nutritionContainer = document.getElementById('nutrition-container');
+        const adviceTextField = document.getElementById('live-advice-text');
 
-        // Render Advice HTML Block
-        function renderAdvice(topics) {
-            if (!topics || topics.length === 0) {
-                adviceContainer.innerHTML = '<div class="loading">No matching medical entries found. Try terms like "Diabetes" or "Asthma".</div>';
-                return;
+        // Dynamic Clinical Advisories Pool Matrix
+        const healthAdvicePool = [
+            "Ensure a consistent 7 to 9 hours of structured, dark room sleep to systematically reset synaptic clarity and long-term memory metrics.",
+            "Implement a strict 20-minute visual break stance looking at a distance after every two hours of continuous screen monitor processing.",
+            "Maintain fluid volumetrics above 3 liters of water daily to keep physical fatigue and oxidative stress down during prolonged study intervals.",
+            "Integrate dynamic posture stretching drills every 90 minutes to prevent lumbar stress and sustain optimal oxygen circulation to the brain.",
+            "Expose your eyes to direct natural outdoor sunlight for 10-15 minutes every morning to align and calibrate internal biological clock rhythms.",
+            "Limit high-velocity sugar inputs during night study sessions to avoid reactive hypoglycemia spikes that disrupt critical analytical thinking logic."
+        ];
+
+        // Extended pool of structural nutrition nodes for auto-rotation mechanics
+        const nutritionPool = [
+            {
+                badge: "Cognitive Output",
+                title: "Omega-3 Fatty Acids",
+                desc: "Essential for brain cell membranes. Incorporating fish (like mackerel or sardines), walnuts, and chia seeds maximizes neural plasticity during intense study and coding sessions."
+            },
+            {
+                badge: "Sustained Energy",
+                title: "Complex Carbohydrates",
+                desc: "Avoid processed sugar crashes. Rely on oats, sweet potatoes, and whole grains to deliver a stable glucose pipeline to the prefrontal cortex for hours of uninterrupted focus."
+            },
+            {
+                badge: "Ocular Defense",
+                title: "Vitamin A & Hydration",
+                desc: "Protect your eyes from screen fatigue. Consume dark leafy greens and carrots, and maintain a strict hydration baseline of 3+ liters of water daily to prevent ocular tissue degradation."
+            },
+            {
+                badge: "System Recovery",
+                title: "Magnesium Nodes",
+                desc: "Crucial for sleep-wake synchronization and stress regulation. Dark chocolate, spinach, and pumpkin seeds naturally down-regulate nervous system stress metrics after exams."
+            },
+            {
+                badge: "Neural Shielding",
+                title: "Antioxidant Berries",
+                desc: "Blueberries, strawberries, and local wild berries contain anthocyanins that improve structural blood flow to the brain, shielding neurons from oxidative study stress."
+            },
+            {
+                badge: "Synaptic Transmission",
+                title: "Lean Proteins & Choline",
+                desc: "Eggs and chicken breasts contain high levels of choline, a precursor neurotransmitter critical for structural memory updates and quick technical decision loops."
+            },
+            {
+                badge: "Focus Acceleration",
+                title: "L-Theanine & Green Tea",
+                desc: "Swapping heavy coffee runs for green tea introduces L-Theanine, which smooths out focus, cutting nervousness out of complex programming operations."
+            },
+            {
+                badge: "Cellular Energy",
+                title: "Iron & B-Vitamin Matrix",
+                desc: "Legumes, beans, and whole grains boost red blood cell efficiency, preventing cellular fatigue during prolonged engineering or physics calculations."
             }
-            adviceContainer.innerHTML = '';
-            topics.forEach(item => {
-                adviceContainer.innerHTML += `
-                    <div class="advice-card">
-                        <h4 class="advice-heading">${item.Title || 'Guideline Update'}</h4>
-                        <p class="advice-text">${item.Notes || item.Teaser || 'Click below to review official medical parameters.'}</p>
-                        <a class="advice-link" href="${item.AccessibleVersion || '#'}" target="_blank">Read Official Guide <i class="fas fa-arrow-right"></i></a>
+        ];
+
+        // Rotate individual clinical advisory item
+        function rotateHealthAdvice() {
+            const randomAdvice = healthAdvicePool[Math.floor(Math.random() * healthAdvicePool.length)];
+            adviceTextField.innerText = `"${randomAdvice}"`;
+        }
+
+        // Randomly pick and arrange 4 nutritional tip matrix components on load
+        function populateDynamicNutrition() {
+            const shuffled = [...nutritionPool].sort(() => 0.5 - Math.random());
+            const selectedTips = shuffled.slice(0, 4);
+            
+            nutritionContainer.innerHTML = '';
+            selectedTips.forEach(tip => {
+                nutritionContainer.innerHTML += `
+                    <div class="nutrition-card">
+                        <span class="nutrition-badge">${tip.badge}</span>
+                        <h4>${tip.title}</h4>
+                        <p>${tip.desc}</p>
                     </div>
                 `;
             });
         }
 
-        // Fetch Advice from Backend API
-        async function searchConditions() {
-            const keyword = document.getElementById('search-keyword').value.trim();
-            if(!keyword) {
-                alert('Please enter a medical condition or topic to search.');
-                return;
-            }
-            adviceContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Querying clinical databases...</div>';
-            try {
-                // Connecting to your existing Vercel API endpoint
-                const res = await fetch(`/api/healthAdvice?type=search&keyword=${keyword}`);
-                const data = await res.json();
-                let topics = data.Result?.Topics?.Topic || data.Result?.MyHealthFinder?.ResultObjects?.ResultObject || [];
-                
-                // Ensure data is an array
-                if (!Array.isArray(topics)) topics = [topics];
-                
-                renderAdvice(topics);
-            } catch (err) {
-                adviceContainer.innerHTML = '<div class="loading" style="color: #ef4444;">Search query connection dropped. Please verify your backend serverless functions are active.</div>';
-            }
-        }
-
-        // Optional: Trigger search on "Enter" key press
-        document.getElementById('search-keyword').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') {
-                searchConditions();
-            }
-        });
-
         // Fetch Verified News Records from Backend API
         async function fetchHealthNews() {
             try {
-                // Connecting to your existing Vercel API endpoint
                 const res = await fetch('/api/healthAdvice?type=news');
                 const data = await res.json();
                 const articles = data.articles || [];
@@ -458,7 +447,9 @@
             }
         }
 
-        // Initialize News layout execution on load
+        // Initialize execution matrix targets on engine activation
+        rotateHealthAdvice();
+        populateDynamicNutrition();
         fetchHealthNews();
     </script>
 </body>
