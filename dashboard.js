@@ -1,71 +1,99 @@
 /**
- * Nexus Pro - Student Grid Console Controller
+ * Nexus Pro Console Lifecycle Driver
  */
 
 document.addEventListener("DOMContentLoaded", () => {
-    // Dismiss rendering blocks preloader
+    // Drop execution block preloader
     const loader = document.getElementById("preloader");
     if (loader) {
         loader.classList.add("fade-out");
         setTimeout(() => loader.remove(), 300);
     }
 
-    // Toggle logic for the layout notification area container 
-    const bellBtn = document.getElementById("bell-toggle-btn");
-    const notifyPane = document.getElementById("notification-pane");
-    const dot = document.querySelector(".notification-dot");
+    // Interactive Hamburger Menu Mechanics
+    setupMasterHamburgerDropdown();
 
-    if (bellBtn && notifyPane) {
-        bellBtn.addEventListener("click", (e) => {
-            e.preventDefault();
-            notifyPane.classList.toggle("active");
-            
-            // Clear notification badge icon light indicator once viewed
-            if (dot) dot.style.display = "none";
-        });
-    }
+    // Authenticate and mount content configurations
+    evaluateConsoleIdentitySession();
 });
 
 /**
- * Simulates text engine parsing actions inside Box 1
+ * Toggles visibility states for the global drawer overlay
  */
-function executeLocalAISolver() {
-    const textInput = document.getElementById("ai-query-input").value.trim();
-    const outputArea = document.getElementById("ai-output-box");
+function setupMasterHamburgerDropdown() {
+    const trigger = document.getElementById("menu-hamburger-trigger");
+    const panel = document.getElementById("global-dropdown-panel");
 
-    if (!textInput) {
-        outputArea.innerHTML = "<span style='color:#ef4444;'>Error: Input parameter missing.</span>";
-        return;
-    }
+    if (!trigger || !panel) return;
 
-    outputArea.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Processing logical evaluation lines...";
+    trigger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        panel.classList.toggle("active");
+    });
 
-    setTimeout(() => {
-        outputArea.innerHTML = `<strong>Analysis Complete:</strong> Verified query parsing for: "${textInput}".<br><br>Detailed curriculum steps generated inside structural database cache blocks.`;
-    }, 1000);
+    document.addEventListener("click", (e) => {
+        if (!panel.contains(e.target) && e.target !== trigger) {
+            panel.classList.remove("active");
+        }
+    });
 }
 
 /**
- * Processes mock support workspace array logging for Box 4
+ * Validates tracking variables to apply role view structures
  */
-function dispatchLocalTicket() {
-    const title = document.getElementById("ticket-title").value.trim();
-    const desc = document.getElementById("ticket-desc").value.trim();
+function evaluateConsoleIdentitySession() {
+    let sessionData = localStorage.getItem("nexus_user_session");
 
-    if (!title || !desc) {
-        alert("Please completely describe your interface logging state.");
-        return;
+    // Developer Box Safeguard: Sets up local token if testing directly via file systems
+    if (!sessionData) {
+        console.info("Identity token unassigned. Issuing default mock student object.");
+        const sandboxProfile = {
+            uid: "sandbox_dev_token",
+            email: "user@trivexacademy.com",
+            role: "student" // Flip string value to "admin" to view administrative box components
+        };
+        localStorage.setItem("nexus_user_session", JSON.stringify(sandboxProfile));
+        sessionData = localStorage.getItem("nexus_user_session");
     }
 
-    alert("Console Event: Support database logging complete!");
-    document.getElementById("ticket-title").value = "";
-    document.getElementById("ticket-desc").value = "";
+    try {
+        const userSession = JSON.parse(sessionData);
+        renderAccountRoleLayout(userSession.role || "student");
+    } catch (err) {
+        console.error("Session serialization error. Cleaning environment variables.", err);
+        localStorage.removeItem("nexus_user_session");
+        window.location.replace("login.html");
+    }
 }
 
 /**
- * Triggers logout session flush scripts
+ * Displays appropriate dashboard blocks based on current privileges
+ */
+function renderAccountRoleLayout(role) {
+    const studentWrapper = document.getElementById("student-view-wrapper");
+    const adminWrapper = document.getElementById("admin-view-wrapper");
+    const studentNavElements = document.querySelectorAll(".student-elements");
+    const adminNavElements = document.querySelectorAll(".admin-elements");
+
+    if (role === "admin") {
+        if (adminWrapper) adminWrapper.style.display = "block";
+        if (studentWrapper) studentWrapper.style.display = "none";
+        
+        adminNavElements.forEach(el => el.style.display = "flex");
+        studentNavElements.forEach(el => el.style.display = "none");
+    } else {
+        if (studentWrapper) studentWrapper.style.display = "block";
+        if (adminWrapper) adminWrapper.style.display = "none";
+        
+        adminNavElements.forEach(el => el.style.display = "none");
+        studentNavElements.forEach(el => el.style.display = "flex");
+    }
+}
+
+/**
+ * Triggers session clears and navigates back out to security gateways
  */
 function handleSignOutAction() {
     localStorage.removeItem("nexus_user_session");
     window.location.replace("login.html");
-        }
+            }
