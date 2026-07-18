@@ -1,51 +1,45 @@
 /**
- * Nexus Pro Platform Core Dashboard Engine
- * Handles fast preloader dismissal, responsive sidebars, workspace tab execution,
- * role-based route tracking, and Firebase runtime metrics.
+ * Nexus Pro Platform Dashboard Engine
+ * Handles high-speed DOM lifecycles and role-filtered visibility rules.
  */
 
-// Initialize configurations when the DOM structural layout tree is active
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Core Speed & Viewport Engines
+    // 1. Performance UI Layers
     dismissPreloaderFast();
     setupMobileNavigationPanel();
     setupTabWorkspaceController();
 
-    // 2. Security & Application Logic Engines
+    // 2. Security Identity Guard
     verifyUserAuthenticationSession();
-    initializeFirebaseDataListeners();
 });
 
 /**
- * Section 1: UI Performance and Viewport Operations
+ * Drops the initial overlay instantly when page structure builds
  */
-
 function dismissPreloaderFast() {
     const preloader = document.getElementById("preloader");
     if (preloader) {
-        // Drop layout layer visibility based on snappy 0.3s CSS rules
         preloader.classList.add("fade-out");
-        
-        // Completely destroy node element tree to free up system render threads
         setTimeout(() => {
             preloader.remove();
-        }, 300);
+        }, 300); // Destruction matches 0.3s fading transition
     }
 }
 
+/**
+ * Standard slider navigation toggle mechanics for small/mobile layouts
+ */
 function setupMobileNavigationPanel() {
     const menuToggle = document.getElementById("menu-toggle");
     const sidebar = document.getElementById("sidebar");
 
     if (!menuToggle || !sidebar) return;
 
-    // Toggle structural slider display classes on user input
     menuToggle.addEventListener("click", (event) => {
         event.stopPropagation();
         sidebar.classList.toggle("active");
     });
 
-    // Auto-collapse mobile canvas if click action targets background panels
     document.addEventListener("click", (event) => {
         if (sidebar.classList.contains("active") && !sidebar.contains(event.target) && event.target !== menuToggle) {
             sidebar.classList.remove("active");
@@ -53,6 +47,9 @@ function setupMobileNavigationPanel() {
     });
 }
 
+/**
+ * Handles container workspace swapping if any tabs are used locally
+ */
 function setupTabWorkspaceController() {
     const menuLinks = document.querySelectorAll(".menu-link");
     const tabContents = document.querySelectorAll(".tab-content");
@@ -67,11 +64,9 @@ function setupTabWorkspaceController() {
             const targetTabId = link.getAttribute("data-tab");
             if (!targetTabId) return;
 
-            // Step 1: Update visual indicator arrays on target button options
             menuLinks.forEach(item => item.classList.remove("active"));
             link.classList.add("active");
 
-            // Step 2: Swap viewport sections smoothly using dynamic token classes
             tabContents.forEach(section => {
                 if (section.id === targetTabId) {
                     section.classList.add("active");
@@ -80,7 +75,6 @@ function setupTabWorkspaceController() {
                 }
             });
 
-            // Step 3: Collapse sidebar automatically on smaller devices
             if (window.innerWidth <= 768 && sidebar) {
                 sidebar.classList.remove("active");
             }
@@ -89,96 +83,91 @@ function setupTabWorkspaceController() {
 }
 
 /**
- * Section 2: Authentication Session Controls & Security Routing
+ * Validates browser authentication blocks to determine the role panel view
  */
-
 function verifyUserAuthenticationSession() {
-    // Read session cache validation blocks 
-    let encodedUserSession = localStorage.getItem("nexus_user_session");
+    let sessionData = localStorage.getItem("nexus_user_session");
     
-    // FIX: Avoid forcing a redirect to login.html during testing if local storage is cleared
-    if (!encodedUserSession) {
-        console.warn("No active session trace detected. Provisioning a development session to bypass login redirection.");
-        
-        const devSession = {
-            uid: "dev_user_123",
+    // Developer Sandbox Safety: Bypasses login.html redirection loop during local code testing
+    if (!sessionData) {
+        console.info("No session token identified. Provisioning placeholder dev admin token.");
+        const localSessionTemplate = {
+            uid: "dev_session_token",
             email: "admin@trivexacademy.com",
-            role: "admin" // Set to "student" to test standard structural filters
+            role: "student" // Change this token property value to "admin" or "student" to preview roles instantly!
         };
-        
-        localStorage.setItem("nexus_user_session", JSON.stringify(devSession));
-        encodedUserSession = localStorage.getItem("nexus_user_session");
+        localStorage.setItem("nexus_user_session", JSON.stringify(localSessionTemplate));
+        sessionData = localStorage.getItem("nexus_user_session");
     }
 
     try {
-        const userProfile = JSON.parse(encodedUserSession);
-        applyRoleBasedAccessPrivileges(userProfile.role || "student");
-    } catch (error) {
-        console.error("Session verification structural malfunction. Purging corrupted session arrays:", error);
+        const profile = JSON.parse(sessionData);
+        enforceRoleContentPermissions(profile.role || "student");
+    } catch (e) {
+        console.error("Damaged session token tracking array. Cleaning environment.", e);
         localStorage.removeItem("nexus_user_session");
         window.location.replace("login.html");
     }
 }
 
-function applyRoleBasedAccessPrivileges(userRole) {
-    console.log(`Securing dashboard viewport routing. Identity Context Mode: [${userRole.toUpperCase()}]`);
-    
-    const administrativeLinks = document.querySelectorAll("[data-tab='user-management-section'], [data-tab='broadcast-section']");
-    
-    if (userRole !== "admin") {
-        // Enforce access rule arrays: Strip internal layout options from student views
-        administrativeLinks.forEach(element => {
-            element.style.display = "none";
-        });
+/**
+ * Toggles structural layout components in the menu bar matching the current authorization permissions
+ */
+function enforceRoleContentPermissions(role) {
+    const adminElements = document.querySelectorAll(".admin-controls");
+    const studentElements = document.querySelectorAll(".student-controls");
+    const mainContentArea = document.querySelector(".main-workspace");
+
+    console.log(`Nexus Engine: Filtering workspaces for role profile: [${role.toUpperCase()}]`);
+
+    // Clean out previous informational cards before running a rebuild configuration
+    const existingNotice = document.getElementById("role-welcome-notice");
+    if (existingNotice) existingNotice.remove();
+
+    if (role === "admin") {
+        // Hide student links, present administration shortcuts
+        adminElements.forEach(el => el.style.display = "flex");
+        studentElements.forEach(el => el.style.display = "none");
         
-        // Ensure standard accounts default safely to target non-privileged dashboard components
-        const activeLink = document.querySelector(".menu-link.active");
-        if (activeLink && (activeLink.getAttribute("data-tab") === "user-management-section" || activeLink.getAttribute("data-tab") === "broadcast-section")) {
-            triggerFallbackWorkspaceView("overview-section");
+        // Isolate dynamic tab container elements
+        document.querySelectorAll(".tab-content").forEach(view => view.style.display = "none");
+
+        if (mainContentArea) {
+            const adminCard = document.createElement("div");
+            adminCard.id = "role-welcome-notice";
+            adminCard.className = "content-card glass";
+            adminCard.innerHTML = `
+                <h2>Administrative Management Control Hub</h2>
+                <p style="color:var(--text-muted); margin-top:10px;">Select a control module option from the left sidebar to open systems configurations.</p>
+            `;
+            mainContentArea.appendChild(adminCard);
         }
     } else {
-        // Explicitly ensure administrative tabs show up normally if role is upgraded
-        administrativeLinks.forEach(element => {
-            element.style.display = "flex";
-        });
-    }
-}
+        // Show student specific link bars, block admin operations
+        adminElements.forEach(el => el.style.display = "none");
+        studentElements.forEach(el => el.style.display = "flex");
 
-function triggerFallbackWorkspaceView(fallbackTabId) {
-    const targetLink = document.querySelector(`[data-tab="${fallbackTabId}"]`);
-    if (targetLink) {
-        targetLink.click();
-    }
-}
+        // Set the active workspace focus back onto local support container blocks
+        const defaultSupportTab = document.getElementById("support-desk-tab");
+        if (defaultSupportTab) defaultSupportTab.classList.add("active");
 
-/**
- * Section 3: Live Firebase Realtime Database Data Listeners
- */
-
-function initializeFirebaseDataListeners() {
-    // Conditional escape execution if firebase core initialization logic is decoupled externally
-    if (typeof firebase === "undefined" || !firebase.apps.length) {
-        console.info("Firebase context engine decoupled or uninitialized. Initializing static viewport arrays.");
-        return;
-    }
-
-    const dbRefInstance = firebase.database().ref();
-
-    // Stream live total active user profiles directly into display nodes
-    dbRefInstance.child("system_metrics/active_users").on("value", (snapshot) => {
-        const activeUserCounterNode = document.querySelector("#overview-section .metric");
-        if (activeUserCounterNode && snapshot.exists()) {
-            activeUserCounterNode.textContent = Number(snapshot.val()).toLocaleString();
+        if (mainContentArea) {
+            const studentWelcomeCard = document.createElement("div");
+            studentWelcomeCard.id = "role-welcome-notice";
+            studentWelcomeCard.className = "content-card glass";
+            studentWelcomeCard.innerHTML = `
+                <h2>Welcome back to the Command Console</h2>
+                <p style="color:var(--text-muted); margin-top:10px;">Use the menu links on your sidebar to access AI Study assets, your Academy E-Library books, and the Health Hub resources.</p>
+            `;
+            mainContentArea.insertBefore(studentWelcomeCard, mainContentArea.firstChild);
         }
-    }, (error) => {
-        console.error("Live metrics sync failed on path arrays:", error);
-    });
+    }
 }
 
 /**
- * Exposed Interface Execution Layer for Action Dispatchers
+ * Safely signs out the user session
  */
-function handleSignOutOperation() {
+function handleSignOutAction() {
     localStorage.removeItem("nexus_user_session");
     window.location.replace("login.html");
-}
+        }
