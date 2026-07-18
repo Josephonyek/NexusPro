@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro | Next-Gen Command Dashboard Platform</title>
+    <title>Nexus Pro | Advanced E-Learning & Wellness Platform</title>
     <!-- Icon Font Library Docs -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -20,6 +20,7 @@
             --accent-green: #10b981;
             --accent-purple: #8b5cf6;
             --accent-orange: #f97316;
+            --whatsapp-green: #25d366;
         }
 
         * {
@@ -68,7 +69,7 @@
             margin-top: 6px;
         }
 
-        /* Top Navigation Header bar */
+        /* Top Navigation Header Bar */
         header {
             position: fixed;
             top: 0;
@@ -347,6 +348,30 @@
             display: none;
         }
 
+        /* Floating WhatsApp Button Action Panel */
+        .whatsapp-floating-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background-color: var(--whatsapp-green);
+            color: #ffffff;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            box-shadow: 0 4px 16px rgba(37, 211, 102, 0.35);
+            text-decoration: none;
+            z-index: 9999;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+        .whatsapp-floating-btn:hover {
+            transform: scale(1.1);
+            background-color: #20ba5a;
+        }
+
         /* Structural Platform Footer */
         footer {
             background-color: var(--bg-deep);
@@ -434,10 +459,20 @@
             .hero-text h1 { font-size: 2.4rem; }
             .footer-grid { grid-template-columns: 1fr; gap: 30px; }
             .footer-bottom-deck { flex-direction: column; gap: 15px; text-align: center; }
+            .whatsapp-floating-btn { bottom: 20px; right: 20px; width: 50px; height: 50px; font-size: 1.6rem; }
         }
     </style>
 </head>
 <body>
+
+    <!-- Floating WhatsApp Action Gateway Component -->
+    <a href="https://wa.me/2349000000000?text=Hello%20Nexus%20Pro%20Support,%20I%20have%20an%20inquiry%20regarding%20the%20e-learning%20platform." 
+       class="whatsapp-floating-btn" 
+       target="_blank" 
+       rel="noopener noreferrer" 
+       title="Chat with Support on WhatsApp">
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
     <!-- Header Navigation Shell -->
     <header>
@@ -447,7 +482,7 @@
         <nav class="desktop-nav">
             <a href="#hero" class="nav-link">Home</a>
             <a href="#services" class="nav-link">Modules</a>
-            <a href="#contact" class="nav-link">Contact</a>
+            <a href="#contact" class="nav-link">Contact Desk</a>
             <a href="login.html" class="btn-portal">Console Login</a>
         </nav>
         <button class="mobile-hamburger" id="hamburger-toggle-btn" title="Toggle Navigation Bar">
@@ -459,7 +494,7 @@
     <div class="mobile-drawer" id="mobile-nav-drawer">
         <a href="#hero" class="nav-link">Home</a>
         <a href="#services" class="nav-link">Modules</a>
-        <a href="#contact" class="nav-link">Contact</a>
+        <a href="#contact" class="nav-link">Contact Desk</a>
         <a href="login.html" class="btn-portal" style="text-align: center; margin-top: 5px;">Console Login</a>
     </div>
 
@@ -470,16 +505,16 @@
         <section id="hero" class="hero-banner">
             <div class="hero-layout">
                 <div class="hero-text">
-                    <h1>Command Unified Analytics &amp; Intelligent Workspaces</h1>
-                    <p>Deploy secure workspace terminal nodes, real-time sync networks, integrated academic calculation tools, and advanced automation scripts built for seamless execution performance.</p>
+                    <h1>Master Core Sciences While Optimizing Health</h1>
+                    <p>Welcome to a next-generation academic terminal. Nexus Pro integrates advanced assignment solver algorithms, comprehensive e-library resources, and clinical self-care tracking mechanics within an immersive dark workspace environment.</p>
                     <div class="hero-cta-deck">
                         <a href="login.html" class="btn-portal" style="padding: 13px 28px; font-size: 0.95rem;">Launch Dashboard</a>
-                        <a href="#services" class="btn-secondary">View Core Services</a>
+                        <a href="#services" class="btn-secondary">Explore Academic Modules</a>
                     </div>
                 </div>
                 <div class="hero-graphic">
                     <div class="hero-visual-box glass">
-                        <i class="fas fa-terminal"></i>
+                        <i class="fas fa-graduation-cap"></i>
                     </div>
                 </div>
             </div>
@@ -488,8 +523,8 @@
         <!-- Section: Services Matrix -->
         <section id="services">
             <div class="section-header">
-                <h2>Integrated Module Architecture</h2>
-                <p>Powerful core systems designed to optimize application control, data processing metrics, and operations workflow.</p>
+                <h2>Integrated E-Learning Ecosystem</h2>
+                <p>Powerful modules constructed engineered to optimize secondary science processing and cognitive efficiency metrics.</p>
             </div>
             
             <div class="services-grid">
@@ -498,35 +533,35 @@
                     <div class="service-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--neon-blue);">
                         <i class="fas fa-robot"></i>
                     </div>
-                    <h3>Intelligent AI Solvers</h3>
-                    <p>Run complex text parsing queries and mathematical formulas effortlessly using automated background processor logic directly within your terminal view.</p>
+                    <h3>Automated AI Solvers</h3>
+                    <p>Execute text-parsing calculations and step-by-step assignments natively through automated background processing layouts built inside the terminal node.</p>
                 </article>
 
                 <!-- Service 2: Premium E-Library Data -->
                 <article class="service-card glass">
                     <div class="service-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--accent-green);">
-                        <i class="fas fa-box-archive"></i>
+                        <i class="fas fa-book-bookmark"></i>
                     </div>
-                    <h3>Structured Libraries</h3>
-                    <p>Instant file distribution mechanics delivering high-volume digital guides, reference textbooks, and structured curriculum databases securely.</p>
+                    <h3>E-Library Databases</h3>
+                    <p>Instant digital access configurations distributing full secondary textbook volumes, study guides, and core physical science references files securely.</p>
                 </article>
 
-                <!-- Service 3: Custom Web Engineering -->
+                <!-- Service 3: Health Hub Container -->
                 <article class="service-card glass">
                     <div class="service-icon" style="background: rgba(139, 92, 246, 0.1); color: var(--accent-purple);">
-                        <i class="fas fa-shield-halved"></i>
+                        <i class="fas fa-heartbeat"></i>
                     </div>
-                    <h3>Role Authentication</h3>
-                    <p>Multi-tier secure identity layers isolating administrative command arrays from standard subscriber screens using high-performance state filters.</p>
+                    <h3>Integrated Health Hub</h3>
+                    <p>Monitor high-performance study mechanics alongside core physical health trackers, sleep monitoring arrays, and optimized cognitive recovery data logs.</p>
                 </article>
 
                 <!-- Service 4: Visual Asset Graphics Design -->
                 <article class="service-card glass">
                     <div class="service-icon" style="background: rgba(249, 115, 22, 0.1); color: var(--accent-orange);">
-                        <i class="fas fa-network-wired"></i>
+                        <i class="fas fa-headset"></i>
                     </div>
-                    <h3>Real-Time Cloud Sync</h3>
-                    <p>Persistent storage engines executing continuous telemetry and logging tracking pipelines safely inside isolated operational database nodes.</p>
+                    <h3>Technical Support Desk</h3>
+                    <p>Report performance metrics or log runtime debugging tickets down directly to workspace administrative handlers for immediate assistance pipelines.</p>
                 </article>
             </div>
         </section>
@@ -535,26 +570,26 @@
         <section id="contact">
             <div class="section-header">
                 <h2>System Communication</h2>
-                <p>Submit inquiries regarding console deployment permissions, account initialization codes, or enterprise support metrics.</p>
+                <p>Submit text inquiries regarding access permission keys or account configurations directly to platform operations.</p>
             </div>
 
             <div class="contact-layout">
                 <div class="contact-info-panel">
-                    <h3>Nexus Pro Networks</h3>
-                    <p>Our infrastructure management team monitors active request pipelines to maintain sustained terminal connection stability.</p>
+                    <h3>Direct Channels</h3>
+                    <p>Submit the functional interface form on the right to open your email terminal, or toggle the floating overlay button for quick WhatsApp chat synchronization.</p>
                     
                     <div class="info-details-row">
-                        <div class="info-icon-wrapper"><i class="fas fa-server"></i></div>
+                        <div class="info-icon-wrapper"><i class="fas fa-envelope"></i></div>
                         <div>
-                            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Network Operations</div>
-                            <div style="font-size:0.95rem; font-weight:600;">sysadmin@nexuspro.io</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Operations Center</div>
+                            <div style="font-size:0.95rem; font-weight:600;">admin@nexuspro.io</div>
                         </div>
                     </div>
                     <div class="info-details-row">
-                        <div class="info-icon-wrapper"><i class="fas fa-circle-nodes"></i></div>
+                        <div class="info-icon-wrapper"><i class="fas fa-mobile-button"></i></div>
                         <div>
-                            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Primary Node Coordinates</div>
-                            <div style="font-size:0.95rem; font-weight:600;">Lagos, Nigeria Hub</div>
+                           <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Instant Messaging</div>
+                            <div style="font-size:0.95rem; font-weight:600;">WhatsApp Connected</div>
                         </div>
                     </div>
                 </div>
@@ -563,14 +598,152 @@
                     <form id="landing-contact-form" novalidate>
                         <div class="form-input-group">
                             <label for="client-name">Identity Handle</label>
-                            <input type="text" id="client-name" class="form-control" placeholder="Enter name or team tag...">
+                            <input type="text" id="client-name" class="form-control" placeholder="Enter full name...">
                         </div>
                         <div class="form-input-group">
                             <label for="client-email">Routing Email Address</label>
-                            <input type="email" id="client-email" class="form-control" placeholder="admin@nexuspro.io">
+                            <input type="email" id="client-email" class="form-control" placeholder="user@example.com">
                         </div>
                         <div class="form-input-group">
-                            <label for="client-message">Request Description</label>
-                            <textarea id="client-message" class="form-control" placeholder="Detail your network request or system optimization target parameters..."></textarea>
+                            <label for="client-message">Request Statement</label>
+                            <textarea id="client-message" class="form-control" placeholder="Detail your terminal update requirements or system question parameters here..."></textarea>
                         </div>
-                        <button type="submit" class="btn-portal" style="width:100%; padding:12px; display:flex; justify-content:center; align-items:center; ga
+                        <button type="submit" class="btn-portal" style="width:100%; padding:12px; display:flex; justify-content:center; align-items:center; gap:8px;">
+                            <i class="fas fa-paper-plane"></i> Initialize Email Routing
+                        </button>
+                        <div id="form-execution-feedback" class="form-feedback-msg"></div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Structural Platform Footer Component -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand-summary">
+                <a href="#" class="brand-logo">
+                    <i class="fas fa-cubes" style="color: var(--neon-blue);"></i>Nexus<span style="color:var(--neon-blue)">Pro</span>
+                </a>
+                <p>High-reliability e-learning infrastructure and cognitive monitoring dashboard matrices built for stable architectural performance.</p>
+            </div>
+            <div class="footer-links-column">
+                <h4>Platform Navigation</h4>
+                <ul>
+                    <li><a href="#hero">Home Canvas</a></li>
+                    <li><a href="#services">Platform Modules</a></li>
+                    <li><a href="#contact">Contact Gateway</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-column">
+                <h4>Console Terminals</h4>
+                <ul>
+                    <li><a href="login.html">Command Dashboard</a></li>
+                    <li><a href="ai_solver.html">AI Research Panel</a></li>
+                    <li><a href="academy.html">E-Library Space</a></li>
+                </ul>
+            </div>
+            <div class="footer-links-column">
+                <h4>Operational Safety</h4>
+                <ul>
+                    <li><a href="support.html">Support Desk</a></li>
+                    <li><a href="health.html">Health Hub</a></li>
+                    <li><a href="notifications.html">System Broadcasts</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom-deck">
+            <div>&copy; 2026 Nexus Pro Platforms. All structural engineering rights reserved.</div>
+            <div class="social-links-wrapper">
+                <a href="#" class="social-link" title="Source Code Hub"><i class="fab fa-github"></i></a>
+                <a href="#" class="social-link" title="Professional Connection Node"><i class="fab fa-linkedin"></i></a>
+                <a href="#" class="social-link" title="Twitter Platform"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Frontend UI Control Interactivity Script -->
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Mobile Drawer Toggle Control Menu Mechanics
+            const burgerBtn = document.getElementById("hamburger-toggle-btn");
+            const mobileDrawer = document.getElementById("mobile-nav-drawer");
+
+            if (burgerBtn && mobileDrawer) {
+                burgerBtn.addEventListener("click", (e) => {
+                    e.stopPropagation();
+                    mobileDrawer.classList.toggle("active");
+                    const currentIcon = burgerBtn.querySelector("i");
+                    if(mobileDrawer.classList.contains("active")) {
+                        currentIcon.className = "fas fa-times";
+                    } else {
+                        currentIcon.className = "fas fa-bars";
+                    }
+                });
+
+                // Auto collapse drawer on navigating specific hash targets
+                mobileDrawer.querySelectorAll(".nav-link, .btn-portal").forEach(link => {
+                    link.addEventListener("click", () => {
+                        mobileDrawer.classList.remove("active");
+                        burgerBtn.querySelector("i").className = "fas fa-bars";
+                    });
+                });
+            }
+
+            // Contact Form Script Validation & Mailto Forwarding Mechanics
+            const contactForm = document.getElementById("landing-contact-form");
+            const feedbackBlock = document.getElementById("form-execution-feedback");
+
+            if (contactForm && feedbackBlock) {
+                contactForm.addEventListener("submit", (event) => {
+                    event.preventDefault();
+
+                    const nameVal = document.getElementById("client-name").value.trim();
+                    const emailVal = document.getElementById("client-email").value.trim();
+                    const messageVal = document.getElementById("client-message").value.trim();
+
+                    // Baseline validation checks
+                    if (!nameVal || !emailVal || !messageVal) {
+                        renderFormStatus("Error: All form tracking field values are strictly required.", "#ef4444");
+                        return;
+                    }
+
+                    // Email regular expression verification structure
+                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    if (!emailPattern.test(emailVal)) {
+                        renderFormStatus("Error: Please specify a valid operational email parameter configuration.", "#ef4444");
+                        return;
+                    }
+
+                    // Success state: Generate system email structure links
+                    renderFormStatus("Routing parameters... Launching secure mail client link.", "#10b981");
+                    
+                    // Re-route parameters straight to your designated management target email address
+                    const targetAdminEmail = "josephugo321@gmail.com"; 
+                    const mailSubject = encodeURIComponent("Nexus Pro Form Submission from " + nameVal);
+                    const mailBody = encodeURIComponent(
+                        "Identity Name: " + nameVal + "\n" +
+                        "Routing Email: " + emailVal + "\n\n" +
+                        "Message Details:\n" + messageVal
+                    );
+
+                    // Execute link launch trigger
+                    window.location.href = "mailto:" + targetAdminEmail + "?subject=" + mailSubject + "&body=" + mailBody;
+
+                    setTimeout(() => {
+                        contactForm.reset();
+                    }, 1000);
+                });
+            }
+
+            function renderFormStatus(msg, hexColor) {
+                feedbackBlock.innerText = msg;
+                feedbackBlock.style.color = hexColor;
+                feedbackBlock.style.display = "block";
+            }
+        });
+    </script>
+</body>
+                     </html>
