@@ -3,186 +3,382 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verified Health & News Center</title>
+    <title>Nexus Pro | Health & Wellness</title>
+    <!-- Icon Font Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: #111827;
-            --text-main: #f9fafb;
-            --text-muted: #9ca3af;
+            --bg-dark: #0f172a;
+            --bg-deep: #090d16;
+            --glass-panel: rgba(30, 41, 59, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --neon-blue: #3b82f6;
             --health-accent: #06b6d4;
-            --border: #1f2937;
+            --accent-green: #10b981;
+            --card-bg: rgba(17, 24, 39, 0.7);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg-dark);
             color: var(--text-main);
-            margin: 0;
-            padding: 20px;
+            overflow-x: hidden;
+            line-height: 1.6;
         }
 
-        .container { max-width: 1200px; margin: 0 auto; }
-        header { text-align: center; margin-bottom: 30px; }
-        h1 { margin: 0 0 10px 0; font-size: 2rem; color: var(--health-accent); }
-        .subtitle { color: var(--text-muted); margin: 0; }
-
-        .search-sections {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 30px;
+        /* Glassmorphism Utilities */
+        .glass {
+            background: var(--glass-panel);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
         }
 
-        @media (max-width: 768px) {
-            .search-sections { grid-template-columns: 1fr; }
-        }
-
-        .panel-box {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 20px;
-            border-radius: 8px;
+        /* Top Header */
+        header.nav-header {
+            width: 100%;
+            height: 75px;
+            padding: 0 40px;
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
-        .panel-box h2 { font-size: 1.1rem; margin: 0 0 5px 0; color: var(--health-accent); }
-        .input-row { display: flex; gap: 10px; align-items: center; }
-
-        select, input {
-            background-color: #1f2937;
-            color: white;
-            border: 1px solid var(--border);
-            padding: 11px;
-            border-radius: 6px;
-            flex: 1;
-            outline: none;
-            font-size: 0.95rem;
-        }
-
-        button {
-            background-color: var(--health-accent);
-            color: #000;
-            border: none;
-            padding: 11px 18px;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-        }
-        button:hover { opacity: 0.9; }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-        }
-
-        .column-title {
-            font-size: 1.3rem;
+        .brand-logo {
+            font-weight: 700;
+            font-size: 1.4rem;
+            text-decoration: none;
             color: var(--text-main);
-            border-bottom: 2px solid var(--border);
-            padding-bottom: 8px;
-            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        /* Advice Cards */
-        .advice-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border);
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 15px;
+        main {
+            max-width: 1250px;
+            margin: 40px auto;
+            padding: 0 24px;
+        }
+
+        /* Page Hero */
+        .page-hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .page-hero h1 {
+            font-size: 2.2rem;
+            color: var(--health-accent);
+            margin-bottom: 8px;
+        }
+        .page-hero p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        /* Advice Search Panel */
+        .search-panel {
+            padding: 30px;
+            margin-bottom: 40px;
             border-left: 4px solid var(--health-accent);
         }
-        .advice-heading { font-size: 1.15rem; font-weight: 600; margin: 0 0 8px 0; }
-        .advice-text { color: var(--text-muted); font-size: 0.95rem; line-height: 1.5; margin: 0; }
-        .advice-link { display: inline-block; margin-top: 12px; color: var(--health-accent); text-decoration: none; font-size: 0.9rem; }
-
-        /* GNews Layout Interface Elements */
-        .news-card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            overflow: hidden;
+        
+        .search-panel h2 {
+            font-size: 1.2rem;
             margin-bottom: 15px;
             display: flex;
-            flex-direction: column;
+            align-items: center;
+            gap: 8px;
         }
+
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            color: white;
+            padding: 14px 20px;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+        .search-bar input:focus {
+            border-color: var(--health-accent);
+        }
+
+        .search-bar button {
+            background: var(--health-accent);
+            color: #000;
+            border: none;
+            padding: 0 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .search-bar button:hover { opacity: 0.9; }
+        .search-bar button:active { transform: scale(0.98); }
+
+        /* Advice Results Container */
+        #advice-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .advice-card {
+            background: rgba(6, 182, 212, 0.05);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .advice-heading { color: var(--text-main); font-size: 1.1rem; margin-bottom: 8px; }
+        .advice-text { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 12px; }
+        .advice-link { color: var(--health-accent); text-decoration: none; font-size: 0.9rem; font-weight: 600; }
+        .advice-link:hover { text-decoration: underline; }
+
+        /* Main Grid Layout */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .content-grid { grid-template-columns: 1fr; }
+            .search-bar { flex-direction: column; }
+            .search-bar button { padding: 14px; justify-content: center; }
+        }
+
+        .section-header {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* News Stream */
+        .news-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .news-card {
+            display: flex;
+            background: var(--card-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.2s, border-color 0.2s;
+        }
+        .news-card:hover {
+            transform: translateY(-3px);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
         .news-img {
-            width: 100%;
-            height: 200px;
+            width: 180px;
             object-fit: cover;
             background-color: #1f2937;
         }
-        .news-body { padding: 15px; }
-        .news-source { font-size: 0.75rem; color: var(--health-accent); font-weight: bold; text-transform: uppercase; margin-bottom: 6px; display: block; }
-        .news-title { font-size: 1.1rem; font-weight: 600; margin: 0 0 8px 0; color: #fff; text-decoration: none; display: block; }
-        .news-title:hover { color: var(--health-accent); }
-        .news-text { color: var(--text-muted); font-size: 0.9rem; line-height: 1.4; margin: 0; }
+        
+        .news-body {
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
 
-        .loading { text-align: center; color: var(--text-muted); padding: 40px; font-style: italic; }
+        .news-source {
+            font-size: 0.75rem;
+            color: var(--neon-blue);
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        
+        .news-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+        .news-title:hover { color: var(--health-accent); }
+        
+        .news-text {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        @media (max-width: 600px) {
+            .news-card { flex-direction: column; }
+            .news-img { width: 100%; height: 180px; }
+        }
+
+        /* Nutrition Sidebar */
+        .nutrition-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .nutrition-card {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid var(--accent-green);
+        }
+
+        .nutrition-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-green);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .nutrition-card h4 {
+            font-size: 1.05rem;
+            margin-bottom: 6px;
+            color: var(--text-main);
+        }
+
+        .nutrition-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .loading {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 30px;
+            font-style: italic;
+        }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <header>
-            <h1>Verified Health & News Center</h1>
-            <p class="subtitle">Global health journalism and clinical advisories unified in one view</p>
-        </header>
+    <!-- Platform Header -->
+    <header class="nav-header">
+        <a href="index.html" class="brand-logo">
+            <i class="fas fa-cubes" style="color: var(--neon-blue);"></i>Nexus<span style="color:var(--neon-blue)">Pro</span>
+        </a>
+    </header>
 
-        <div class="search-sections">
-            <div class="panel-box">
-                <h2>1. Daily Checkups Check</h2>
-                <div class="input-row">
-                    <input type="number" id="user-age" value="25" min="1" max="120">
-                    <select id="user-sex">
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                    </select>
-                </div>
-                <button onclick="getRecommendations()">Get Recommendations</button>
-            </div>
-
-            <div class="panel-box">
-                <h2>2. Search Health Conditions</h2>
-                <div class="input-row">
-                    <input type="text" id="search-keyword" placeholder="e.g., Diabetes, Asthma, Allergy">
-                </div>
-                <button onclick="searchConditions()">Search Directory</button>
-            </div>
+    <main>
+        <!-- Hero Section -->
+        <div class="page-hero">
+            <h1>Health & Wellness Center</h1>
+            <p>Access live clinical advisories, global health journalism, and structural nutrition for peak cognitive performance.</p>
         </div>
 
-        <div class="dashboard-grid">
-            <div>
-                <h3 class="column-title">Medical Advisories</h3>
-                <div id="advice-container">
-                    <div class="loading">Select metric updates above to drop clinical guidelines...</div>
-                </div>
+        <!-- Health Advice Search API Interface -->
+        <div class="search-panel glass">
+            <h2><i class="fas fa-stethoscope"></i> Clinical Advice & Condition Directory</h2>
+            <div class="search-bar">
+                <input type="text" id="search-keyword" placeholder="Search conditions (e.g., Asthma, Diabetes, Malaria...)">
+                <button onclick="searchConditions()"><i class="fas fa-search"></i> Search</button>
             </div>
-
-            <div>
-                <h3 class="column-title">Top Health Headlines</h3>
-                <div id="news-container">
-                    <div class="loading">Connecting to verified health news wire...</div>
-                </div>
-            </div>
+            <div id="advice-container"></div>
         </div>
-    </div>
 
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+            
+            <!-- Column 1: Health News -->
+            <div>
+                <h3 class="section-header"><i class="fas fa-globe-africa" style="color: var(--neon-blue);"></i> Top Health Headlines</h3>
+                <div class="news-stream" id="news-container">
+                    <div class="loading"><i class="fas fa-spinner fa-spin"></i> Connecting to verified health news wire...</div>
+                </div>
+            </div>
+
+            <!-- Column 2: Nutritional Tips -->
+            <div>
+                <h3 class="section-header"><i class="fas fa-apple-whole" style="color: var(--accent-green);"></i> Nutritional Scaffolding</h3>
+                <div class="nutrition-sidebar">
+                    
+                    <div class="nutrition-card">
+                        <span class="nutrition-badge">Cognitive Output</span>
+                        <h4>Omega-3 Fatty Acids</h4>
+                        <p>Essential for brain cell membranes. Incorporating fish (like mackerel or sardines), walnuts, and chia seeds maximizes neural plasticity during intense study and coding sessions.</p>
+                    </div>
+
+                    <div class="nutrition-card">
+                        <span class="nutrition-badge">Sustained Energy</span>
+                        <h4>Complex Carbohydrates</h4>
+                        <p>Avoid processed sugar crashes. Rely on oats, brown rice, and whole grains to deliver a stable glucose pipeline to the prefrontal cortex for hours of uninterrupted focus.</p>
+                    </div>
+
+                    <div class="nutrition-card">
+                        <span class="nutrition-badge">Ocular Defense</span>
+                        <h4>Vitamin A & Hydration</h4>
+                        <p>Protect your eyes from screen fatigue. Consume leafy greens and carrots, and maintain a strict hydration baseline of 3+ liters of water daily to prevent ocular tissue degradation.</p>
+                    </div>
+
+                    <div class="nutrition-card">
+                        <span class="nutrition-badge">System Recovery</span>
+                        <h4>Magnesium Nodes</h4>
+                        <p>Crucial for sleep-wake synchronization and stress regulation. Dark chocolate, spinach, and pumpkin seeds naturally down-regulate nervous system stress metrics after exams.</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Interactive Scripts -->
     <script>
         const adviceContainer = document.getElementById('advice-container');
         const newsContainer = document.getElementById('news-container');
 
+        // Render Advice HTML Block
         function renderAdvice(topics) {
             if (!topics || topics.length === 0) {
-                adviceContainer.innerHTML = '<div class="loading">No matching entries found. Try terms like "Diabetes".</div>';
+                adviceContainer.innerHTML = '<div class="loading">No matching medical entries found. Try terms like "Diabetes" or "Asthma".</div>';
                 return;
             }
             adviceContainer.innerHTML = '';
@@ -190,50 +386,53 @@
                 adviceContainer.innerHTML += `
                     <div class="advice-card">
                         <h4 class="advice-heading">${item.Title || 'Guideline Update'}</h4>
-                        <p class="advice-text">${item.Notes || item.Teaser || 'Click below to review official rules.'}</p>
-                        <a class="advice-link" href="${item.AccessibleVersion || '#'}" target="_blank">Read Guide &rarr;</a>
+                        <p class="advice-text">${item.Notes || item.Teaser || 'Click below to review official medical parameters.'}</p>
+                        <a class="advice-link" href="${item.AccessibleVersion || '#'}" target="_blank">Read Official Guide <i class="fas fa-arrow-right"></i></a>
                     </div>
                 `;
             });
         }
 
-        async function getRecommendations() {
-            const age = document.getElementById('user-age').value;
-            const sex = document.getElementById('user-sex').value;
-            adviceContainer.innerHTML = '<div class="loading">Compiling clinical guidelines...</div>';
-            try {
-                const res = await fetch(`/api/healthAdvice?type=recommendations&age=${age}&sex=${sex}`);
-                const data = await res.json();
-                renderAdvice(data.Result?.MyHealthFinder?.ResultObjects?.ResultObject || []);
-            } catch {
-                adviceContainer.innerHTML = '<div class="loading">Error loading lists.</div>';
-            }
-        }
-
+        // Fetch Advice from Backend API
         async function searchConditions() {
             const keyword = document.getElementById('search-keyword').value.trim();
-            if(!keyword) return alert('Enter a topic word.');
-            adviceContainer.innerHTML = '<div class="loading">Searching...</div>';
+            if(!keyword) {
+                alert('Please enter a medical condition or topic to search.');
+                return;
+            }
+            adviceContainer.innerHTML = '<div class="loading"><i class="fas fa-spinner fa-spin"></i> Querying clinical databases...</div>';
             try {
+                // Connecting to your existing Vercel API endpoint
                 const res = await fetch(`/api/healthAdvice?type=search&keyword=${keyword}`);
                 const data = await res.json();
                 let topics = data.Result?.Topics?.Topic || data.Result?.MyHealthFinder?.ResultObjects?.ResultObject || [];
+                
+                // Ensure data is an array
                 if (!Array.isArray(topics)) topics = [topics];
+                
                 renderAdvice(topics);
-            } catch {
-                adviceContainer.innerHTML = '<div class="loading">Search query connection dropped.</div>';
+            } catch (err) {
+                adviceContainer.innerHTML = '<div class="loading" style="color: #ef4444;">Search query connection dropped. Please verify your backend serverless functions are active.</div>';
             }
         }
 
-        // Fetch Verified GNews Records
+        // Optional: Trigger search on "Enter" key press
+        document.getElementById('search-keyword').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                searchConditions();
+            }
+        });
+
+        // Fetch Verified News Records from Backend API
         async function fetchHealthNews() {
             try {
+                // Connecting to your existing Vercel API endpoint
                 const res = await fetch('/api/healthAdvice?type=news');
                 const data = await res.json();
                 const articles = data.articles || [];
 
                 if (articles.length === 0) {
-                    newsContainer.innerHTML = '<div class="loading">No news found. Ensure your GNEWS_API_KEY is configured on Vercel.</div>';
+                    newsContainer.innerHTML = '<div class="loading">No news feeds found. Ensure your GNEWS_API_KEY is properly configured on Vercel.</div>';
                     return;
                 }
 
@@ -245,17 +444,17 @@
 
                     newsContainer.innerHTML += `
                         <div class="news-card">
-                            <img class="news-img" src="${imageSrc}" alt="" onerror="this.src='${fallbackImg}'">
+                            <img class="news-img" src="${imageSrc}" alt="News Image" onerror="this.src='${fallbackImg}'">
                             <div class="news-body">
-                                <span class="news-source">${publisher}</span>
+                                <span class="news-source"><i class="fas fa-rss"></i> ${publisher}</span>
                                 <a class="news-title" href="${article.url}" target="_blank">${article.title}</a>
-                                <p class="news-text">${article.description || ''}</p>
+                                <p class="news-text">${article.description || 'No description provided by the wire.'}</p>
                             </div>
                         </div>
                     `;
                 });
             } catch (err) {
-                newsContainer.innerHTML = '<div class="loading">Failed to stream live news feeds.</div>';
+                newsContainer.innerHTML = '<div class="loading" style="color: #ef4444;">Failed to stream live news feeds. Please check your backend connection.</div>';
             }
         }
 
@@ -263,4 +462,4 @@
         fetchHealthNews();
     </script>
 </body>
-</html>
+                                                                                                               </html>
