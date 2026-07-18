@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro | Command Console</title>
-    <!-- Icons for Navigation Panels -->
+    <title>Nexus Pro | Student Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* Glassmorphic Dark Slate Theme styling rules */
         :root {
             --bg-dark: #0f172a;
             --glass-panel: rgba(30, 41, 59, 0.45);
@@ -17,6 +15,10 @@
             --text-muted: #94a3b8;
             --neon-blue: #3b82f6;
             --neon-glow: rgba(59, 130, 246, 0.25);
+            --accent-green: #10b981;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f97316;
+            --accent-pink: #ec4899;
         }
 
         * {
@@ -30,10 +32,9 @@
             background-color: var(--bg-dark);
             color: var(--text-main);
             min-height: 100vh;
-            overflow-x: hidden;
         }
 
-        /* Fast Render Preloader CSS */
+        /* Preloader styling */
         #preloader {
             position: fixed;
             top: 0;
@@ -45,25 +46,19 @@
             justify-content: center;
             align-items: center;
             z-index: 9999;
-            opacity: 1;
-            transition: opacity 0.3s ease-in-out, visibility 0.3s;
+            transition: opacity 0.3s ease, visibility 0.3s;
         }
-        #preloader.fade-out {
-            opacity: 0;
-            visibility: hidden;
-        }
+        #preloader.fade-out { opacity: 0; visibility: hidden; }
         .spinner {
             width: 45px;
             height: 45px;
             border: 4px solid rgba(255, 255, 255, 0.05);
             border-top-color: var(--neon-blue);
             border-radius: 50%;
-            box-shadow: 0 0 15px var(--neon-glow);
             animation: spin 0.7s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Glassmorphism Structural Cards */
         .glass {
             background: var(--glass-panel);
             backdrop-filter: blur(12px);
@@ -72,7 +67,7 @@
             border-radius: 12px;
         }
 
-        /* Top Navigation Header Bar */
+        /* Top Navbar Layout */
         .top-navbar {
             position: fixed;
             top: 0;
@@ -93,15 +88,15 @@
             display: flex;
             align-items: center;
             gap: 20px;
-            margin-left: auto;
         }
 
-        /* Notification Link styling */
+        /* Notification Bell Indicator Link */
         .bell-icon {
             color: var(--text-muted);
             font-size: 1.3rem;
             text-decoration: none;
             position: relative;
+            cursor: pointer;
             transition: color 0.2s;
         }
         .bell-icon:hover { color: var(--neon-blue); }
@@ -115,117 +110,117 @@
             border-radius: 50%;
         }
 
-        #menu-toggle {
-            background: none;
-            border: none;
-            color: var(--text-main);
-            font-size: 1.4rem;
-            cursor: pointer;
-            display: none;
+        /* Workspace Content Containers */
+        .main-workspace {
+            padding: 110px 40px 40px 40px;
+            max-width: 1400px;
+            margin: 0 auto;
         }
 
-        /* Side Navigation Tree Panel */
-        .sidebar {
-            position: fixed;
-            top: 70px;
-            left: 0;
-            height: calc(100vh - 70px);
-            width: 260px;
-            padding: 25px 15px;
+        .welcome-heading {
+            margin-bottom: 30px;
+        }
+        .welcome-heading h1 { font-size: 2rem; font-weight: 600; }
+        .welcome-heading p { color: var(--text-muted); margin-top: 4px; }
+
+        /* The Box-to-Box Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+        }
+
+        @media (max-width: 500px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+        }
+
+        .tool-box {
+            padding: 25px;
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            z-index: 100;
-            transition: transform 0.3s ease;
+            justify-content: space-between;
         }
 
-        .menu-link, .admin-link, .student-link {
+        .tool-box h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 12px 16px;
-            color: var(--text-muted);
-            text-decoration: none;
+            gap: 12px;
+        }
+
+        .tool-content {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--glass-border);
+            padding: 15px;
             border-radius: 8px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            margin-top: 15px;
+            flex-grow: 1;
         }
-        .menu-link:hover, .admin-link:hover, .student-link:hover {
+
+        /* Utility Form Inputs */
+        .input-field, .textarea-field {
+            width: 100%;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--glass-border);
+            padding: 10px 14px;
+            border-radius: 6px;
             color: var(--text-main);
-            background: rgba(255, 255, 255, 0.03);
+            font-size: 0.9rem;
+            outline: none;
+            margin-bottom: 10px;
         }
-        .menu-link.active {
+        .textarea-field { resize: none; height: 80px; }
+        .input-field:focus, .textarea-field:focus { border-color: var(--neon-blue); }
+
+        .btn-action {
+            background: var(--neon-blue);
             color: #ffffff;
-            background: rgba(59, 130, 246, 0.15);
-            border-left: 3px solid var(--neon-blue);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: background 0.2s;
         }
+        .btn-action:hover { background: #2563eb; }
 
-        /* Category Header Titles */
-        .role-divider {
-            margin: 15px 10px 10px 10px;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--neon-blue);
-            font-weight: 700;
+        .list-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
         }
+        .list-item-row:last-child { border-bottom: none; }
 
-        /* Workspace Grid Windows */
-        .main-workspace {
-            margin-left: 260px;
-            padding: 110px 40px 40px 40px;
-            min-height: 100vh;
-        }
-
-        .tab-content {
+        /* Notification overlay pane view style */
+        .notification-view {
             display: none;
-            animation: viewSlidIn 0.3s ease forwards;
+            animation: fadeIn 0.2s ease;
         }
-        .tab-content.active { display: block; }
-        @keyframes viewSlidIn {
-            from { opacity: 0; transform: translateY(4px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .content-card {
-            padding: 25px;
-            margin-bottom: 20px;
-        }
-
-        /* Responsiveness adjustments */
-        @media (max-width: 768px) {
-            #menu-toggle { display: block; }
-            .sidebar {
-                top: 70px;
-                height: calc(100vh - 70px);
-                transform: translateX(-100%);
-                background: #090d16;
-            }
-            .sidebar.active { transform: translateX(0); }
-            .main-workspace { margin-left: 0; padding: 100px 20px 20px 20px; }
-        }
+        .notification-view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
-    <!-- Ultra-Fast Preloader Screen -->
-    <div id="preloader">
-        <div class="spinner"></div>
-    </div>
+    <div id="preloader"><div class="spinner"></div></div>
 
-    <!-- Upper Master Panel Header Bar -->
+    <!-- Upper Control Navigation Bar -->
     <nav class="top-navbar">
-        <button id="menu-toggle" title="Toggle Navigation Menu">
-            <i class="fas fa-bars"></i>
-        </button>
         <div class="brand-logo" style="font-weight:700; font-size:1.3rem; letter-spacing:0.5px;">
             <i class="fas fa-cubes" style="color: var(--neon-blue); margin-right: 6px;"></i>Nexus<span style="color:var(--neon-blue)">Pro</span>
         </div>
         
         <div class="header-actions">
-            <!-- Notification Bell Anchor Linked to notifications.html -->
-            <a href="notifications.html" class="bell-icon" title="View Notifications System">
+            <!-- Functional Notification Bell -->
+            <a class="bell-icon" id="bell-toggle-btn" title="View Desktop Notification System">
                 <i class="fas fa-bell"></i>
                 <div class="notification-dot"></div>
             </a>
@@ -235,38 +230,111 @@
         </div>
     </nav>
 
-    <!-- Side Control Panel Deck -->
-    <aside class="sidebar glass" id="sidebar">
-        <!-- Client Student Modules Links -->
-        <div class="role-divider student-controls">Student Hub</div>
-        <nav class="nav-menu student-controls">
-            <!-- Updated direct page configurations for student interfaces -->
-            <a href="ai_solver.html" class="student-link"><i class="fas fa-robot"></i> AI Study &amp; Research</a>
-            <a href="academy.html" class="student-link"><i class="fas fa-graduation-cap"></i> E-Library</a>
-            <a href="health.html" class="student-link"><i class="fas fa-heartbeat"></i> Health Hub</a>
-            <a class="menu-link active" data-tab="support-desk-tab"><i class="fas fa-headset"></i> Support Desk</a>
-        </nav>
-
-        <!-- Administrative Shortcut Router links -->
-        <div class="role-divider admin-controls">Admin Controls</div>
-        <nav class="nav-menu admin-controls">
-            <a href="admin-users.html" class="admin-link"><i class="fas fa-users-cog"></i> User Management</a>
-            <a href="broadcast.html" class="admin-link"><i class="fas fa-bullhorn"></i> Broadcast Engine</a>
-            <a href="admin-upload.html" class="admin-link"><i class="fas fa-cloud-upload-alt"></i> E-Library Publisher</a>
-        </nav>
-    </aside>
-
-    <!-- Core Content Workspaces -->
+    <!-- Main Body Container View Area -->
     <main class="main-workspace">
-        <!-- Shared Support Tab Panel -->
-        <section id="support-desk-tab" class="tab-content active">
-            <div class="content-card glass">
-                <h2>Support Desk Interactive Portal</h2>
-                <p style="color:var(--text-muted); margin-top:10px;">Dispatch application support tickets directly to the platform administration console here.</p>
+        
+        <!-- Hidden Notification Center View Segment Toggle -->
+        <section id="notification-pane" class="notification-view" style="margin-bottom: 40px;">
+            <div class="glass" style="padding: 25px;">
+                <h2 style="font-size: 1.4rem; color: var(--accent-pink);"><i class="fas fa-bell"></i> System Notifications</h2>
+                <div style="margin-top: 15px; background: rgba(0,0,0,0.15); padding: 15px; border-radius: 8px; border-left: 4px solid var(--neon-blue);">
+                    <h4 style="font-size: 0.95rem;">System Update Notice</h4>
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 4px;">All core platform assignment tools, resource files, libraries, and communication paths are running directly on your home workspace matrix.</p>
+                </div>
             </div>
         </section>
+
+        <!-- Dynamic Landing Header Blocks -->
+        <div class="welcome-heading">
+            <h1>Student Workspace Dashboard</h1>
+            <p>Access your integrated AI tooling engines, modules, logs, and technical communication queues below.</p>
+        </div>
+
+        <!-- The Unified Sequential Box Layout Matrix -->
+        <div class="dashboard-grid">
+
+            <!-- BOX 1: AI Assignment & Research Tool -->
+            <section class="tool-box glass">
+                <div>
+                    <h2><i class="fas fa-robot" style="color: var(--neon-blue);"></i> AI Assistant &amp; Research</h2>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Input syllabus inquiries or formulas to construct direct study answers.</p>
+                </div>
+                <div class="tool-content">
+                    <textarea id="ai-query-input" class="textarea-field" placeholder="Paste your secondary science questions or search research queries here..."></textarea>
+                    <button class="btn-action" onclick="executeLocalAISolver()"><i class="fas fa-brain"></i> Ask Assistant</button>
+                    <div id="ai-output-box" style="margin-top: 12px; font-size: 0.85rem; color: var(--text-muted); line-height: 1.4; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 10px;">
+                        Awaiting input stream payload parameters...
+                    </div>
+                </div>
+            </section>
+
+            <!-- BOX 2: Integrated Library Vault Content -->
+            <section class="tool-box glass">
+                <div>
+                    <h2><i class="fas fa-graduation-cap" style="color: var(--accent-green);"></i> E-Library Portal</h2>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Read and explore downloaded curriculum materials and textbooks directly.</p>
+                </div>
+                <div class="tool-content" style="display: flex; flex-direction: column; gap: 4px;">
+                    <input type="text" class="input-field" style="margin-bottom: 8px;" placeholder="Filter files by subject keywords...">
+                    <div class="list-item-row">
+                        <div>
+                            <div style="font-size:0.9rem; font-weight:600;">OpenStax Physics Secondary Guide</div>
+                            <span style="font-size:0.75rem; color:var(--text-muted);">PDF Asset • 14.2 MB</span>
+                        </div>
+                        <button class="btn-action" style="background:var(--accent-green); padding: 6px 12px;">Open</button>
+                    </div>
+                    <div class="list-item-row">
+                        <div>
+                            <div style="font-size:0.9rem; font-weight:600;">Core Chemistry Companion (SS2-SS3)</div>
+                            <span style="font-size:0.75rem; color:var(--text-muted);">PDF Asset • 9.8 MB</span>
+                        </div>
+                        <button class="btn-action" style="background:var(--accent-green); padding: 6px 12px;">Open</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BOX 3: Wellness & Health Metrics Log Box -->
+            <section class="tool-box glass">
+                <div>
+                    <h2><i class="fas fa-heartbeat" style="color: var(--accent-purple);"></i> Health &amp; Wellness Hub</h2>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Monitor study sleep allocations and log wellness tracking values.</p>
+                </div>
+                <div class="tool-content">
+                    <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.88rem;">
+                        <div style="display: flex; justify-content: space-between; background: rgba(255,255,255,0.01); padding: 6px; border-radius: 4px;">
+                            <span style="color: var(--text-muted);">Daily Rest Allocation:</span>
+                            <span style="font-weight: 600; color: #fff;">7.5 Hours</span>
+                        </div>
+                        <div style="display: flex; justify-content: space-between; background: rgba(255,255,255,0.01); padding: 6px; border-radius: 4px;">
+                            <span style="color: var(--text-muted);">Concentration Efficiency:</span>
+                            <span style="font-weight: 600; color: var(--accent-green);">Optimal</span>
+                        </div>
+                        <div style="font-size: 0.78rem; color: var(--text-muted); line-height: 1.3; margin-top: 4px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.04);">
+                            <i class="fas fa-lightbulb" style="color: var(--accent-orange);"></i> Take a 5-minute deep focus intermission block every 25 minutes to protect your memorization tracks.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- BOX 4: Communications & Support Desk Request Terminal -->
+            <section class="tool-box glass">
+                <div>
+                    <h2><i class="fas fa-headset" style="color: var(--accent-orange);"></i> Support Ticket Desk</h2>
+                    <p style="color: var(--text-muted); font-size: 0.85rem;">Log structural issue records directly to application tracking nodes.</p>
+                </div>
+                <div class="tool-content">
+                    <input id="ticket-title" type="text" class="input-field" placeholder="Enter problem header context...">
+                    <textarea id="ticket-desc" class="textarea-field" placeholder="Provide precise bug reproduction notes..."></textarea>
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 5px;">
+                        <button class="btn-action" style="background: var(--accent-orange);" onclick="dispatchLocalTicket()"><i class="fas fa-paper-plane"></i> File Ticket</button>
+                        <span style="font-size: 0.75rem; background: rgba(249, 115, 22, 0.15); color: var(--accent-orange); padding: 4px 8px; border-radius: 4px; font-weight: 600;">System Ready</span>
+                    </div>
+                </div>
+            </section>
+
+        </div>
     </main>
 
     <script src="dashboard.js"></script>
 </body>
-</html>
+    </html>
