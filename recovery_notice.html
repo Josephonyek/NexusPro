@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Pro | Token Dispatched</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #0f172a;
+            --bg-deep: #090d16;
+            --glass-panel: rgba(30, 41, 59, 0.45);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --neon-blue: #3b82f6;
+            --neon-glow: rgba(59, 130, 246, 0.2);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        header.nav-header {
+            width: 100%;
+            height: 75px;
+            padding: 0 40px;
+            display: flex;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--glass-border);
+            position: fixed;
+            top: 0; left: 0; z-index: 1000;
+        }
+
+        .brand-logo {
+            font-weight: 700;
+            font-size: 1.4rem;
+            text-decoration: none;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .auth-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 110px 24px 40px 24px;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 460px;
+            padding: 40px;
+            border-top: 4px solid var(--neon-blue);
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .glass {
+            background: var(--glass-panel);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+        }
+
+        .icon-pulse {
+            width: 70px;
+            height: 70px;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            color: var(--neon-blue);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            margin: 0 auto 20px auto;
+            animation: pulse-glow 2s infinite ease-in-out;
+        }
+
+        h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 12px; }
+        p { color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 25px; }
+        
+        .inbox-hint {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: left;
+            margin-bottom: 25px;
+        }
+
+        .btn-return {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            background: var(--neon-blue);
+            color: #fff;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 12px var(--neon-glow);
+            transition: opacity 0.2s;
+        }
+        .btn-return:hover { opacity: 0.9; }
+
+        footer {
+            background: var(--bg-deep);
+            border-top: 1px solid var(--glass-border);
+            padding: 20px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.2); }
+            50% { transform: scale(1.04); box-shadow: 0 0 15px 5px rgba(59, 130, 246, 0.1); }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="nav-header">
+        <a href="index.html" class="brand-logo">
+            <i class="fas fa-cubes" style="color: var(--neon-blue);"></i>Nexus<span style="color:var(--neon-blue)">Pro</span>
+        </a>
+    </header>
+
+    <main class="auth-container">
+        <div class="auth-card glass">
+            <div class="icon-pulse">
+                <i class="fas fa-envelope-open-text"></i>
+            </div>
+            <h1>Verification Dispatched</h1>
+            <p>A secure parameter synchronization token has been routed to your inbox. You must log into your email interface and execute the confirmation link to declare clearance for password overriding tools.</p>
+            
+            <div class="inbox-hint">
+                <i class="fas fa-circle-info" style="color: var(--neon-blue); margin-right: 4px;"></i> 
+                <strong>System Note:</strong> If the operational transmission payload does not manifest within 3 minutes, verify your spam directory arrays or re-initialize parameter routing variables.
+            </div>
+
+            <!-- Temporary redirect anchor simulation for local front-end debugging -->
+            <a href="reset_password.html" class="btn-return">
+                Simulate Email Link Click <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </main>
+
+    <footer>
+        <div>&copy; 2026 Nexus Pro Platforms. Security systems operational.</div>
+    </footer>
+
+</body>
+</html>
