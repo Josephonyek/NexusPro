@@ -47,8 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('nexusAuthToken', result.token);
             localStorage.setItem('nexusUserId', result.userId);
             localStorage.setItem('nexusUserRole', result.role);
-localStorage.setItem("nx_role", userRole.toLowerCase());
-localStorage.setItem("nx_name", userName);
+// Safe pre-cache block
+const safeRole = (typeof userData !== "undefined" && userData.role) ? userData.role.toLowerCase() : "student";
+const safeName = (typeof userData !== "undefined" && (userData.name || userData.fullName)) ? (userData.name || userData.fullName) : "User";
+
+localStorage.setItem("nx_role", safeRole);
+localStorage.setItem("nx_name", safeName);
             btn.textContent = "Redirecting...";
             window.location.replace('dashboard.html');
 
