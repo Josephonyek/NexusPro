@@ -2,8 +2,7 @@ import { auth } from "./firebase-config.js";
 import {
     signInWithEmailAndPassword,
     setPersistence,
-    browserLocalPersistence,
-    fetchSignInMethodsForEmail
+    browserLocalPersistence
 } from "firebase/auth";
 import { ref, get } from "firebase/database";
 import { rtdb } from "./firebase-config.js";
@@ -48,29 +47,16 @@ if (loginForm) {
         }
 
         console.log("🔍 Attempting login with email:", email);
-
         setLoading(btn, true, "Sign In");
 
         try {
-            // Check if email exists
-            console.log("📡 Checking email existence...");
-            const signInMethods = await fetchSignInMethodsForEmail(auth, email);
-            console.log("📡 Sign-in methods:", signInMethods);
-
-            if (signInMethods.length === 0) {
-                setLoading(btn, false, "Sign In");
-                showError("No account found for this email. Please sign up first.");
-                return;
-            }
-
-            // Sign in
-            console.log("🔐 Attempting signInWithEmailAndPassword...");
+            // 🔥 Direct sign‑in attempt (no prior check)
             await setPersistence(auth, browserLocalPersistence);
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             console.log("✅ Login successful for:", user.email);
 
-            // Fetch from DB
+            // Fetch from DB (optional)
             let role = "student";
             let name = user.email.split("@")[0];
             try {
@@ -96,7 +82,7 @@ if (loginForm) {
             setLoading(btn, false, "Sign In");
             console.error("🔥 Login error:", err.code, err.message);
 
-            // Show specific error
+            // Show user‑friendly messages
             switch (err.code) {
                 case "auth/wrong-password":
                 case "auth/invalid-credential":
