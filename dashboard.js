@@ -17,7 +17,7 @@ const appSidebar = document.getElementById("app-sidebar");
 const sidebarOverlay = document.getElementById("sidebar-overlay");
 const btnLogout = document.getElementById("btn-logout");
 
-// Hamburger Mobile Drawer Controller
+// Drawer Control
 function toggleSidebar() {
     const isOpen = appSidebar.classList.contains("open");
     if (isOpen) {
@@ -32,23 +32,56 @@ function toggleSidebar() {
 btnToggleMenu?.addEventListener("click", toggleSidebar);
 sidebarOverlay?.addEventListener("click", toggleSidebar);
 
-// STRICT ZERO-TRUST AUTH RE-VERIFICATION
+// UI Renderer Helper
+function renderDashboardUI(role, name) {
+    if (displayNameEl) displayNameEl.innerText = name;
+
+    if (role === "admin") {
+        if (headerRolePill) {
+            headerRolePill.innerText = "Administrator";
+            headerRolePill.className = "role-pill admin";
+        }
+        if (roleDescEl) roleDescEl.innerText = "Administrative privilege level verified. System controls active.";
+        adminModule?.classList.add("active");
+        studentModule?.classList.remove("active");
+    } else {
+        if (headerRolePill) {
+            headerRolePill.innerText = "Student";
+            headerRolePill.className = "role-pill student";
+        }
+        if (roleDescEl) roleDescEl.innerText = "Student workspace active. Access your practice material and library below.";
+        studentModule?.classList.add("active");
+        adminModule?.classList.remove("active");
+    }
+
+    // Reveal main shell instantly
+    if (authGuard) authGuard.style.display = "none";
+    if (mainWrapper) mainWrapper.classList.add("visible");
+}
+
+// 1. FAST OPTIMISTIC LAUNCH (< 10ms)
+const cachedRole = localStorage.getItem("nx_role");
+const cachedName = localStorage.getItem("nx_name");
+
+if (cachedRole && cachedName) {
+    renderDashboardUI(cachedRole, cachedName);
+}
+
+// 2. SILENT BACKGROUND SERVER RE-VALIDATION
 onAuthStateChanged(auth, async (user) => {
-    // 1. If no authenticated session exists in Firebase Auth -> Immediate Redirect
     if (!user) {
+        localStorage.clear();
         sessionStorage.clear();
         window.location.replace("login.html");
         return;
     }
 
     try {
-        // 2. Query Realtime Database directly to fetch server-validated role
         const userRef = ref(rtdb, `users/${user.uid}`);
         const snapshot = await get(userRef);
 
         if (!snapshot.exists()) {
-            // Unregistered user attempt -> Purge session and kick out
-            sessionStorage.clear();
+            localStorage.clear();
             await signOut(auth);
             window.location.replace("login.html");
             return;
@@ -58,45 +91,31 @@ onAuthStateChanged(auth, async (user) => {
         const verifiedRole = (userData.role || "student").toLowerCase();
         const userName = userData.name || userData.fullName || user.email.split("@")[0];
 
-        // 3. Render verified profile to DOM
-        if (displayNameEl) displayNameEl.innerText = userName;
+        // Cache updated credentials locally
+        localStorage.setItem("nx_role", verifiedRole);
+        localStorage.setItem("nx_name", userName);
 
-        if (verifiedRole === "admin") {
-            if (headerRolePill) {
-                headerRolePill.innerText = "Administrator";
-                headerRolePill.className = "role-pill admin";
-            }
-            if (roleDescEl) roleDescEl.innerText = "Administrative privilege level verified. System controls active.";
-            adminModule?.classList.add("active");
-            studentModule?.classList.remove("active");
-        } else {
-            if (headerRolePill) {
-                headerRolePill.innerText = "Student";
-                headerRolePill.className = "role-pill student";
-            }
-            if (roleDescEl) roleDescEl.innerText = "Student workspace active. Access your practice material and library below.";
-            studentModule?.classList.add("active");
-            adminModule?.classList.remove("active");
-        }
-
-        // 4. Reveal content ONLY after successful auth check
-        if (authGuard) authGuard.style.display = "none";
-        if (mainWrapper) mainWrapper.classList.add("visible");
+        // Update UI seamlessly if data changed or initial cache wasn't present
+        renderDashboardUI(verifiedRole, userName);
 
     } catch (error) {
-        console.error("Security Authentication Failure:", error);
-        sessionStorage.clear();
-        window.location.replace("login.html");
+        console.error("Silent security check error:", error);
+        // On network fail, allow access if cache exists, otherwise purge
+        if (!localStorage.getItem("nx_role")) {
+            localStorage.clear();
+            window.location.replace("login.html");
+        }
     }
 });
 
-// Secure Sign Out Execution
+// Secure Logout
 btnLogout?.addEventListener("click", async () => {
     try {
+        localStorage.clear();
         sessionStorage.clear();
         await signOut(auth);
         window.location.replace("login.html");
     } catch (err) {
-        console.error("Logout execution failed:", err);
+        console.error("Logout error:", err);
     }
 });
