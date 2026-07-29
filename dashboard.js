@@ -2,7 +2,7 @@ import { auth, rtdb } from "./firebase-config.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-// DOM
+// DOM Elements
 const adminSection   = document.getElementById("admin-section");
 const studentSection = document.getElementById("student-section");
 const headerRolePill = document.getElementById("header-role-pill");
@@ -31,10 +31,12 @@ window.addEventListener("resize", () => {
   }
 });
 
-// ---------- Fast UI Renderer ----------
+// ---------- Apply Role to UI ----------
 function applyState(role, name) {
-  const cleanRole = (role || "student").toLowerCase().trim();
+  const cleanRole = (role || "student").toString().toLowerCase().trim();
   const cleanName = name || "User";
+
+  console.log("Applying UI → role:", cleanRole, "| name:", cleanName);
 
   if (displayNameEl) displayNameEl.textContent = cleanName;
 
@@ -55,73 +57,66 @@ function applyState(role, name) {
     studentSection?.classList.add("active");
     adminSection?.classList.remove("active");
   }
+
+  if (loadingBadge) loadingBadge.style.display = "none";
 }
 
-// -------------------------------------------------
-// 1. INSTANT RENDER FROM CACHE  (< 2 ms)
-// -------------------------------------------------
+// ---------- Instant cache (temporary) ----------
 const cachedRole = localStorage.getItem("nx_role") || "student";
 const cachedName = localStorage.getItem("nx_name") || "User";
 applyState(cachedRole, cachedName);
 
-// Hide the verifying badge almost immediately
-if (loadingBadge) {
-  setTimeout(() => loadingBadge.style.display = "none", 80);
-}
-
-// -------------------------------------------------
-// 2. BACKGROUND AUTH + RTDB VERIFICATION
-// -------------------------------------------------
+// ---------- MAIN: Detect role from Database ----------
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
+    console.log("No user → redirecting to login");
     localStorage.clear();
     sessionStorage.clear();
     window.location.replace("login.html");
     return;
   }
 
-  // Quick name while we wait for DB
-  const quickName = user.displayName ||
-                    (user.email ? user.email.split("@")[0] : "User");
+  console.log("User authenticated:", user.uid);
 
-  // Only update name if we didn't have one cached
-  if (!localStorage.getItem("nx_name")) {
-    applyState(cachedRole, quickName);
-  }
+  const quickName = user.displayName || (user.email ? user.email.split("@")[0] : "User");
 
-  // Fast RTDB fetch
   try {
-    const snap = await get(ref(rtdb, `users/${user.uid}`));
+    const userRef = ref(rtdb, `users/${user.uid}`);
+    console.log("Fetching from path: users/" + user.uid);
 
-    if (snap.exists()) {
-      const data = snap.val();
-      const verifiedRole = (data.role || "student").toLowerCase().trim();
-      const verifiedName = data.name || data.fullName || quickName;
+    const snapshot = await get(userRef);
 
-      // Only accept known roles
-      const safeRole = verifiedRole === "admin" ? "admin" : "student";
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      console.log("Database data found:", data);
 
-      // Update cache
-      localStorage.setItem("nx_role", safeRole);
-      localStorage.setItem("nx_name", verifiedName);
+      // Try common field names for role
+      let role = data.role || data.userRole || data.type || data.accountType || "student";
+      role = role.toString().toLowerCase().trim();
 
-      // Only re-render if something actually changed
-      if (safeRole !== cachedRole || verifiedName !== cachedName) {
-        applyState(safeRole, verifiedName);
+      // Only allow valid roles
+      if (role !== "admin" && role !== "student") {
+        role = "student";
       }
+
+      const name = data.name || data.fullName || data.displayName || quickName;
+
+      // Save to cache
+      localStorage.setItem("nx_role", role);
+      localStorage.setItem("nx_name", name);
+
+      // Show correct content
+      applyState(role, name);
     } else {
-      // No profile yet → force student
+      console.warn("No profile found in database for this user. Using student.");
       localStorage.setItem("nx_role", "student");
       localStorage.setItem("nx_name", quickName);
-      if (cachedRole !== "student") {
-        applyState("student", quickName);
-      }
+      applyState("student", quickName);
     }
-  } catch (err) {
-    console.warn("Role verification failed – keeping cached view:", err);
-    // We keep the optimistic UI (fail open for speed)
-  } finally {
-    if (loadingBadge) loadingBadge.style.display = "none";
+  } catch (error) {
+    console.error("Failed to load role from database:", error);
+    // Keep the cached version if network fails
+    applyState(cachedRole, cachedName || quickName);
   }
 });
 
