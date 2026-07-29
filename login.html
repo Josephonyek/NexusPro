@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- SEO Meta -->
     <title>Nexus Pro | Sign In to Your Academic Workspace</title>
-    <meta name="description" content="Secure login portal for Nexus Pro. Access your curriculum notes, customized video modules, and academic performance suites instantly." />
+    <meta name="description" content="Secure login portal for Nexus Pro." />
     <meta name="robots" content="index, nofollow" />
     <link rel="canonical" href="https://nexuspro.vercel.app/login.html" />
 
-    <!-- ========== FIREBASE IMPORT MAP (FIX #1) ========== -->
+    <!-- ========== FIREBASE IMPORT MAP ========== -->
     <script type="importmap">
     {
         "imports": {
@@ -21,14 +19,12 @@
     }
     </script>
 
-    <!-- Tailwind & Custom Styles -->
+    <!-- Tailwind & custom styles -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
-        /* (your existing styles - unchanged) */
         .glass-card {
             background: rgba(15, 15, 15, 0.4) !important;
             backdrop-filter: blur(24px) !important;
-            -webkit-backdrop-filter: blur(24px) !important;
             border: 1px solid rgba(255, 255, 255, 0.08) !important;
         }
         .glow-orb-blue {
@@ -86,7 +82,6 @@
         .modern-toggle-btn:active {
             transform: translateY(0px);
         }
-        /* Error message styling (FIX #2) */
         #login-error {
             color: #f87171;
             font-size: 0.8rem;
@@ -125,9 +120,8 @@
                 <p class="text-xs text-neutral-400 font-medium">Enter your credentials to access your course files</p>
             </div>
 
-            <!-- LOGIN FORM -->
+            <!-- Login Form -->
             <form id="loginForm" class="space-y-5" novalidate>
-                
                 <!-- Email -->
                 <div class="space-y-2">
                     <label for="loginEmail" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Email Address</label>
@@ -136,7 +130,7 @@
                            class="w-full bg-neutral-900/60 border border-neutral-800/80 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl px-4 py-3.5 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
                 </div>
 
-                <!-- Password with Toggle -->
+                <!-- Password -->
                 <div class="space-y-2">
                     <label for="loginPassword" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Security Password</label>
                     <div class="password-row-wrapper">
@@ -150,7 +144,7 @@
                     </div>
                 </div>
 
-                <!-- Forgot Password Link -->
+                <!-- Forgot Password -->
                 <div style="text-align: right; margin-bottom: 20px; font-size: 0.88rem;">
                     <a href="forgot_password.html" style="color: #4f46e5; text-decoration: none; font-weight: 600; transition: color 0.2s;" 
                        onmouseover="this.style.color='#2563eb'" onmouseout="this.style.color='#4f46e5'">
@@ -158,23 +152,22 @@
                     </a>
                 </div>
 
-                <!-- ========== ERROR MESSAGE CONTAINER (FIX #2) ========== -->
+                <!-- Error container -->
                 <div id="login-error" role="alert"></div>
 
-                <!-- Submit Button -->
+                <!-- Submit -->
                 <button type="submit" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-lg shadow-indigo-950/40 hover:shadow-indigo-900/50 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer">
                     Sign In to Dashboard
                 </button>
             </form>
 
-            <!-- Sign Up Link -->
+            <!-- Sign Up -->
             <div class="text-center pt-2 space-y-2">
                 <span class="text-xs text-neutral-500 font-medium block">Need an academic student account?</span>
                 <a href="signup.html" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold hover:underline transition-all inline-block">
                     Create your Free Student Profile
                 </a>
             </div>
-
         </div>
     </main>
 
@@ -183,10 +176,10 @@
         <p class="text-[10px] text-neutral-600 font-medium tracking-wide">&copy; 2026 Nexus Pro Academy. All Systems Operational.</p>
     </footer>
 
-    <!-- ========== LOGIN.JS (ES Module) ========== -->
+    <!-- Login Script -->
     <script type="module" src="login.js"></script>
 
-    <!-- ========== TOGGLE SCRIPT (isolated) ========== -->
+    <!-- Toggle Script -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const passwordField = document.getElementById("loginPassword");
@@ -197,18 +190,11 @@
             toggleBtn.addEventListener("click", () => {
                 const isPassword = passwordField.type === "password";
                 passwordField.type = isPassword ? "text" : "password";
-                
-                if (isPassword) {
-                    toggleText.innerText = "Hide";
-                    toggleEmoji.innerText = "🙈";
-                    toggleBtn.setAttribute("aria-label", "Hide password");
-                } else {
-                    toggleText.innerText = "Show";
-                    toggleEmoji.innerText = "👁️";
-                    toggleBtn.setAttribute("aria-label", "Show password");
-                }
+                toggleText.innerText = isPassword ? "Hide" : "Show";
+                toggleEmoji.innerText = isPassword ? "🙈" : "👁️";
+                toggleBtn.setAttribute("aria-label", isPassword ? "Hide password" : "Show password");
             });
         });
     </script>
 </body>
-                            </html>
+</html>
