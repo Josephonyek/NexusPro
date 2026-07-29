@@ -1,324 +1,278 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro | Control Terminal</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --bg-dark: #070a12;
-            --bg-card: rgba(15, 23, 42, 0.75);
-            --bg-nav: rgba(11, 17, 32, 0.95);
-            --border-glow: rgba(255, 255, 255, 0.08);
-            --neon-blue: #3b82f6;
-            --accent-purple: #a855f7;
-            --accent-green: #10b981;
-            --accent-amber: #f59e0b;
-            --accent-red: #ef4444;
-            --text-main: #f8fafc;
-            --text-sub: #94a3b8;
-            --sidebar-width: 260px;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus Pro | Control Terminal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-dark: #070a12;
+      --bg-card: rgba(15, 23, 42, 0.72);
+      --bg-nav: rgba(11, 17, 32, 0.92);
+      --border: rgba(255, 255, 255, 0.07);
+      --neon-blue: #3b82f6;
+      --accent-purple: #a855f7;
+      --accent-green: #10b981;
+      --accent-amber: #f59e0b;
+      --accent-red: #ef4444;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+      --sidebar-w: 260px;
+    }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
-        
-        body { 
-            background: var(--bg-dark); 
-            color: var(--text-main); 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            overflow-x: hidden; 
-        }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      overflow-x: hidden;
+    }
 
-        /* TOP NAVBAR */
-        header.top-navbar {
-            height: 65px;
-            background: var(--bg-nav);
-            border-bottom: 1px solid var(--border-glow);
-            padding: 0 20px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
-            backdrop-filter: blur(12px);
-        }
+    /* ---------- TOP BAR ---------- */
+    header.top-navbar {
+      height: 64px;
+      background: var(--bg-nav);
+      border-bottom: 1px solid var(--border);
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      backdrop-filter: blur(16px);
+    }
+    .nav-left { display: flex; align-items: center; gap: 14px; }
+    .hamburger-btn {
+      background: transparent; border: none; color: var(--text-main);
+      font-size: 1.2rem; cursor: pointer; padding: 8px; border-radius: 8px;
+      display: flex; transition: background .2s;
+    }
+    .hamburger-btn:hover { background: rgba(255,255,255,.08); }
+    @media (min-width: 1024px) { .hamburger-btn { display: none; } }
 
-        .nav-left { display: flex; align-items: center; gap: 16px; }
+    .brand-logo {
+      font-size: 1.15rem; font-weight: 800; letter-spacing: -0.4px;
+      text-decoration: none; color: #fff; display: flex; align-items: center; gap: 8px;
+    }
+    .brand-logo i { color: var(--neon-blue); }
 
-        .hamburger-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-main);
-            font-size: 1.25rem;
-            cursor: pointer;
-            padding: 8px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-        .hamburger-btn:hover { background: rgba(255, 255, 255, 0.08); }
+    .role-pill {
+      padding: 5px 13px; border-radius: 20px; font-size: 0.72rem;
+      font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
+    }
+    .role-pill.admin {
+      background: rgba(168,85,247,.15); color: #d8b4fe;
+      border: 1px solid rgba(168,85,247,.3);
+    }
+    .role-pill.student {
+      background: rgba(59,130,246,.15); color: #93c5fd;
+      border: 1px solid rgba(59,130,246,.3);
+    }
+    #role-loading {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.7rem; color: var(--text-sub); margin-left: 10px;
+    }
+    #role-loading i { animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-        .brand-logo {
-            font-size: 1.2rem;
-            font-weight: 800;
-            letter-spacing: -0.5px;
-            text-decoration: none;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .brand-logo i { color: var(--neon-blue); }
+    /* ---------- SIDEBAR ---------- */
+    .sidebar-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.55);
+      backdrop-filter: blur(4px); z-index: 998;
+      opacity: 0; pointer-events: none; transition: opacity .25s;
+    }
+    .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
 
-        .role-pill {
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 800;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .role-pill.admin { background: rgba(168, 85, 247, 0.15); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.3); }
-        .role-pill.student { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .sidebar {
+      position: fixed; top: 64px; left: calc(-1 * var(--sidebar-w));
+      width: var(--sidebar-w); height: calc(100vh - 64px);
+      background: var(--bg-nav); border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; justify-content: space-between;
+      padding: 18px 12px; transition: left .25s cubic-bezier(.4,0,.2,1);
+      z-index: 999;
+    }
+    .sidebar.open { left: 0; }
 
-        /* SIDEBAR & DRAWER */
-        .sidebar-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            z-index: 998;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.25s ease;
-        }
-        .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+    @media (min-width: 1024px) {
+      .sidebar { left: 0; }
+      .sidebar-overlay { display: none; }
+    }
 
-        .sidebar {
-            position: fixed;
-            top: 65px;
-            left: -260px;
-            width: var(--sidebar-width);
-            height: calc(100vh - 65px);
-            background: var(--bg-nav);
-            border-right: 1px solid var(--border-glow);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 20px 12px;
-            transition: left 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 999;
-        }
-        .sidebar.open { left: 0; }
+    .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+    .nav-link {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px; color: var(--text-sub); text-decoration: none;
+      border-radius: 10px; font-weight: 600; font-size: 0.9rem; transition: all .2s;
+    }
+    .nav-link:hover, .nav-link.active {
+      background: rgba(59,130,246,.12); color: var(--neon-blue);
+    }
 
-        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 6px; }
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px 16px;
-            color: var(--text-sub);
-            text-decoration: none;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-        }
-        .nav-link:hover, .nav-link.active {
-            background: rgba(59, 130, 246, 0.12);
-            color: var(--neon-blue);
-        }
+    .btn-logout {
+      width: 100%; padding: 11px; background: rgba(239,68,68,.1);
+      border: 1px solid rgba(239,68,68,.25); color: #fca5a5;
+      border-radius: 10px; cursor: pointer; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all .2s; font-size: 0.9rem;
+    }
+    .btn-logout:hover { background: var(--accent-red); color: #fff; }
 
-        .btn-logout {
-            width: 100%;
-            padding: 12px;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.25);
-            color: #fca5a5;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-        .btn-logout:hover { background: var(--accent-red); color: #fff; }
+    /* ---------- MAIN ---------- */
+    main.main-content {
+      margin-top: 64px; padding: 28px 20px;
+      max-width: 1200px; width: 100%; margin-left: auto; margin-right: auto;
+      flex: 1;
+    }
+    @media (min-width: 1024px) {
+      main.main-content { margin-left: var(--sidebar-w); }
+    }
 
-        /* MAIN CONTENT AREA */
-        main.main-content {
-            margin-top: 65px;
-            padding: 28px 20px;
-            max-width: 1280px;
-            width: 100%;
-            margin-left: auto;
-            margin-right: auto;
-        }
+    .hero-banner {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 26px 28px; margin-bottom: 28px;
+      backdrop-filter: blur(12px);
+    }
+    .hero-banner h2 { font-size: 1.45rem; font-weight: 700; margin-bottom: 4px; }
+    .hero-banner p { color: var(--text-sub); font-size: 0.9rem; }
 
-        .hero-banner {
-            background: var(--bg-card);
-            border: 1px solid var(--border-glow);
-            border-radius: 16px;
-            padding: 28px;
-            margin-bottom: 28px;
-        }
-        .hero-banner h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 6px; }
-        .hero-banner p { color: var(--text-sub); font-size: 0.9rem; }
+    .card-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+      gap: 18px;
+    }
+    .card-tile {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 14px; padding: 22px; display: flex; flex-direction: column;
+      justify-content: space-between; transition: transform .2s, border-color .2s;
+      backdrop-filter: blur(12px);
+    }
+    .card-tile:hover {
+      transform: translateY(-3px); border-color: rgba(59,130,246,.4);
+    }
+    .card-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.15rem; margin-bottom: 14px; background: rgba(255,255,255,.05);
+    }
+    .card-tile h3 { font-size: 1.05rem; margin-bottom: 6px; font-weight: 700; }
+    .card-tile p { color: var(--text-sub); font-size: 0.84rem; line-height: 1.5; margin-bottom: 18px; }
 
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-        }
+    .btn-action {
+      display: inline-flex; align-items: center; justify-content: space-between;
+      width: 100%; padding: 10px 14px; background: rgba(255,255,255,.05);
+      border: 1px solid var(--border); border-radius: 8px; color: #fff;
+      text-decoration: none; font-size: 0.84rem; font-weight: 600; transition: background .2s;
+    }
+    .btn-action:hover { background: var(--neon-blue); }
 
-        .card-tile {
-            background: var(--bg-card);
-            border: 1px solid var(--border-glow);
-            border-radius: 14px;
-            padding: 24px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            transition: transform 0.2s, border-color 0.2s;
-        }
-        .card-tile:hover {
-            transform: translateY(-4px);
-            border-color: rgba(59, 130, 246, 0.35);
-        }
+    .role-section { display: none; }
+    .role-section.active { display: block; animation: fadeIn .3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
-        .card-icon {
-            width: 46px;
-            height: 46px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            margin-bottom: 16px;
-            background: rgba(255, 255, 255, 0.05);
-        }
-        .card-tile h3 { font-size: 1.1rem; margin-bottom: 8px; }
-        .card-tile p { color: var(--text-sub); font-size: 0.85rem; line-height: 1.5; margin-bottom: 20px; }
-
-        .btn-action {
-            display: inline-flex;
-            align-items: center;
-            justify-content: space-between;
-            width: 100%;
-            padding: 10px 14px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--border-glow);
-            border-radius: 8px;
-            color: #fff;
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 600;
-            transition: background 0.2s;
-        }
-        .btn-action:hover { background: var(--neon-blue); }
-
-        .role-section { display: none; }
-        .role-section.active { display: block; }
-    </style>
+    .section-title {
+      margin-bottom: 16px; font-size: 1.05rem; font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+    }
+  </style>
 </head>
 <body>
 
-    <!-- Header Navigation -->
-    <header class="top-navbar">
-        <div class="nav-left">
-            <button class="hamburger-btn" id="btn-toggle-menu" aria-label="Toggle Navigation">
-                <i class="fas fa-bars"></i>
-            </button>
-            <a href="dashboard.html" class="brand-logo">
-                <i class="fas fa-cubes"></i> Nexus<span style="color:var(--neon-blue)">Pro</span>
-            </a>
-        </div>
-        <div>
-            <span id="header-role-pill" class="role-pill student">Student</span>
-        </div>
-    </header>
+  <!-- TOP NAV -->
+  <header class="top-navbar">
+    <div class="nav-left">
+      <button class="hamburger-btn" id="btn-toggle-menu" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+      </button>
+      <a href="dashboard.html" class="brand-logo">
+        <i class="fas fa-cubes"></i> Nexus<span style="color:var(--neon-blue)">Pro</span>
+      </a>
+    </div>
+    <div style="display:flex;align-items:center;">
+      <span id="header-role-pill" class="role-pill student">Student</span>
+      <span id="role-loading"><i class="fas fa-circle-notch"></i> verifying</span>
+    </div>
+  </header>
 
-    <!-- Sidebar & Mobile Overlay -->
-    <div class="sidebar-overlay" id="sidebar-overlay"></div>
-    <aside class="sidebar" id="app-sidebar">
-        <ul class="nav-menu">
-            <li><a href="dashboard.html" class="nav-link active"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
-            <li><a href="library.html" class="nav-link"><i class="fas fa-book"></i> E-Library</a></li>
-            <li><a href="practice.html" class="nav-link"><i class="fas fa-vial"></i> CBT Drills</a></li>
-            <li><a href="contact.html" class="nav-link"><i class="fas fa-headset"></i> Support Desk</a></li>
-        </ul>
-        <div>
-            <button id="btn-logout" class="btn-logout">
-                <i class="fas fa-right-from-bracket"></i> Sign Out
-            </button>
+  <!-- SIDEBAR -->
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+  <aside class="sidebar" id="app-sidebar">
+    <ul class="nav-menu">
+      <li><a href="dashboard.html" class="nav-link active"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+      <li><a href="library.html" class="nav-link"><i class="fas fa-book"></i> E-Library</a></li>
+      <li><a href="practice.html" class="nav-link"><i class="fas fa-vial"></i> CBT Drills</a></li>
+      <li><a href="contact.html" class="nav-link"><i class="fas fa-headset"></i> Support Desk</a></li>
+    </ul>
+    <div>
+      <button id="btn-logout" class="btn-logout">
+        <i class="fas fa-right-from-bracket"></i> Sign Out
+      </button>
+    </div>
+  </aside>
+
+  <!-- CONTENT -->
+  <main class="main-content">
+    <div class="hero-banner">
+      <h2>Welcome back, <span id="user-display-name">User</span></h2>
+      <p id="user-role-description">Your workspace is loading…</p>
+    </div>
+
+    <!-- ADMIN (hidden until verified) -->
+    <div id="admin-section" class="role-section">
+      <h3 class="section-title">
+        <i class="fas fa-shield-halved" style="color:var(--accent-purple)"></i> Control Panel
+      </h3>
+      <div class="card-grid">
+        <div class="card-tile">
+          <div>
+            <div class="card-icon" style="color:var(--neon-blue)"><i class="fas fa-users-gear"></i></div>
+            <h3>User Directory</h3>
+            <p>Manage registered accounts and adjust student / administrator access levels.</p>
+          </div>
+          <a href="admin_users.html" class="btn-action">Open Directory <i class="fas fa-chevron-right"></i></a>
         </div>
-    </aside>
-
-    <!-- Dashboard Content Shell -->
-    <main class="main-content">
-        
-        <div class="hero-banner">
-            <h2>Welcome back, <span id="user-display-name">User</span></h2>
-            <p id="user-role-description">Your workspace is loaded.</p>
+        <div class="card-tile">
+          <div>
+            <div class="card-icon" style="color:var(--accent-green)"><i class="fas fa-cloud-arrow-up"></i></div>
+            <h3>E-Library Upload</h3>
+            <p>Publish textbooks, syllabus PDFs, and new practice test resources.</p>
+          </div>
+          <a href="admin_upload.html" class="btn-action">Upload Hub <i class="fas fa-chevron-right"></i></a>
         </div>
+      </div>
+    </div>
 
-        <!-- ADMIN CONTROLS -->
-        <div id="admin-section" class="role-section">
-            <h3 style="margin-bottom: 16px; font-size: 1.1rem;"><i class="fas fa-shield-halved" style="color:var(--accent-purple)"></i> Control Panel</h3>
-            <div class="card-grid">
-                <div class="card-tile">
-                    <div>
-                        <div class="card-icon" style="color: var(--neon-blue);"><i class="fas fa-users-gear"></i></div>
-                        <h3>User Directory</h3>
-                        <p>Manage registered accounts and adjust student and administrator access levels.</p>
-                    </div>
-                    <a href="admin_users.html" class="btn-action">Open Directory <i class="fas fa-chevron-right"></i></a>
-                </div>
-                <div class="card-tile">
-                    <div>
-                        <div class="card-icon" style="color: var(--accent-green);"><i class="fas fa-cloud-arrow-up"></i></div>
-                        <h3>E-Library Upload</h3>
-                        <p>Publish textbooks, syllabus PDFs, and new practice test resources.</p>
-                    </div>
-                    <a href="admin_upload.html" class="btn-action">Upload Hub <i class="fas fa-chevron-right"></i></a>
-                </div>
-            </div>
+    <!-- STUDENT (safe default) -->
+    <div id="student-section" class="role-section active">
+      <h3 class="section-title">
+        <i class="fas fa-graduation-cap" style="color:var(--neon-blue)"></i> Learning Modules
+      </h3>
+      <div class="card-grid">
+        <div class="card-tile">
+          <div>
+            <div class="card-icon" style="color:var(--neon-blue)"><i class="fas fa-book-bookmark"></i></div>
+            <h3>Study E-Library</h3>
+            <p>Browse course materials, WAEC/JAMB syllabus guides, and notes.</p>
+          </div>
+          <a href="library.html" class="btn-action">Access Library <i class="fas fa-chevron-right"></i></a>
         </div>
-
-        <!-- STUDENT CONTROLS (DEFAULT ACTIVE FOR INSTANT LOAD) -->
-        <div id="student-section" class="role-section active">
-            <h3 style="margin-bottom: 16px; font-size: 1.1rem;"><i class="fas fa-graduation-cap" style="color:var(--neon-blue)"></i> Learning Modules</h3>
-            <div class="card-grid">
-                <div class="card-tile">
-                    <div>
-                        <div class="card-icon" style="color: var(--neon-blue);"><i class="fas fa-book-bookmark"></i></div>
-                        <h3>Study E-Library</h3>
-                        <p>Browse course materials, WAEC/JAMB syllabus guides, and notes.</p>
-                    </div>
-                    <a href="library.html" class="btn-action">Access Library <i class="fas fa-chevron-right"></i></a>
-                </div>
-                <div class="card-tile">
-                    <div>
-                        <div class="card-icon" style="color: var(--accent-amber);"><i class="fas fa-pen-to-square"></i></div>
-                        <h3>Practice CBT Tests</h3>
-                        <p>Take practice questions and timed examination drills.</p>
-                    </div>
-                    <a href="practice.html" class="btn-action">Start Practice <i class="fas fa-chevron-right"></i></a>
-                </div>
-            </div>
+        <div class="card-tile">
+          <div>
+            <div class="card-icon" style="color:var(--accent-amber)"><i class="fas fa-pen-to-square"></i></div>
+            <h3>Practice CBT Tests</h3>
+            <p>Take practice questions and timed examination drills.</p>
+          </div>
+          <a href="practice.html" class="btn-action">Start Practice <i class="fas fa-chevron-right"></i></a>
         </div>
+      </div>
+    </div>
+  </main>
 
-    </main>
-
-    <script type="module" src="dashboard.js"></script>
+  <script type="module" src="dashboard.js"></script>
 </body>
-                </html>
+                                                               </html>
