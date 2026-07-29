@@ -1,12 +1,10 @@
 import { auth } from "./firebase-config.js";
 import {
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  updateProfile,
   setPersistence,
   browserLocalPersistence
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { ref, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+} from "[gstatic.com](https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js)";
+import { ref, get } from "[gstatic.com](https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js)";
 import { rtdb } from "./firebase-config.js";
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -78,11 +76,12 @@ loginForm?.addEventListener("submit", async (e) => {
       case "auth/invalid-email":
         showError("login-error", "Please enter a valid email address.");
         break;
+      case "auth/network-request-failed":
+        showError("login-error", "Network error. Check your connection and try again.");
+        break;
       default:
         showError("login-error", "Login failed: " + err.message);
     }
   }
 });
-
-// ── SIGN UP ───────────────────────────────────────────────────────────────────
-
+                            
