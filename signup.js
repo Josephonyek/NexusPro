@@ -57,7 +57,8 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('nexusAuthToken', result.token);
             localStorage.setItem('nexusUserId', result.userId);
             localStorage.setItem('nexusUserRole', result.role);
-
+localStorage.setItem("nx_role", userRole.toLowerCase());
+localStorage.setItem("nx_name", userName);
             btn.textContent = "Redirecting to workspace...";
             window.location.replace('dashboard.html');
 
