@@ -9,23 +9,10 @@ const headerRolePill = document.getElementById("header-role-pill");
 const displayNameEl  = document.getElementById("user-display-name");
 const roleDescEl     = document.getElementById("user-role-description");
 const loadingBadge   = document.getElementById("role-loading");
-
 const btnToggleMenu  = document.getElementById("btn-toggle-menu");
 const appSidebar     = document.getElementById("app-sidebar");
 const sidebarOverlay = document.getElementById("sidebar-overlay");
 const btnLogout      = document.getElementById("btn-logout");
-
-// Sanity check: warn loudly in console if required elements are missing,
-// instead of silently throwing and killing the rest of the script.
-const requiredEls = {
-  "admin-section": adminSection,
-  "student-section": studentSection,
-  "header-role-pill": headerRolePill,
-  "user-role-description": roleDescEl
-};
-for (const [id, el] of Object.entries(requiredEls)) {
-  if (!el) console.error(`[dashboard.js] Missing required element: #${id}`);
-}
 
 // Sidebar
 function toggleSidebar() {
@@ -35,7 +22,6 @@ function toggleSidebar() {
 }
 btnToggleMenu?.addEventListener("click", toggleSidebar);
 sidebarOverlay?.addEventListener("click", toggleSidebar);
-
 window.addEventListener("resize", () => {
   if (window.innerWidth >= 1024) {
     appSidebar?.classList.remove("open");
@@ -43,20 +29,13 @@ window.addEventListener("resize", () => {
   }
 });
 
-// Apply role to the UI
+// Apply role to UI
 function applyState(role, name) {
   const cleanRole = (role || "student").toLowerCase().trim();
   const cleanName = name || "User";
 
   if (displayNameEl) displayNameEl.textContent = cleanName;
-
-  // Guard: if core elements aren't on the page, bail out safely
-  // instead of throwing and halting the whole script.
-  if (!adminSection || !studentSection || !headerRolePill || !roleDescEl) {
-    console.error("[dashboard.js] Cannot apply role UI — required elements missing.");
-    if (loadingBadge) loadingBadge.style.display = "none";
-    return;
-  }
+  if (!adminSection || !studentSection || !headerRolePill || !roleDescEl) return;
 
   if (cleanRole === "admin") {
     headerRolePill.textContent = "Administrator";
@@ -75,18 +54,30 @@ function applyState(role, name) {
   if (loadingBadge) loadingBadge.style.display = "none";
 }
 
-// Instant cache (for speed)
+// Show cached state instantly while auth loads
 const cachedRole = localStorage.getItem("nx_role") || "student";
 const cachedName = localStorage.getItem("nx_name") || "User";
 applyState(cachedRole, cachedName);
 
-// Main role detection
+// Auth state — with redirect guard
+let redirectTimer = null;
+
 onAuthStateChanged(auth, async (user) => {
+  // If no user, wait 3 seconds before redirecting
+  // This gives Firebase time to restore session on slow mobile connections
   if (!user) {
-    localStorage.clear();
-    sessionStorage.clear();
-    window.location.replace("login.html");
+    redirectTimer = setTimeout(() => {
+      localStorage.clear();
+      sessionStorage.clear();
+      window.location.replace("login.html");
+    }, 3000);
     return;
+  }
+
+  // User is signed in — cancel any pending redirect
+  if (redirectTimer) {
+    clearTimeout(redirectTimer);
+    redirectTimer = null;
   }
 
   const quickName = user.displayName || (user.email ? user.email.split("@")[0] : "User");
@@ -96,7 +87,6 @@ onAuthStateChanged(auth, async (user) => {
     const snapshot = await get(userRef);
 
     if (snapshot.exists()) {
-      // Profile already exists → read the role
       const data = snapshot.val();
       const role = (data.role || "student").toLowerCase().trim();
       const name = data.name || quickName;
@@ -106,7 +96,6 @@ onAuthStateChanged(auth, async (user) => {
       applyState(role, name);
 
     } else {
-      // First time user → create profile as student
       const newProfile = {
         name: quickName,
         email: user.email || "",
@@ -115,14 +104,18 @@ onAuthStateChanged(auth, async (user) => {
       };
 
       await set(userRef, newProfile);
-
       localStorage.setItem("nx_role", "student");
       localStorage.setItem("nx_name", quickName);
       applyState("student", quickName);
     }
+
   } catch (error) {
-    console.error("Error loading role:", error);
-    // Keep cached version if network fails
+    // Show error on screen since user is on mobile with no DevTools
+    const debugBox = document.getElementById("debug-box");
+    if (debugBox) {
+      debugBox.style.display = "block";
+      debugBox.textContent = "DB ERROR: " + error.message;
+    }
     applyState(cachedRole, cachedName);
   }
 });
