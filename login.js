@@ -1,67 +1,88 @@
-/**
- * Nexus Pro 2.0 - Frontend Login Controller (With Failsafe Server Guards)
- */
+import { auth } from "./firebase-config.js";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  setPersistence,
+  browserLocalPersistence
+} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { ref, set, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { rtdb } from "./firebase-config.js";
 
-// Cryptographic engine to match backend security requirements
-async function hashPasswordSHA256(password) {
-    const encoder = new TextEncoder();
-    const data = encoder.encode(password);
-    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+function showError(elId, msg) {
+  const el = document.getElementById(elId);
+  if (el) { el.textContent = msg; el.style.display = "block"; }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('loginForm')?.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const btn = e.target.querySelector('button[type="submit"]');
-        
-        const email = document.getElementById('loginEmail').value.trim();
-        const plainPassword = document.getElementById('loginPassword').value;
+function hideError(elId) {
+  const el = document.getElementById(elId);
+  if (el) { el.textContent = ""; el.style.display = "none"; }
+}
 
-        try {
-            btn.disabled = true;
-            btn.textContent = "Hashing security tokens...";
+function setLoading(btn, loading, defaultText) {
+  btn.disabled = loading;
+  btn.textContent = loading ? "Please wait…" : defaultText;
+}
 
-            const hashedPassword = await hashPasswordSHA256(plainPassword);
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
 
-            // FIX: Targeted absolute Vercel serverless root route path
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, hashedPassword })
-            });
+const loginForm = document.getElementById("loginForm");
+loginForm?.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  hideError("login-error");
 
-            // FIX: Content-Type Guard to catch Vercel HTML error pages before JSON parser crashes
-            const contentType = response.headers.get("content-type");
-            if (!contentType || !contentType.includes("application/json")) {
-                const rawErrorText = await response.text();
-                console.error("Vercel Server Environment Crash Payload:", rawErrorText);
-                throw new Error("Server Environment Error. Check your Vercel Dashboard Environment Variables.");
-            }
+  const btn      = loginForm.querySelector("button[type='submit']");
+  const email    = document.getElementById("loginEmail").value.trim();
+  const password = document.getElementById("loginPassword").value;
 
-            const result = await response.json();
-            if (!response.ok) throw new Error(result.message || "Login authentication rejected.");
+  if (!email || !password) {
+    showError("login-error", "Please enter your email and password.");
+    return;
+  }
 
-            // Cache authorization tokens
-            localStorage.clear();
-            localStorage.setItem('nexusAuthToken', result.token);
-            localStorage.setItem('nexusUserId', result.userId);
-            localStorage.setItem('nexusUserRole', result.role);
-// Safe pre-cache block
-const safeRole = (typeof userData !== "undefined" && userData.role) ? userData.role.toLowerCase() : "student";
-const safeName = (typeof userData !== "undefined" && (userData.name || userData.fullName)) ? (userData.name || userData.fullName) : "User";
+  setLoading(btn, true, "Sign In");
 
-localStorage.setItem("nx_role", safeRole);
-localStorage.setItem("nx_name", safeName);
-            btn.textContent = "Redirecting...";
-            window.location.replace('dashboard.html');
+  try {
+    // Persist session across page reloads and browser restarts
+    await setPersistence(auth, browserLocalPersistence);
 
-        } catch (err) {
-            alert(`Login Failed: ${err.message}`);
-            if (btn) {
-                btn.disabled = false;
-                btn.textContent = "Sign In to Dashboard";
-            }
-        }
-    });
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // Pre-cache name and role so dashboard loads instantly
+    const snapshot = await get(ref(rtdb, `users/${user.uid}`));
+    if (snapshot.exists()) {
+      const data = snapshot.val();
+      localStorage.setItem("nx_role", (data.role || "student").toLowerCase().trim());
+      localStorage.setItem("nx_name", data.name || user.email.split("@")[0]);
+    } else {
+      localStorage.setItem("nx_role", "student");
+      localStorage.setItem("nx_name", user.email.split("@")[0]);
+    }
+
+    window.location.replace("dashboard.html");
+
+  } catch (err) {
+    setLoading(btn, false, "Sign In");
+    switch (err.code) {
+      case "auth/user-not-found":
+      case "auth/wrong-password":
+      case "auth/invalid-credential":
+        showError("login-error", "Incorrect email or password.");
+        break;
+      case "auth/too-many-requests":
+        showError("login-error", "Too many attempts. Try again later.");
+        break;
+      case "auth/invalid-email":
+        showError("login-error", "Please enter a valid email address.");
+        break;
+      default:
+        showError("login-error", "Login failed: " + err.message);
+    }
+  }
 });
+
+// ── SIGN UP ───────────────────────────────────────────────────────────────────
+
