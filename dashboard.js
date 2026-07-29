@@ -1,99 +1,95 @@
-/**
- * Nexus Pro Console Lifecycle Driver
- */
+import { auth, rtdb } from "./firebase-config.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-document.addEventListener("DOMContentLoaded", () => {
-    // Drop execution block preloader
-    const loader = document.getElementById("preloader");
-    if (loader) {
-        loader.classList.add("fade-out");
-        setTimeout(() => loader.remove(), 300);
-    }
+// DOM Element References
+const loaderState = document.getElementById("loader-state");
+const dashboardContent = document.getElementById("dashboard-content");
+const adminSection = document.getElementById("admin-section");
+const studentSection = document.getElementById("student-section");
+const roleTag = document.getElementById("user-role-tag");
+const displayNameEl = document.getElementById("user-display-name");
+const welcomeTextEl = document.getElementById("role-welcome-text");
+const btnLogout = document.getElementById("btn-logout");
 
-    // Interactive Hamburger Menu Mechanics
-    setupMasterHamburgerDropdown();
-
-    // Authenticate and mount content configurations
-    evaluateConsoleIdentitySession();
-});
-
-/**
- * Toggles visibility states for the global drawer overlay
- */
-function setupMasterHamburgerDropdown() {
-    const trigger = document.getElementById("menu-hamburger-trigger");
-    const panel = document.getElementById("global-dropdown-panel");
-
-    if (!trigger || !panel) return;
-
-    trigger.addEventListener("click", (e) => {
-        e.stopPropagation();
-        panel.classList.toggle("active");
-    });
-
-    document.addEventListener("click", (e) => {
-        if (!panel.contains(e.target) && e.target !== trigger) {
-            panel.classList.remove("active");
-        }
-    });
-}
-
-/**
- * Validates tracking variables to apply role view structures
- */
-function evaluateConsoleIdentitySession() {
-    let sessionData = localStorage.getItem("nexus_user_session");
-
-    // Developer Box Safeguard: Sets up local token if testing directly via file systems
-    if (!sessionData) {
-        console.info("Identity token unassigned. Issuing default mock student object.");
-        const sandboxProfile = {
-            uid: "sandbox_dev_token",
-            email: "user@trivexacademy.com",
-            role: "student" // Flip string value to "admin" to view administrative box components
-        };
-        localStorage.setItem("nexus_user_session", JSON.stringify(sandboxProfile));
-        sessionData = localStorage.getItem("nexus_user_session");
+// Authentication & Role Checking Engine
+onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+        // Unauthenticated session -> Redirect to login page
+        window.location.href = "login.html";
+        return;
     }
 
     try {
-        const userSession = JSON.parse(sessionData);
-        renderAccountRoleLayout(userSession.role || "student");
-    } catch (err) {
-        console.error("Session serialization error. Cleaning environment variables.", err);
-        localStorage.removeItem("nexus_user_session");
-        window.location.replace("login.html");
-    }
-}
+        // Fetch user profile node from Firebase Realtime Database
+        const userRef = ref(rtdb, `users/${user.uid}`);
+        const snapshot = await get(userRef);
 
-/**
- * Displays appropriate dashboard blocks based on current privileges
- */
-function renderAccountRoleLayout(role) {
-    const studentWrapper = document.getElementById("student-view-wrapper");
-    const adminWrapper = document.getElementById("admin-view-wrapper");
-    const studentNavElements = document.querySelectorAll(".student-elements");
-    const adminNavElements = document.querySelectorAll(".admin-elements");
+        let userRole = "student"; // Default fallback role
+        let userFullName = user.email ? user.email.split('@')[0] : "User";
 
-    if (role === "admin") {
-        if (adminWrapper) adminWrapper.style.display = "block";
-        if (studentWrapper) studentWrapper.style.display = "none";
-        
-        adminNavElements.forEach(el => el.style.display = "flex");
-        studentNavElements.forEach(el => el.style.display = "none");
-    } else {
-        if (studentWrapper) studentWrapper.style.display = "block";
-        if (adminWrapper) adminWrapper.style.display = "none";
-        
-        adminNavElements.forEach(el => el.style.display = "none");
-        studentNavElements.forEach(el => el.style.display = "flex");
-    }
-}
-
-/**
- * Triggers session clears and navigates back out to security gateways
- */
-function handleSignOutAction() {
-    localStorage.removeItem("nexus_user_session");
-    window.location.replace("login.html");
+        if (snapshot.exists()) {
+            const data = snapshot.val();
+            if (data.role) {
+                userRole = data.role.toLowerCase();
             }
+            if (data.name) {
+                userFullName = data.name;
+            } else if (data.fullName) {
+                userFullName = data.fullName;
+            }
+        }
+
+        // Set User Display Name
+        if (displayNameEl) {
+            displayNameEl.innerText = userFullName;
+        }
+
+        // Render sections based on database role
+        if (userRole === "admin") {
+            if (roleTag) {
+                roleTag.innerText = "Administrator";
+                roleTag.className = "role-badge admin";
+            }
+            if (welcomeTextEl) {
+                welcomeTextEl.innerText = "System administrative access verified. Manage platform operations below.";
+            }
+            if (adminSection) adminSection.classList.add("active");
+            if (studentSection) studentSection.classList.remove("active");
+        } else {
+            if (roleTag) {
+                roleTag.innerText = "Student";
+                roleTag.className = "role-badge student";
+            }
+            if (welcomeTextEl) {
+                welcomeTextEl.innerText = "Student portal active. Access your study modules and learning tools below.";
+            }
+            if (studentSection) studentSection.classList.add("active");
+            if (adminSection) adminSection.classList.remove("active");
+        }
+
+        // Hide loading state & reveal dashboard content
+        if (loaderState) loaderState.style.display = "none";
+        if (dashboardContent) dashboardContent.style.display = "block";
+
+    } catch (err) {
+        console.error("Failed to fetch user role from Realtime Database:", err);
+        
+        // Fallback to student view in case of read error
+        if (studentSection) studentSection.classList.add("active");
+        if (loaderState) loaderState.style.display = "none";
+        if (dashboardContent) dashboardContent.style.display = "block";
+    }
+});
+
+// Logout Handler
+if (btnLogout) {
+    btnLogout.addEventListener("click", async () => {
+        try {
+            await signOut(auth);
+            window.location.href = "login.html";
+        } catch (err) {
+            console.error("Logout failed:", err);
+        }
+    });
+}
