@@ -17,7 +17,7 @@ const appSidebar = document.getElementById("app-sidebar");
 const sidebarOverlay = document.getElementById("sidebar-overlay");
 const btnLogout = document.getElementById("btn-logout");
 
-// Drawer Control
+// Drawer Toggle
 function toggleSidebar() {
     const isOpen = appSidebar.classList.contains("open");
     if (isOpen) {
@@ -32,7 +32,7 @@ function toggleSidebar() {
 btnToggleMenu?.addEventListener("click", toggleSidebar);
 sidebarOverlay?.addEventListener("click", toggleSidebar);
 
-// UI Renderer Helper
+// UI Renderer
 function renderDashboardUI(role, name) {
     if (displayNameEl) displayNameEl.innerText = name;
 
@@ -54,12 +54,12 @@ function renderDashboardUI(role, name) {
         adminModule?.classList.remove("active");
     }
 
-    // Reveal main shell instantly
+    // Hide loading screen instantly
     if (authGuard) authGuard.style.display = "none";
     if (mainWrapper) mainWrapper.classList.add("visible");
 }
 
-// 1. FAST OPTIMISTIC LAUNCH (< 10ms)
+// 1. INSTANT LOCAL CHECK (<5ms)
 const cachedRole = localStorage.getItem("nx_role");
 const cachedName = localStorage.getItem("nx_name");
 
@@ -67,8 +67,8 @@ if (cachedRole && cachedName) {
     renderDashboardUI(cachedRole, cachedName);
 }
 
-// 2. SILENT BACKGROUND SERVER RE-VALIDATION
-onAuthStateChanged(auth, async (user) => {
+// 2. FIREBASE SESSION CHECK
+onAuthStateChanged(auth, (user) => {
     if (!user) {
         localStorage.clear();
         sessionStorage.clear();
@@ -76,39 +76,41 @@ onAuthStateChanged(auth, async (user) => {
         return;
     }
 
-    try {
-        const userRef = ref(rtdb, `users/${user.uid}`);
-        const snapshot = await get(userRef);
+    // OPTIMIZATION FOR NEW USERS:
+    // If no cache exists, immediately render using default "student" role & email prefix
+    // so the new user doesn't wait on the RTDB network request screen!
+    if (!localStorage.getItem("nx_role")) {
+        const fallbackName = user.displayName || (user.email ? user.email.split("@")[0] : "New User");
+        renderDashboardUI("student", fallbackName);
+    }
 
+    // 3. SILENT BACKGROUND RTDB RE-VALIDATION
+    const userRef = ref(rtdb, `users/${user.uid}`);
+    get(userRef).then((snapshot) => {
         if (!snapshot.exists()) {
+            // Unregistered user attempt -> kick out
             localStorage.clear();
-            await signOut(auth);
+            signOut(auth);
             window.location.replace("login.html");
             return;
         }
 
         const userData = snapshot.val();
         const verifiedRole = (userData.role || "student").toLowerCase();
-        const userName = userData.name || userData.fullName || user.email.split("@")[0];
+        const userName = userData.name || userData.fullName || user.displayName || user.email.split("@")[0];
 
-        // Cache updated credentials locally
+        // Store into localStorage for future instant loads
         localStorage.setItem("nx_role", verifiedRole);
         localStorage.setItem("nx_name", userName);
 
-        // Update UI seamlessly if data changed or initial cache wasn't present
+        // Update UI seamlessly if role/name differs from fallback
         renderDashboardUI(verifiedRole, userName);
-
-    } catch (error) {
-        console.error("Silent security check error:", error);
-        // On network fail, allow access if cache exists, otherwise purge
-        if (!localStorage.getItem("nx_role")) {
-            localStorage.clear();
-            window.location.replace("login.html");
-        }
-    }
+    }).catch((err) => {
+        console.warn("Background RTDB check delayed:", err);
+    });
 });
 
-// Secure Logout
+// Logout Handler
 btnLogout?.addEventListener("click", async () => {
     try {
         localStorage.clear();
