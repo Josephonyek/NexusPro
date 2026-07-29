@@ -272,7 +272,21 @@
       </div>
     </div>
   </main>
+<div id="debug-box" style="position:fixed;bottom:0;left:0;right:0;background:#ef4444;color:#fff;font-size:13px;padding:10px;z-index:9999;display:none;word-break:break-all;"></div>
 
+<script type="module">
+  window.addEventListener("error", (e) => {
+    const box = document.getElementById("debug-box");
+    box.style.display = "block";
+    box.textContent = "ERROR: " + e.message + " — " + e.filename + ":" + e.lineno;
+  });
+
+  window.addEventListener("unhandledrejection", (e) => {
+    const box = document.getElementById("debug-box");
+    box.style.display = "block";
+    box.textContent = "PROMISE ERROR: " + e.reason;
+  });
+</script>
   <script type="module" src="dashboard.js"></script>
 </body>
                                                                </html>
