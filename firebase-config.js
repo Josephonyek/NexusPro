@@ -15,4 +15,4 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
-export const rtdb = getDatabase(app);  // ← renamed to match dashboard.js
+export const rtdb = getDatabase(app);
