@@ -2,22 +2,21 @@ import { auth, rtdb } from "./firebase-config.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-// DOM Handles
-const authGuard = document.getElementById("auth-guard-screen");
-const mainWrapper = document.getElementById("main-wrapper");
-const adminModule = document.getElementById("admin-module");
-const studentModule = document.getElementById("student-module");
+// DOM References
+const authGuard = document.getElementById("auth-guard");
+const adminSection = document.getElementById("admin-section");
+const studentSection = document.getElementById("student-section");
 const headerRolePill = document.getElementById("header-role-pill");
 const displayNameEl = document.getElementById("user-display-name");
 const roleDescEl = document.getElementById("user-role-description");
 
-// Sidebar & Hamburger Handles
+// Menu Controls
 const btnToggleMenu = document.getElementById("btn-toggle-menu");
 const appSidebar = document.getElementById("app-sidebar");
 const sidebarOverlay = document.getElementById("sidebar-overlay");
 const btnLogout = document.getElementById("btn-logout");
 
-// Drawer Toggle
+// Drawer Handler
 function toggleSidebar() {
     const isOpen = appSidebar.classList.contains("open");
     if (isOpen) {
@@ -32,42 +31,43 @@ function toggleSidebar() {
 btnToggleMenu?.addEventListener("click", toggleSidebar);
 sidebarOverlay?.addEventListener("click", toggleSidebar);
 
-// UI Renderer
-function renderDashboardUI(role, name) {
-    if (displayNameEl) displayNameEl.innerText = name;
+// Single Source-of-Truth UI Renderer
+function applyState(role, name) {
+    const cleanRole = (role || "student").toLowerCase();
+    const cleanName = name || "User";
 
-    if (role === "admin") {
+    if (displayNameEl) displayNameEl.innerText = cleanName;
+
+    if (cleanRole === "admin") {
         if (headerRolePill) {
             headerRolePill.innerText = "Administrator";
             headerRolePill.className = "role-pill admin";
         }
-        if (roleDescEl) roleDescEl.innerText = "Administrative privilege level verified. System controls active.";
-        adminModule?.classList.add("active");
-        studentModule?.classList.remove("active");
+        if (roleDescEl) roleDescEl.innerText = "System administrative permissions active.";
+        adminSection?.classList.add("active");
+        studentSection?.classList.remove("active");
     } else {
         if (headerRolePill) {
             headerRolePill.innerText = "Student";
             headerRolePill.className = "role-pill student";
         }
-        if (roleDescEl) roleDescEl.innerText = "Student workspace active. Access your practice material and library below.";
-        studentModule?.classList.add("active");
-        adminModule?.classList.remove("active");
+        if (roleDescEl) roleDescEl.innerText = "Student hub active. Access learning materials below.";
+        studentSection?.classList.add("active");
+        adminSection?.classList.remove("active");
     }
 
-    // Hide loading screen instantly
+    // Hide guard overlay immediately once state is set
     if (authGuard) authGuard.style.display = "none";
-    if (mainWrapper) mainWrapper.classList.add("visible");
 }
 
-// 1. INSTANT LOCAL CHECK (<5ms)
+// 1. FAST-PATH (Instant render if cache exists)
 const cachedRole = localStorage.getItem("nx_role");
 const cachedName = localStorage.getItem("nx_name");
-
 if (cachedRole && cachedName) {
-    renderDashboardUI(cachedRole, cachedName);
+    applyState(cachedRole, cachedName);
 }
 
-// 2. FIREBASE SESSION CHECK
+// 2. AUTHENTICATION & RTDB SYNC
 onAuthStateChanged(auth, (user) => {
     if (!user) {
         localStorage.clear();
@@ -76,41 +76,39 @@ onAuthStateChanged(auth, (user) => {
         return;
     }
 
-    // OPTIMIZATION FOR NEW USERS:
-    // If no cache exists, immediately render using default "student" role & email prefix
-    // so the new user doesn't wait on the RTDB network request screen!
+    // Immediate fallback for brand new users without cache
+    const quickName = user.displayName || (user.email ? user.email.split("@")[0] : "New User");
     if (!localStorage.getItem("nx_role")) {
-        const fallbackName = user.displayName || (user.email ? user.email.split("@")[0] : "New User");
-        renderDashboardUI("student", fallbackName);
+        applyState("student", quickName);
     }
 
-    // 3. SILENT BACKGROUND RTDB RE-VALIDATION
+    // Silent Database Verification
     const userRef = ref(rtdb, `users/${user.uid}`);
     get(userRef).then((snapshot) => {
         if (!snapshot.exists()) {
-            // Unregistered user attempt -> kick out
             localStorage.clear();
             signOut(auth);
             window.location.replace("login.html");
             return;
         }
 
-        const userData = snapshot.val();
-        const verifiedRole = (userData.role || "student").toLowerCase();
-        const userName = userData.name || userData.fullName || user.displayName || user.email.split("@")[0];
+        const data = snapshot.val();
+        const verifiedRole = data.role || "student";
+        const verifiedName = data.name || data.fullName || user.displayName || user.email.split("@")[0];
 
-        // Store into localStorage for future instant loads
-        localStorage.setItem("nx_role", verifiedRole);
-        localStorage.setItem("nx_name", userName);
+        // Seed cache
+        localStorage.setItem("nx_role", verifiedRole.toLowerCase());
+        localStorage.setItem("nx_name", verifiedName);
 
-        // Update UI seamlessly if role/name differs from fallback
-        renderDashboardUI(verifiedRole, userName);
+        // Render verified state
+        applyState(verifiedRole, verifiedName);
+
     }).catch((err) => {
-        console.warn("Background RTDB check delayed:", err);
+        console.warn("Background RTDB sync delayed:", err);
     });
 });
 
-// Logout Handler
+// Clean Sign Out
 btnLogout?.addEventListener("click", async () => {
     try {
         localStorage.clear();
@@ -118,6 +116,6 @@ btnLogout?.addEventListener("click", async () => {
         await signOut(auth);
         window.location.replace("login.html");
     } catch (err) {
-        console.error("Logout error:", err);
+        console.error("Sign out error:", err);
     }
 });
