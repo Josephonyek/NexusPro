@@ -3,7 +3,7 @@ import {
     signInWithEmailAndPassword,
     setPersistence,
     browserLocalPersistence,
-    fetchSignInMethodsForEmail   // 👈 new
+    fetchSignInMethodsForEmail
 } from "firebase/auth";
 import { ref, get } from "firebase/database";
 import { rtdb } from "./firebase-config.js";
@@ -54,22 +54,21 @@ if (loginForm) {
         setLoading(btn, true, "Sign In");
 
         try {
-            // 1️⃣ Check if the email is registered in Firebase Auth
+            // 1️⃣ Check if email exists in Firebase Auth
             const signInMethods = await fetchSignInMethodsForEmail(auth, email);
             if (signInMethods.length === 0) {
-                // Email not found
                 setLoading(btn, false, "Sign In");
                 showError("No account found for this email. Please sign up first.");
                 return;
             }
 
-            // 2️⃣ Now attempt sign‑in
+            // 2️⃣ Sign in
             await setPersistence(auth, browserLocalPersistence);
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             console.log("✅ Login successful for:", user.email);
 
-            // 3️⃣ Fetch profile from RTDB (non‑blocking)
+            // 3️⃣ Read user data from Realtime Database (non‑blocking)
             let role = "student";
             let name = user.email.split("@")[0];
             try {
@@ -86,16 +85,17 @@ if (loginForm) {
                 console.warn("⚠️ Database read failed:", dbError.message);
             }
 
+            // 4️⃣ Store in localStorage for dashboard
             localStorage.setItem("nx_role", role);
             localStorage.setItem("nx_name", name);
 
+            // 5️⃣ Redirect
             window.location.replace("dashboard.html");
 
         } catch (err) {
             setLoading(btn, false, "Sign In");
             console.error("🔥 Login error:", err.code, err.message);
 
-            // User‑friendly messages
             switch (err.code) {
                 case "auth/wrong-password":
                 case "auth/invalid-credential":
@@ -115,4 +115,4 @@ if (loginForm) {
             }
         }
     });
-    }
+}
