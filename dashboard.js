@@ -1,6 +1,6 @@
 import { auth, rtdb } from "./firebase-config.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { ref, get, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 // DOM
 const adminSection   = document.getElementById("admin-section");
@@ -8,7 +8,6 @@ const studentSection = document.getElementById("student-section");
 const headerRolePill = document.getElementById("header-role-pill");
 const displayNameEl  = document.getElementById("user-display-name");
 const roleDescEl     = document.getElementById("user-role-description");
-const loadingBadge   = document.getElementById("role-loading");
 
 const btnToggleMenu  = document.getElementById("btn-toggle-menu");
 const appSidebar     = document.getElementById("app-sidebar");
@@ -24,14 +23,7 @@ function toggleSidebar() {
 btnToggleMenu?.addEventListener("click", toggleSidebar);
 sidebarOverlay?.addEventListener("click", toggleSidebar);
 
-window.addEventListener("resize", () => {
-  if (window.innerWidth >= 1024) {
-    appSidebar?.classList.remove("open");
-    sidebarOverlay?.classList.remove("active");
-  }
-});
-
-// Apply role to the UI
+// Apply role
 function applyState(role, name) {
   const cleanRole = (role || "student").toLowerCase().trim();
   const cleanName = name || "User";
@@ -51,70 +43,73 @@ function applyState(role, name) {
     studentSection.classList.add("active");
     adminSection.classList.remove("active");
   }
-
-  if (loadingBadge) loadingBadge.style.display = "none";
 }
 
-// Instant cache (for speed)
-const cachedRole = localStorage.getItem("nx_role") || "student";
-const cachedName = localStorage.getItem("nx_name") || "User";
-applyState(cachedRole, cachedName);
+// Temporary debug box (will show on screen)
+function showDebug(message) {
+  let box = document.getElementById("debug-box");
+  if (!box) {
+    box = document.createElement("div");
+    box.id = "debug-box";
+    box.style.cssText = `
+      background: #1e293b;
+      color: #f8fafc;
+      padding: 16px;
+      margin: 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      border: 1px solid #334155;
+    `;
+    document.querySelector("main").prepend(box);
+  }
+  box.textContent = message;
+}
 
-// Main role detection
+// Main logic
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    localStorage.clear();
-    sessionStorage.clear();
     window.location.replace("login.html");
     return;
   }
 
-  const quickName = user.displayName || (user.email ? user.email.split("@")[0] : "User");
-  const userRef = ref(rtdb, `users/${user.uid}`);
+  showDebug("Logged in as: " + user.uid + "\nFetching role...");
 
   try {
+    const userRef = ref(rtdb, `users/${user.uid}`);
     const snapshot = await get(userRef);
 
     if (snapshot.exists()) {
-      // Profile already exists → read the role
       const data = snapshot.val();
+      
+      // Show exactly what is in the database
+      showDebug(
+        "SUCCESS - Data found in database:\n\n" +
+        JSON.stringify(data, null, 2) +
+        "\n\nDetected role: " + (data.role || "NOT FOUND")
+      );
+
       const role = (data.role || "student").toLowerCase().trim();
-      const name = data.name || quickName;
+      const name = data.name || user.displayName || "User";
 
       localStorage.setItem("nx_role", role);
       localStorage.setItem("nx_name", name);
+
       applyState(role, name);
-
     } else {
-      // First time user → create profile as student
-      const newProfile = {
-        name: quickName,
-        email: user.email || "",
-        role: "student",
-        createdAt: Date.now()
-      };
-
-      await set(userRef, newProfile);
-
-      localStorage.setItem("nx_role", "student");
-      localStorage.setItem("nx_name", quickName);
-      applyState("student", quickName);
+      showDebug("NO DATA FOUND\nPath users/" + user.uid + " does not exist in the database.");
+      applyState("student", "User");
     }
   } catch (error) {
-    console.error("Error loading role:", error);
-    // Keep cached version if network fails
-    applyState(cachedRole, cachedName);
+    showDebug("ERROR loading role:\n" + error.message);
+    applyState("student", "User");
   }
 });
 
 // Logout
 btnLogout?.addEventListener("click", async () => {
-  try {
-    localStorage.clear();
-    sessionStorage.clear();
-    await signOut(auth);
-    window.location.replace("login.html");
-  } catch (err) {
-    console.error(err);
-  }
+  localStorage.clear();
+  await signOut(auth);
+  window.location.replace("login.html");
 });
