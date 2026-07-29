@@ -8,8 +8,6 @@ import {
 import { ref, get } from "firebase/database";
 import { rtdb } from "./firebase-config.js";
 
-// ── Helpers ──────────────────────────────────────────────────────────
-
 function showError(msg) {
     const el = document.getElementById("login-error");
     if (el) {
@@ -31,8 +29,6 @@ function setLoading(btn, loading, defaultText) {
     btn.textContent = loading ? "Please wait…" : defaultText;
 }
 
-// ── LOGIN HANDLER ───────────────────────────────────────────────────
-
 const loginForm = document.getElementById("loginForm");
 if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
@@ -51,24 +47,30 @@ if (loginForm) {
             return;
         }
 
+        console.log("🔍 Attempting login with email:", email);
+
         setLoading(btn, true, "Sign In");
 
         try {
-            // 1️⃣ Check if email exists in Firebase Auth
+            // Check if email exists
+            console.log("📡 Checking email existence...");
             const signInMethods = await fetchSignInMethodsForEmail(auth, email);
+            console.log("📡 Sign-in methods:", signInMethods);
+
             if (signInMethods.length === 0) {
                 setLoading(btn, false, "Sign In");
                 showError("No account found for this email. Please sign up first.");
                 return;
             }
 
-            // 2️⃣ Sign in
+            // Sign in
+            console.log("🔐 Attempting signInWithEmailAndPassword...");
             await setPersistence(auth, browserLocalPersistence);
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
             console.log("✅ Login successful for:", user.email);
 
-            // 3️⃣ Read user data from Realtime Database (non‑blocking)
+            // Fetch from DB
             let role = "student";
             let name = user.email.split("@")[0];
             try {
@@ -85,21 +87,23 @@ if (loginForm) {
                 console.warn("⚠️ Database read failed:", dbError.message);
             }
 
-            // 4️⃣ Store in localStorage for dashboard
             localStorage.setItem("nx_role", role);
             localStorage.setItem("nx_name", name);
 
-            // 5️⃣ Redirect
             window.location.replace("dashboard.html");
 
         } catch (err) {
             setLoading(btn, false, "Sign In");
             console.error("🔥 Login error:", err.code, err.message);
 
+            // Show specific error
             switch (err.code) {
                 case "auth/wrong-password":
                 case "auth/invalid-credential":
                     showError("Incorrect password. Please try again.");
+                    break;
+                case "auth/user-not-found":
+                    showError("No account found for this email. Please sign up first.");
                     break;
                 case "auth/too-many-requests":
                     showError("Too many failed attempts. Try again later.");
@@ -115,4 +119,4 @@ if (loginForm) {
             }
         }
     });
-}
+    }
