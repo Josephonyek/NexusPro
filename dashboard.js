@@ -18,6 +18,7 @@ const btnLogout = document.getElementById("btn-logout");
 
 // Drawer Handler
 function toggleSidebar() {
+    if (!appSidebar || !sidebarOverlay) return;
     const isOpen = appSidebar.classList.contains("open");
     if (isOpen) {
         appSidebar.classList.remove("open");
@@ -56,56 +57,72 @@ function applyState(role, name) {
         adminSection?.classList.remove("active");
     }
 
-    // Hide guard overlay immediately once state is set
-    if (authGuard) authGuard.style.display = "none";
+    // GUARANTEED HIDE: Remove loading guard overlay
+    if (authGuard) {
+        authGuard.style.opacity = "0";
+        setTimeout(() => {
+            authGuard.style.display = "none";
+        }, 200);
+    }
 }
 
-// 1. FAST-PATH (Instant render if cache exists)
+// 1. HARD TIMEOUT SHIELD (Prevents getting stuck forever under any condition)
+setTimeout(() => {
+    if (authGuard && authGuard.style.display !== "none") {
+        console.warn("Nexus Pro: Safety timeout triggered. Displaying default UI.");
+        const fallbackRole = localStorage.getItem("nx_role") || "student";
+        const fallbackName = localStorage.getItem("nx_name") || "User";
+        applyState(fallbackRole, fallbackName);
+    }
+}, 2500);
+
+// 2. FAST-PATH (Instant render if cache exists)
 const cachedRole = localStorage.getItem("nx_role");
 const cachedName = localStorage.getItem("nx_name");
 if (cachedRole && cachedName) {
     applyState(cachedRole, cachedName);
 }
 
-// 2. AUTHENTICATION & RTDB SYNC
+// 3. AUTHENTICATION & RTDB SYNC
 onAuthStateChanged(auth, (user) => {
     if (!user) {
+        console.log("No authenticated user found. Redirecting to login...");
         localStorage.clear();
         sessionStorage.clear();
         window.location.replace("login.html");
         return;
     }
 
-    // Immediate fallback for brand new users without cache
-    const quickName = user.displayName || (user.email ? user.email.split("@")[0] : "New User");
-    if (!localStorage.getItem("nx_role")) {
-        applyState("student", quickName);
-    }
+    // Immediate display fallback for logged-in users
+    const quickName = user.displayName || (user.email ? user.email.split("@")[0] : "User");
+    const existingRole = localStorage.getItem("nx_role") || "student";
+    applyState(existingRole, quickName);
 
-    // Silent Database Verification
+    // Silent Realtime Database Verification
     const userRef = ref(rtdb, `users/${user.uid}`);
-    get(userRef).then((snapshot) => {
-        if (!snapshot.exists()) {
-            localStorage.clear();
-            signOut(auth);
-            window.location.replace("login.html");
-            return;
-        }
+    get(userRef)
+        .then((snapshot) => {
+            if (!snapshot.exists()) {
+                console.warn("User ID not found in database record.");
+                return;
+            }
 
-        const data = snapshot.val();
-        const verifiedRole = data.role || "student";
-        const verifiedName = data.name || data.fullName || user.displayName || user.email.split("@")[0];
+            const data = snapshot.val();
+            const verifiedRole = data.role || "student";
+            const verifiedName = data.name || data.fullName || user.displayName || user.email.split("@")[0];
 
-        // Seed cache
-        localStorage.setItem("nx_role", verifiedRole.toLowerCase());
-        localStorage.setItem("nx_name", verifiedName);
+            // Update cache
+            localStorage.setItem("nx_role", verifiedRole.toLowerCase());
+            localStorage.setItem("nx_name", verifiedName);
 
-        // Render verified state
-        applyState(verifiedRole, verifiedName);
-
-    }).catch((err) => {
-        console.warn("Background RTDB sync delayed:", err);
-    });
+            // Update UI with verified state
+            applyState(verifiedRole, verifiedName);
+        })
+        .catch((err) => {
+            console.error("RTDB Verification Error:", err);
+            // Even if database fails, keep UI active with auth info
+            applyState(existingRole, quickName);
+        });
 });
 
 // Clean Sign Out
