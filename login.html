@@ -1,64 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
-    <!-- PRIMARY SEARCH ENGINE OPTIMIZATION (SEO) META MATRIX -->
+    <!-- SEO Meta -->
     <title>Nexus Pro | Sign In to Your Academic Workspace</title>
-    <meta name="description" content="Secure login portal for Nexus Pro. Access your curriculum notes, customized video modules, and academic performance suites instantly.">
-    <meta name="robots" content="index, nofollow">
-    <link rel="canonical" href="https://nexuspro.vercel.app/login.html">
+    <meta name="description" content="Secure login portal for Nexus Pro. Access your curriculum notes, customized video modules, and academic performance suites instantly." />
+    <meta name="robots" content="index, nofollow" />
+    <link rel="canonical" href="https://nexuspro.vercel.app/login.html" />
 
-    <!-- TAILWIND PLAY CDN -->
+    <!-- ========== FIREBASE IMPORT MAP (FIX #1) ========== -->
+    <script type="importmap">
+    {
+        "imports": {
+            "firebase/app": "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js",
+            "firebase/auth": "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js",
+            "firebase/database": "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js"
+        }
+    }
+    </script>
+
+    <!-- Tailwind & Custom Styles -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    
-    <!-- COMPREHENSIVE STYLE SYSTEM -->
     <style>
-        /* Smooth backdrop blur and glow patterns */
+        /* (your existing styles - unchanged) */
         .glass-card {
             background: rgba(15, 15, 15, 0.4) !important;
             backdrop-filter: blur(24px) !important;
             -webkit-backdrop-filter: blur(24px) !important;
             border: 1px solid rgba(255, 255, 255, 0.08) !important;
         }
-
-        /* Floating background orbs */
         .glow-orb-blue {
             filter: blur(100px);
             background: radial-gradient(circle, #2563eb 0%, transparent 70%);
             animation: float-blue 12s infinite alternate ease-in-out;
         }
-
         .glow-orb-purple {
             filter: blur(120px);
             background: radial-gradient(circle, #4f46e5 0%, transparent 70%);
             animation: float-purple 16s infinite alternate ease-in-out;
         }
-
         @keyframes float-blue {
             0% { transform: translate(0px, 0px) scale(1); }
             100% { transform: translate(80px, 40px) scale(1.2); }
         }
-
         @keyframes float-purple {
             0% { transform: translate(0px, 0px) scale(1); }
             100% { transform: translate(-80px, -50px) scale(1.1); }
         }
-
-        /* Fail-safe layout wrapper for the password field */
         .password-row-wrapper {
             display: flex !important;
             gap: 10px !important;
             width: 100% !important;
             align-items: center !important;
         }
-
         .password-input-field {
             flex-grow: 1 !important;
             min-width: 0 !important;
         }
-
         .modern-toggle-btn {
             display: flex !important;
             align-items: center !important;
@@ -74,29 +74,38 @@
             letter-spacing: 0.05em !important;
             cursor: pointer !important;
             white-space: nowrap !important;
-            height: 46px !important; /* Perfect align match to the email field */
+            height: 46px !important;
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
         }
-
         .modern-toggle-btn:hover {
             background-color: rgba(255, 255, 255, 0.1) !important;
             border-color: rgba(255, 255, 255, 0.2) !important;
             color: #ffffff !important;
             transform: translateY(-1px);
         }
-
         .modern-toggle-btn:active {
             transform: translateY(0px);
+        }
+        /* Error message styling (FIX #2) */
+        #login-error {
+            color: #f87171;
+            font-size: 0.8rem;
+            margin-top: 0.25rem;
+            display: none;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            border-left: 3px solid #ef4444;
         }
     </style>
 </head>
 <body class="bg-neutral-950 text-neutral-200 min-h-screen flex flex-col justify-between antialiased selection:bg-indigo-950 selection:text-indigo-400 overflow-x-hidden relative">
 
-    <!-- FLOATING DECORATIVE BACKGROUND SYSTEM -->
+    <!-- Background Orbs -->
     <div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] glow-orb-blue pointer-events-none z-0"></div>
     <div class="absolute bottom-[-10%] right-[-10%] w-[60%] h-[60%] glow-orb-purple pointer-events-none z-0"></div>
 
-    <!-- TOP DECK: BRAND HEADER -->
+    <!-- Header -->
     <header class="w-full h-20 px-8 flex items-center relative z-10">
         <a href="index.html" class="flex items-center gap-3 hover:opacity-90 transition-opacity">
             <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-indigo-700 flex items-center justify-center font-black shadow-[0_0_20px_rgba(37,99,235,0.3)] text-white" aria-hidden="true">N</div>
@@ -104,11 +113,10 @@
         </a>
     </header>
 
-    <!-- MAIN CORE PANEL -->
+    <!-- Main -->
     <main class="flex-grow flex items-center justify-center px-4 py-8 relative z-10">
         <div class="w-full max-w-[440px] glass-card rounded-[32px] p-8 md:p-10 space-y-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
             
-            <!-- HEADER INFO block -->
             <div class="space-y-2 text-center">
                 <div class="inline-block px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 text-[10px] text-indigo-300 font-extrabold tracking-widest uppercase rounded-full">
                     Academic Command Console
@@ -117,43 +125,49 @@
                 <p class="text-xs text-neutral-400 font-medium">Enter your credentials to access your course files</p>
             </div>
 
-            <!-- INTERACTIVE LOGIN FORM (ID set to loginForm for login.js match) -->
+            <!-- LOGIN FORM -->
             <form id="loginForm" class="space-y-5" novalidate>
                 
-                <!-- EMAIL ADDR INPUT (ID set to loginEmail for login.js match) -->
+                <!-- Email -->
                 <div class="space-y-2">
                     <label for="loginEmail" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Email Address</label>
                     <input type="email" id="loginEmail" name="email" placeholder="you@domain.com" required
+                           autocomplete="email"
                            class="w-full bg-neutral-900/60 border border-neutral-800/80 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl px-4 py-3.5 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
                 </div>
 
-                <!-- EXTERNAL PASSWORD FIELD ROW -->
+                <!-- Password with Toggle -->
                 <div class="space-y-2">
                     <label for="loginPassword" class="block text-[11px] font-extrabold uppercase tracking-widest text-neutral-400">Security Password</label>
                     <div class="password-row-wrapper">
-                        <!-- Password input block (ID set to loginPassword for login.js match) -->
                         <input type="password" id="loginPassword" name="password" placeholder="••••••••" required
+                               autocomplete="current-password"
                                class="password-input-field bg-neutral-900/60 border border-neutral-800/80 focus:border-indigo-500/80 focus:ring-1 focus:ring-indigo-500/50 rounded-xl px-4 py-3.5 text-xs text-neutral-100 outline-none transition-all placeholder:text-neutral-600">
-                        
-                        <!-- Fixed External Toggle Button -->
                         <button type="button" id="togglePasswordBtn" class="modern-toggle-btn" aria-label="Show password">
                             <span id="toggleText" style="margin-right: 4px;">Show</span>
                             <span id="toggleEmoji">👁️</span>
                         </button>
                     </div>
                 </div>
-<div style="text-align: right; margin-bottom: 20px; font-size: 0.88rem;">
-    <a href="forgot_password.html" style="color: var(--neon-blue); text-decoration: none; font-weight: 600; transition: color 0.2s;" onmouseover="this.style.color='#2563eb'" onmouseout="this.style.color='var(--neon-blue)'">
-        Forgot Password?
-    </a>
-</div>
-                <!-- FORWARD SUBMIT TRIGGER -->
+
+                <!-- Forgot Password Link -->
+                <div style="text-align: right; margin-bottom: 20px; font-size: 0.88rem;">
+                    <a href="forgot_password.html" style="color: #4f46e5; text-decoration: none; font-weight: 600; transition: color 0.2s;" 
+                       onmouseover="this.style.color='#2563eb'" onmouseout="this.style.color='#4f46e5'">
+                        Forgot Password?
+                    </a>
+                </div>
+
+                <!-- ========== ERROR MESSAGE CONTAINER (FIX #2) ========== -->
+                <div id="login-error" role="alert"></div>
+
+                <!-- Submit Button -->
                 <button type="submit" class="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-extrabold uppercase tracking-wider rounded-xl shadow-lg shadow-indigo-950/40 hover:shadow-indigo-900/50 hover:scale-[1.01] active:scale-[0.99] transition-all cursor-pointer">
                     Sign In to Dashboard
                 </button>
             </form>
 
-            <!-- FOOTER SWITCH TOGGLE SYSTEM -->
+            <!-- Sign Up Link -->
             <div class="text-center pt-2 space-y-2">
                 <span class="text-xs text-neutral-500 font-medium block">Need an academic student account?</span>
                 <a href="signup.html" class="text-xs text-indigo-400 hover:text-indigo-300 font-bold hover:underline transition-all inline-block">
@@ -164,15 +178,15 @@
         </div>
     </main>
 
-    <!-- FOOTER SECTION -->
+    <!-- Footer -->
     <footer class="w-full py-8 text-center relative z-10">
         <p class="text-[10px] text-neutral-600 font-medium tracking-wide">&copy; 2026 Nexus Pro Academy. All Systems Operational.</p>
     </footer>
 
-    <!-- LINKED LOGIN JS ENGINE -->
-    <script src="login.js"></script>
+    <!-- ========== LOGIN.JS (ES Module) ========== -->
+    <script type="module" src="login.js"></script>
 
-    <!-- TOGGLE LOGIC SCRIPT (Isolated so it doesn't conflict with login.js) -->
+    <!-- ========== TOGGLE SCRIPT (isolated) ========== -->
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const passwordField = document.getElementById("loginPassword");
@@ -180,7 +194,6 @@
             const toggleText = document.getElementById("toggleText");
             const toggleEmoji = document.getElementById("toggleEmoji");
 
-            // Password field character peek function
             toggleBtn.addEventListener("click", () => {
                 const isPassword = passwordField.type === "password";
                 passwordField.type = isPassword ? "text" : "password";
@@ -198,4 +211,4 @@
         });
     </script>
 </body>
-    </html>
+                            </html>
