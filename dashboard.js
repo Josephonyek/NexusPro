@@ -38,7 +38,7 @@ function applyState(role, name) {
   }
 }
 
-// Show cached data instantly (better UX)
+// Show cached data instantly if available
 const cachedRole = localStorage.getItem("nx_role") || "student";
 const cachedName = localStorage.getItem("nx_name") || "User";
 applyState(cachedRole, cachedName);
@@ -53,7 +53,7 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // User is logged in – load their profile
+  // User is logged in – load their profile safely
   try {
     const userRef = ref(rtdb, `users/${user.uid}`);
     const snapshot = await get(userRef);
@@ -76,24 +76,27 @@ onAuthStateChanged(auth, async (user) => {
 
   } catch (error) {
     console.error("Error loading user profile:", error);
-    // Still show the page with cached / basic info
+    // Fallback to cached state
     applyState(cachedRole, cachedName);
+  } finally {
+    // ALWAYS hide loading screen once auth evaluation completes
+    if (loadingScreen) {
+      loadingScreen.classList.add("hidden");
+    }
   }
-
-  // Hide loading screen
-  if (loadingScreen) loadingScreen.classList.add("hidden");
 });
 
 // ========== LOGOUT ==========
-btnLogout?.addEventListener("click", async () => {
-  try {
-    localStorage.clear();
-    sessionStorage.clear();
-    await signOut(auth);
-    window.location.replace("auth.html");
-  } catch (err) {
-    console.error("Logout error:", err);
-    // Force redirect even if signOut fails
-    window.location.replace("auth.html");
-  }
-});
+if (btnLogout) {
+  btnLogout.addEventListener("click", async () => {
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+      await signOut(auth);
+      window.location.replace("auth.html");
+    } catch (err) {
+      console.error("Logout error:", err);
+      window.location.replace("auth.html");
+    }
+  });
+}
