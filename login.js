@@ -8,7 +8,6 @@ const passwordInput = document.getElementById("login-password");
 const submitBtn = document.getElementById("btn-login-submit");
 const errorMessageEl = document.getElementById("login-error-message");
 
-// Helper function to show UI error alerts
 function showError(msg) {
     if (errorMessageEl) {
         errorMessageEl.innerText = msg;
@@ -18,7 +17,6 @@ function showError(msg) {
     }
 }
 
-// Helper function to hide errors
 function hideError() {
     if (errorMessageEl) {
         errorMessageEl.innerText = "";
@@ -50,14 +48,14 @@ loginForm?.addEventListener("submit", async (e) => {
         return;
     }
 
-    // Indicate loading state
     if (submitBtn) {
         submitBtn.disabled = true;
         submitBtn.innerText = "Signing in...";
     }
 
     try {
-        // 1. Dispatch request to your backend API route (/api/login)
+        console.log("1. Sending request to /api/login...");
+
         const response = await fetch("/api/login", {
             method: "POST",
             headers: {
@@ -70,8 +68,8 @@ loginForm?.addEventListener("submit", async (e) => {
         });
 
         const data = await response.json();
+        console.log("2. API response:", data);
 
-        // 2. Handle failures returned by api/login.js
         if (!response.ok || !data.success) {
             let errorMsg = data.message || "Login failed. Please check your credentials.";
             
@@ -86,27 +84,30 @@ loginForm?.addEventListener("submit", async (e) => {
             throw new Error(errorMsg);
         }
 
-        // 3. Cache session data from API response
+        // Success from API
+        console.log("3. API success – saving to localStorage");
         if (data.role) localStorage.setItem("nx_role", data.role.toLowerCase());
         if (data.userId) localStorage.setItem("nx_uid", data.userId);
         if (data.token) localStorage.setItem("nx_token", data.token);
 
-        // 4. Create a real Firebase client session (this was the missing piece)
+        // Try client-side Firebase sign-in
+        console.log("4. Trying client-side signInWithEmailAndPassword...");
         try {
             await signInWithEmailAndPassword(auth, email, rawPassword);
+            console.log("5. Client sign-in successful");
         } catch (firebaseErr) {
             console.error("Client sign-in failed:", firebaseErr);
-            // Continue anyway — the API already verified the credentials
+            showError("API ok, but Firebase client sign-in failed: " + firebaseErr.message);
+            // We still continue to redirect so you can see what happens
         }
 
-        // 5. Redirect (use replace to avoid back-button loops)
+        console.log("6. Redirecting to dashboard...");
         window.location.replace("dashboard.html");
 
     } catch (error) {
         console.error("Login failure:", error);
         showError(error.message || "An unexpected error occurred.");
 
-        // Reset submit button state
         if (submitBtn) {
             submitBtn.disabled = false;
             submitBtn.innerText = "Sign In";
