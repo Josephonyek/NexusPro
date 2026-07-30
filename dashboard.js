@@ -1,133 +1,99 @@
 import { auth, rtdb } from "./firebase-config.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { ref, get, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-// DOM
-const adminSection   = document.getElementById("admin-section");
-const studentSection = document.getElementById("student-section");
-const headerRolePill = document.getElementById("header-role-pill");
-const displayNameEl  = document.getElementById("user-display-name");
-const roleDescEl     = document.getElementById("user-role-description");
-const loadingBadge   = document.getElementById("role-loading");
-const btnToggleMenu  = document.getElementById("btn-toggle-menu");
-const appSidebar     = document.getElementById("app-sidebar");
-const sidebarOverlay = document.getElementById("sidebar-overlay");
-const btnLogout      = document.getElementById("btn-logout");
+// DOM elements
+const loadingScreen   = document.getElementById("loading-screen");
+const adminSection    = document.getElementById("admin-section");
+const studentSection  = document.getElementById("student-section");
+const headerRolePill  = document.getElementById("header-role-pill");
+const displayNameEl   = document.getElementById("user-display-name");
+const welcomeNameEl   = document.getElementById("welcome-name");
+const roleDescEl      = document.getElementById("user-role-description");
+const btnLogout       = document.getElementById("btn-logout");
 
-// Sidebar
-function toggleSidebar() {
-  if (!appSidebar || !sidebarOverlay) return;
-  const open = appSidebar.classList.toggle("open");
-  sidebarOverlay.classList.toggle("active", open);
-}
-btnToggleMenu?.addEventListener("click", toggleSidebar);
-sidebarOverlay?.addEventListener("click", toggleSidebar);
-window.addEventListener("resize", () => {
-  if (window.innerWidth >= 1024) {
-    appSidebar?.classList.remove("open");
-    sidebarOverlay?.classList.remove("active");
-  }
-});
-
-// Apply role to UI
+// Apply role to the UI
 function applyState(role, name) {
   const cleanRole = (role || "student").toLowerCase().trim();
   const cleanName = name || "User";
 
+  // Update name displays
   if (displayNameEl) displayNameEl.textContent = cleanName;
+  if (welcomeNameEl) welcomeNameEl.textContent = cleanName;
+
   if (!adminSection || !studentSection || !headerRolePill || !roleDescEl) return;
 
   if (cleanRole === "admin") {
-    headerRolePill.textContent = "Administrator";
+    headerRolePill.textContent = "Admin";
     headerRolePill.className = "role-pill admin";
-    roleDescEl.textContent = "System administrative permissions active.";
+    roleDescEl.textContent = "You have administrator access.";
     adminSection.classList.add("active");
     studentSection.classList.remove("active");
   } else {
     headerRolePill.textContent = "Student";
     headerRolePill.className = "role-pill student";
-    roleDescEl.textContent = "Student hub active. Access learning materials below.";
+    roleDescEl.textContent = "Student dashboard – access your learning tools below.";
     studentSection.classList.add("active");
     adminSection.classList.remove("active");
   }
-
-  if (loadingBadge) loadingBadge.style.display = "none";
 }
 
-// Show cached state instantly while auth loads
+// Show cached data instantly (better UX)
 const cachedRole = localStorage.getItem("nx_role") || "student";
 const cachedName = localStorage.getItem("nx_name") || "User";
 applyState(cachedRole, cachedName);
 
-// Auth state — with redirect guard
-let redirectTimer = null;
-
+// ========== AUTH GUARD ==========
 onAuthStateChanged(auth, async (user) => {
-  // If no user, wait 3 seconds before redirecting
-  // This gives Firebase time to restore session on slow mobile connections
+  // Not logged in → force back to auth page
   if (!user) {
-    redirectTimer = setTimeout(() => {
-      localStorage.clear();
-      sessionStorage.clear();
-      window.location.replace("login.html");
-    }, 3000);
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.replace("auth.html");
     return;
   }
 
-  // User is signed in — cancel any pending redirect
-  if (redirectTimer) {
-    clearTimeout(redirectTimer);
-    redirectTimer = null;
-  }
-
-  const quickName = user.displayName || (user.email ? user.email.split("@")[0] : "User");
-  const userRef = ref(rtdb, `users/${user.uid}`);
-
+  // User is logged in – load their profile
   try {
+    const userRef = ref(rtdb, `users/${user.uid}`);
     const snapshot = await get(userRef);
+
+    let role = "student";
+    let name = user.displayName || (user.email ? user.email.split("@")[0] : "User");
 
     if (snapshot.exists()) {
       const data = snapshot.val();
-      const role = (data.role || "student").toLowerCase().trim();
-      const name = data.name || quickName;
-
-      localStorage.setItem("nx_role", role);
-      localStorage.setItem("nx_name", name);
-      applyState(role, name);
-
-    } else {
-      const newProfile = {
-        name: quickName,
-        email: user.email || "",
-        role: "student",
-        createdAt: Date.now()
-      };
-
-      await set(userRef, newProfile);
-      localStorage.setItem("nx_role", "student");
-      localStorage.setItem("nx_name", quickName);
-      applyState("student", quickName);
+      role = (data.role || "student").toLowerCase().trim();
+      name = data.name || name;
     }
+
+    // Save to localStorage for fast future loads
+    localStorage.setItem("nx_role", role);
+    localStorage.setItem("nx_name", name);
+    localStorage.setItem("nx_uid", user.uid);
+
+    applyState(role, name);
 
   } catch (error) {
-    // Show error on screen since user is on mobile with no DevTools
-    const debugBox = document.getElementById("debug-box");
-    if (debugBox) {
-      debugBox.style.display = "block";
-      debugBox.textContent = "DB ERROR: " + error.message;
-    }
+    console.error("Error loading user profile:", error);
+    // Still show the page with cached / basic info
     applyState(cachedRole, cachedName);
   }
+
+  // Hide loading screen
+  if (loadingScreen) loadingScreen.classList.add("hidden");
 });
 
-// Logout
+// ========== LOGOUT ==========
 btnLogout?.addEventListener("click", async () => {
   try {
     localStorage.clear();
     sessionStorage.clear();
     await signOut(auth);
-    window.location.replace("login.html");
+    window.location.replace("auth.html");
   } catch (err) {
-    console.error(err);
+    console.error("Logout error:", err);
+    // Force redirect even if signOut fails
+    window.location.replace("auth.html");
   }
 });
