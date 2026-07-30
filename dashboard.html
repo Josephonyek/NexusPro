@@ -1,292 +1,275 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexus Pro | Control Terminal</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
   <style>
-    :root {
-      --bg-dark: #070a12;
-      --bg-card: rgba(15, 23, 42, 0.72);
-      --bg-nav: rgba(11, 17, 32, 0.92);
-      --border: rgba(255, 255, 255, 0.07);
-      --neon-blue: #3b82f6;
-      --accent-purple: #a855f7;
-      --accent-green: #10b981;
-      --accent-amber: #f59e0b;
-      --accent-red: #ef4444;
-      --text-main: #f8fafc;
-      --text-sub: #94a3b8;
-      --sidebar-w: 260px;
-    }
-
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg-dark);
-      color: var(--text-main);
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
       min-height: 100vh;
-      display: flex;
-      overflow-x: hidden;
     }
 
-    /* ---------- TOP BAR ---------- */
-    header.top-navbar {
-      height: 64px;
-      background: var(--bg-nav);
-      border-bottom: 1px solid var(--border);
-      padding: 0 20px;
+    /* Header */
+    .header {
+      background: white;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 14px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 1000;
-      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
-    .nav-left { display: flex; align-items: center; gap: 14px; }
-    .hamburger-btn {
-      background: transparent; border: none; color: var(--text-main);
-      font-size: 1.2rem; cursor: pointer; padding: 8px; border-radius: 8px;
-      display: flex; transition: background .2s;
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
     }
-    .hamburger-btn:hover { background: rgba(255,255,255,.08); }
-    @media (min-width: 1024px) { .hamburger-btn { display: none; } }
-
-    .brand-logo {
-      font-size: 1.15rem; font-weight: 800; letter-spacing: -0.4px;
-      text-decoration: none; color: #fff; display: flex; align-items: center; gap: 8px;
+    .logo {
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: #2563eb;
     }
-    .brand-logo i { color: var(--neon-blue); }
-
     .role-pill {
-      padding: 5px 13px; border-radius: 20px; font-size: 0.72rem;
-      font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px;
-    }
-    .role-pill.admin {
-      background: rgba(168,85,247,.15); color: #d8b4fe;
-      border: 1px solid rgba(168,85,247,.3);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      text-transform: uppercase;
     }
     .role-pill.student {
-      background: rgba(59,130,246,.15); color: #93c5fd;
-      border: 1px solid rgba(59,130,246,.3);
+      background: #dbeafe;
+      color: #1d4ed8;
     }
-    #role-loading {
-      display: inline-flex; align-items: center; gap: 6px;
-      font-size: 0.7rem; color: var(--text-sub); margin-left: 10px;
+    .role-pill.admin {
+      background: #fce7f3;
+      color: #be185d;
     }
-    #role-loading i { animation: spin 1s linear infinite; }
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ---------- SIDEBAR ---------- */
-    .sidebar-overlay {
-      position: fixed; inset: 0; background: rgba(0,0,0,.55);
-      backdrop-filter: blur(4px); z-index: 998;
-      opacity: 0; pointer-events: none; transition: opacity .25s;
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
     }
-    .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
-
-    .sidebar {
-      position: fixed; top: 64px; left: calc(-1 * var(--sidebar-w));
-      width: var(--sidebar-w); height: calc(100vh - 64px);
-      background: var(--bg-nav); border-right: 1px solid var(--border);
-      display: flex; flex-direction: column; justify-content: space-between;
-      padding: 18px 12px; transition: left .25s cubic-bezier(.4,0,.2,1);
-      z-index: 999;
+    .user-name {
+      font-size: 0.9rem;
+      font-weight: 500;
     }
-    .sidebar.open { left: 0; }
-
-    @media (min-width: 1024px) {
-      .sidebar { left: 0; }
-      .sidebar-overlay { display: none; }
-    }
-
-    .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 4px; }
-    .nav-link {
-      display: flex; align-items: center; gap: 12px;
-      padding: 11px 14px; color: var(--text-sub); text-decoration: none;
-      border-radius: 10px; font-weight: 600; font-size: 0.9rem; transition: all .2s;
-    }
-    .nav-link:hover, .nav-link.active {
-      background: rgba(59,130,246,.12); color: var(--neon-blue);
-    }
-
     .btn-logout {
-      width: 100%; padding: 11px; background: rgba(239,68,68,.1);
-      border: 1px solid rgba(239,68,68,.25); color: #fca5a5;
-      border-radius: 10px; cursor: pointer; font-weight: 700;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      transition: all .2s; font-size: 0.9rem;
+      background: #fee2e2;
+      color: #b91c1c;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
     }
-    .btn-logout:hover { background: var(--accent-red); color: #fff; }
-
-    /* ---------- MAIN ---------- */
-    main.main-content {
-      margin-top: 64px; padding: 28px 20px;
-      max-width: 1200px; width: 100%; margin-left: auto; margin-right: auto;
-      flex: 1;
-    }
-    @media (min-width: 1024px) {
-      main.main-content { margin-left: var(--sidebar-w); }
+    .btn-logout:hover {
+      background: #fecaca;
     }
 
-    .hero-banner {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 16px; padding: 26px 28px; margin-bottom: 28px;
-      backdrop-filter: blur(12px);
+    /* Main */
+    .main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px;
     }
-    .hero-banner h2 { font-size: 1.45rem; font-weight: 700; margin-bottom: 4px; }
-    .hero-banner p { color: var(--text-sub); font-size: 0.9rem; }
+    .welcome {
+      margin-bottom: 28px;
+    }
+    .welcome h1 {
+      font-size: 1.6rem;
+      margin-bottom: 6px;
+    }
+    .welcome p {
+      color: #6b7280;
+      font-size: 0.95rem;
+    }
 
-    .card-grid {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-      gap: 18px;
+    /* Cards grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
     }
-    .card-tile {
-      background: var(--bg-card); border: 1px solid var(--border);
-      border-radius: 14px; padding: 22px; display: flex; flex-direction: column;
-      justify-content: space-between; transition: transform .2s, border-color .2s;
-      backdrop-filter: blur(12px);
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 24px;
+      border: 1px solid #e5e7eb;
+      text-decoration: none;
+      color: inherit;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
-    .card-tile:hover {
-      transform: translateY(-3px); border-color: rgba(59,130,246,.4);
+    .card:hover {
+      border-color: #2563eb;
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.1);
+      transform: translateY(-2px);
     }
     .card-icon {
-      width: 44px; height: 44px; border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 1.15rem; margin-bottom: 14px; background: rgba(255,255,255,.05);
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      margin-bottom: 4px;
     }
-    .card-tile h3 { font-size: 1.05rem; margin-bottom: 6px; font-weight: 700; }
-    .card-tile p { color: var(--text-sub); font-size: 0.84rem; line-height: 1.5; margin-bottom: 18px; }
-
-    .btn-action {
-      display: inline-flex; align-items: center; justify-content: space-between;
-      width: 100%; padding: 10px 14px; background: rgba(255,255,255,.05);
-      border: 1px solid var(--border); border-radius: 8px; color: #fff;
-      text-decoration: none; font-size: 0.84rem; font-weight: 600; transition: background .2s;
+    .card h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
     }
-    .btn-action:hover { background: var(--neon-blue); }
+    .card p {
+      font-size: 0.875rem;
+      color: #6b7280;
+      line-height: 1.4;
+    }
 
-    .role-section { display: none; }
-    .role-section.active { display: block; animation: fadeIn .3s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    /* Icon colors */
+    .icon-blue { background: #dbeafe; }
+    .icon-green { background: #d1fae5; }
+    .icon-purple { background: #ede9fe; }
+    .icon-orange { background: #ffedd5; }
+    .icon-pink { background: #fce7f3; }
+    .icon-teal { background: #ccfbf1; }
+    .icon-indigo { background: #e0e7ff; }
+    .icon-red { background: #fee2e2; }
 
-    .section-title {
-      margin-bottom: 16px; font-size: 1.05rem; font-weight: 700;
-      display: flex; align-items: center; gap: 8px;
+    /* Sections */
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* Loading */
+    .loading-screen {
+      position: fixed;
+      inset: 0;
+      background: #f3f4f6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      font-size: 1rem;
+      color: #6b7280;
+    }
+    .loading-screen.hidden {
+      display: none;
+    }
+
+    @media (max-width: 600px) {
+      .header { padding: 12px 16px; }
+      .user-name { display: none; }
+      .main { padding: 24px 16px; }
     }
   </style>
 </head>
 <body>
+  <!-- Loading screen while checking auth -->
+  <div class="loading-screen" id="loading-screen">
+    Checking authentication...
+  </div>
 
-  <!-- TOP NAV -->
-  <header class="top-navbar">
-    <div class="nav-left">
-      <button class="hamburger-btn" id="btn-toggle-menu" aria-label="Toggle menu">
-        <i class="fas fa-bars"></i>
-      </button>
-      <a href="dashboard.html" class="brand-logo">
-        <i class="fas fa-cubes"></i> Nexus<span style="color:var(--neon-blue)">Pro</span>
-      </a>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <div class="logo">Nexora</div>
+      <span class="role-pill student" id="header-role-pill">Student</span>
     </div>
-    <div style="display:flex;align-items:center;">
-      <span id="header-role-pill" class="role-pill student">Student</span>
-      <span id="role-loading"><i class="fas fa-circle-notch"></i> verifying</span>
+    <div class="header-right">
+      <span class="user-name" id="user-display-name">User</span>
+      <button class="btn-logout" id="btn-logout">Logout</button>
     </div>
   </header>
 
-  <!-- SIDEBAR -->
-  <div class="sidebar-overlay" id="sidebar-overlay"></div>
-  <aside class="sidebar" id="app-sidebar">
-    <ul class="nav-menu">
-      <li><a href="dashboard.html" class="nav-link active"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
-      <li><a href="library.html" class="nav-link"><i class="fas fa-book"></i> E-Library</a></li>
-      <li><a href="practice.html" class="nav-link"><i class="fas fa-vial"></i> CBT Drills</a></li>
-      <li><a href="contact.html" class="nav-link"><i class="fas fa-headset"></i> Support Desk</a></li>
-    </ul>
-    <div>
-      <button id="btn-logout" class="btn-logout">
-        <i class="fas fa-right-from-bracket"></i> Sign Out
-      </button>
-    </div>
-  </aside>
-
-  <!-- CONTENT -->
-  <main class="main-content">
-    <div class="hero-banner">
-      <h2>Welcome back, <span id="user-display-name">User</span></h2>
-      <p id="user-role-description">Your workspace is loading…</p>
+  <!-- Main content -->
+  <main class="main">
+    <div class="welcome">
+      <h1>Welcome back, <span id="welcome-name">User</span></h1>
+      <p id="user-role-description">Loading your dashboard...</p>
     </div>
 
-    <!-- ADMIN (hidden until verified) -->
-    <div id="admin-section" class="role-section">
-      <h3 class="section-title">
-        <i class="fas fa-shield-halved" style="color:var(--accent-purple)"></i> Control Panel
-      </h3>
-      <div class="card-grid">
-        <div class="card-tile">
-          <div>
-            <div class="card-icon" style="color:var(--neon-blue)"><i class="fas fa-users-gear"></i></div>
-            <h3>User Directory</h3>
-            <p>Manage registered accounts and adjust student / administrator access levels.</p>
-          </div>
-          <a href="admin_users.html" class="btn-action">Open Directory <i class="fas fa-chevron-right"></i></a>
-        </div>
-        <div class="card-tile">
-          <div>
-            <div class="card-icon" style="color:var(--accent-green)"><i class="fas fa-cloud-arrow-up"></i></div>
-            <h3>E-Library Upload</h3>
-            <p>Publish textbooks, syllabus PDFs, and new practice test resources.</p>
-          </div>
-          <a href="admin_upload.html" class="btn-action">Upload Hub <i class="fas fa-chevron-right"></i></a>
-        </div>
+    <!-- ========== STUDENT SECTION ========== -->
+    <section class="section" id="student-section">
+      <div class="grid">
+        <!-- AI Studio -->
+        <a href="ai_solver.html" class="card">
+          <div class="card-icon icon-blue">🤖</div>
+          <h3>AI Studio</h3>
+          <p>Get help solving questions with AI assistance.</p>
+        </a>
+
+        <!-- E-Library -->
+        <a href="academy.html" class="card">
+          <div class="card-icon icon-green">📚</div>
+          <h3>E-Library</h3>
+          <p>Access books, notes and learning materials.</p>
+        </a>
+
+        <!-- Health Hub -->
+        <a href="health.html" class="card">
+          <div class="card-icon icon-teal">🏥</div>
+          <h3>Health Hub</h3>
+          <p>Health tips, resources and support.</p>
+        </a>
+
+        <!-- Practice Questions -->
+        <a href="#" class="card">
+          <div class="card-icon icon-orange">📝</div>
+          <h3>Practice Questions</h3>
+          <p>Test yourself with practice questions.</p>
+        </a>
+
+        <!-- Support Desk -->
+        <a href="contact.html" class="card">
+          <div class="card-icon icon-purple">💬</div>
+          <h3>Support Desk</h3>
+          <p>Need help? Contact our support team.</p>
+        </a>
       </div>
-    </div>
+    </section>
 
-    <!-- STUDENT (safe default) -->
-    <div id="student-section" class="role-section active">
-      <h3 class="section-title">
-        <i class="fas fa-graduation-cap" style="color:var(--neon-blue)"></i> Learning Modules
-      </h3>
-      <div class="card-grid">
-        <div class="card-tile">
-          <div>
-            <div class="card-icon" style="color:var(--neon-blue)"><i class="fas fa-book-bookmark"></i></div>
-            <h3>Study E-Library</h3>
-            <p>Browse course materials, WAEC/JAMB syllabus guides, and notes.</p>
-          </div>
-          <a href="library.html" class="btn-action">Access Library <i class="fas fa-chevron-right"></i></a>
-        </div>
-        <div class="card-tile">
-          <div>
-            <div class="card-icon" style="color:var(--accent-amber)"><i class="fas fa-pen-to-square"></i></div>
-            <h3>Practice CBT Tests</h3>
-            <p>Take practice questions and timed examination drills.</p>
-          </div>
-          <a href="practice.html" class="btn-action">Start Practice <i class="fas fa-chevron-right"></i></a>
-        </div>
+    <!-- ========== ADMIN SECTION ========== -->
+    <section class="section" id="admin-section">
+      <div class="grid">
+        <!-- User Directory -->
+        <a href="admin_users.html" class="card">
+          <div class="card-icon icon-indigo">👥</div>
+          <h3>User Directory</h3>
+          <p>View and manage all registered users.</p>
+        </a>
+
+        <!-- Upload Books -->
+        <a href="admin_upload.html" class="card">
+          <div class="card-icon icon-green">📤</div>
+          <h3>Upload Books</h3>
+          <p>Upload new books and materials to the library.</p>
+        </a>
+
+        <!-- Support Desk -->
+        <a href="admin_support.html" class="card">
+          <div class="card-icon icon-pink">🎧</div>
+          <h3>Support Desk</h3>
+          <p>Manage support tickets and user messages.</p>
+        </a>
+
+        <!-- Past Questions -->
+        <a href="#" class="card">
+          <div class="card-icon icon-orange">📋</div>
+          <h3>Past Questions</h3>
+          <p>Manage past questions and exam materials.</p>
+        </a>
       </div>
-    </div>
+    </section>
   </main>
-<div id="debug-box" style="position:fixed;bottom:0;left:0;right:0;background:#ef4444;color:#fff;font-size:13px;padding:10px;z-index:9999;display:none;word-break:break-all;"></div>
 
-<script type="module">
-  window.addEventListener("error", (e) => {
-    const box = document.getElementById("debug-box");
-    box.style.display = "block";
-    box.textContent = "ERROR: " + e.message + " — " + e.filename + ":" + e.lineno;
-  });
-
-  window.addEventListener("unhandledrejection", (e) => {
-    const box = document.getElementById("debug-box");
-    box.style.display = "block";
-    box.textContent = "PROMISE ERROR: " + e.reason;
-  });
-</script>
   <script type="module" src="dashboard.js"></script>
 </body>
-                                                               </html>
+      </html>
