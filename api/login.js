@@ -1,4 +1,4 @@
-// api/login.js - Production Ready with Cloud Fallbacks
+// api/login.js - Secure Production Endpoint
 module.exports = async function handler(req, res) {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
@@ -8,13 +8,19 @@ module.exports = async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).json({ success: false, message: 'Method not allowed' });
 
     const { email, hashedPassword } = req.body;
-    
-    // HARDCODED FALLBACKS: If Vercel's environment variables are missing, use these directly
-    const apiKey = process.env.FIREBASE_API_KEY || "AIzaSyDbt1wfOLhRls_JG2ysysfHvqRBL8LRpBI"; 
-    const dbUrl = (process.env.FIREBASE_BASE_URL || "https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app").replace(/\/$/, "");
+
+    // Load exclusively from environment variables
+    const apiKey = process.env.FIREBASE_API_KEY;
+    const dbUrl = process.env.FIREBASE_BASE_URL ? process.env.FIREBASE_BASE_URL.replace(/\/$/, "") : null;
+
+    // Guard against unconfigured environment variables
+    if (!apiKey || !dbUrl) {
+        console.error("Server misconfiguration: Missing FIREBASE_API_KEY or FIREBASE_BASE_URL.");
+        return res.status(500).json({ success: false, message: "Internal server authentication setup error." });
+    }
 
     try {
-        // 1. Authenticate credentials
+        // 1. Authenticate credentials via REST API
         const identityResponse = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -27,7 +33,7 @@ module.exports = async function handler(req, res) {
         const userId = identityData.localId;
         const idToken = identityData.idToken;
 
-        // 2. Clear user state validation
+        // 2. Fetch user details from Realtime Database
         const dbResponse = await fetch(`${dbUrl}/users/${userId}.json?auth=${idToken}`);
         const profile = dbResponse.ok ? await dbResponse.json() : null;
         
