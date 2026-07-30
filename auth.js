@@ -7,10 +7,8 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 import { ref, set } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-// Wait for DOM to be fully loaded
-document.addEventListener("DOMContentLoaded", () => {
-
-  // ========== DOM ELEMENTS ==========
+// Global DOM helper to ensure listeners attach immediately
+function initAuthUI() {
   const loginForm     = document.getElementById("login-form");
   const signupForm    = document.getElementById("signup-form");
   const forgotForm    = document.getElementById("forgot-form");
@@ -32,7 +30,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (btnSignup) btnSignup.dataset.originalText = "Create Account";
   if (btnForgot) btnForgot.dataset.originalText = "Send Reset Link";
 
-  // ========== HELPERS ==========
+  // Helpers
   function showError(msg) {
     if (successBox) successBox.style.display = "none";
     if (errorBox) {
@@ -81,9 +79,12 @@ document.addEventListener("DOMContentLoaded", () => {
     showSection("login-form");
   }
 
-  // ========== TAB SWITCHING ==========
-  document.querySelectorAll(".tab").forEach(tab => {
-    tab.addEventListener("click", () => {
+  // ========== TAB SWITCHING (Event Delegation) ==========
+  if (tabsContainer) {
+    tabsContainer.addEventListener("click", (e) => {
+      const tab = e.target.closest(".tab");
+      if (!tab) return;
+
       document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
       tab.classList.add("active");
 
@@ -95,26 +96,26 @@ document.addEventListener("DOMContentLoaded", () => {
       const target = tab.getAttribute("data-tab");
       showSection(target + "-form");
     });
-  });
+  }
 
   // ========== SHOW / HIDE PASSWORD ==========
-  document.querySelectorAll(".toggle-password").forEach(btn => {
-    btn.addEventListener("click", () => {
-      const targetId = btn.getAttribute("data-target");
+  document.addEventListener("click", (e) => {
+    if (e.target.classList.contains("toggle-password")) {
+      const targetId = e.target.getAttribute("data-target");
       const input = document.getElementById(targetId);
       if (!input) return;
 
       if (input.type === "password") {
         input.type = "text";
-        btn.textContent = "Hide";
+        e.target.textContent = "Hide";
       } else {
         input.type = "password";
-        btn.textContent = "Show";
+        e.target.textContent = "Show";
       }
-    });
+    }
   });
 
-  // ========== EDUCATION TYPE ==========
+  // ========== EDUCATION TYPE TOGGLE ==========
   if (educationType) {
     educationType.addEventListener("change", () => {
       const value = educationType.value;
@@ -129,7 +130,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ========== FORGOT PASSWORD LINK ==========
+  // ========== FORGOT PASSWORD & BACK LINKS ==========
   const forgotLink = document.getElementById("forgot-password-link");
   if (forgotLink) {
     forgotLink.addEventListener("click", (e) => {
@@ -144,7 +145,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ========== BACK TO LOGIN ==========
   const backToLogin = document.getElementById("back-to-login");
   if (backToLogin) {
     backToLogin.addEventListener("click", (e) => {
@@ -153,7 +153,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ========== LOGIN ==========
+  // ========== LOGIN FORM SUBMIT ==========
   if (loginForm) {
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -171,9 +171,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
       try {
         await signInWithEmailAndPassword(auth, email, password);
-        // Auth state listener below will handle redirect seamlessly
+        // Let onAuthStateChanged handle the redirect smoothly
       } catch (err) {
-        console.error(err);
+        console.error("Login error:", err);
         let msg = "Login failed. Please try again.";
 
         if (err.code === "auth/invalid-credential" || 
@@ -192,7 +192,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ========== FORGOT PASSWORD ==========
+  // ========== FORGOT FORM SUBMIT ==========
   if (forgotForm) {
     forgotForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -212,15 +212,13 @@ document.addEventListener("DOMContentLoaded", () => {
         showSuccess("Password reset link sent! Check your email (and spam folder).");
         setLoading(btnForgot, false);
       } catch (err) {
-        console.error(err);
+        console.error("Forgot password error:", err);
         let msg = "Failed to send reset email.";
 
         if (err.code === "auth/user-not-found") {
           msg = "No account found with this email.";
         } else if (err.code === "auth/invalid-email") {
           msg = "Please enter a valid email address.";
-        } else if (err.code === "auth/too-many-requests") {
-          msg = "Too many attempts. Please try again later.";
         }
 
         showError(msg);
@@ -229,7 +227,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ========== SIGN UP ==========
+  // ========== SIGNUP FORM SUBMIT ==========
   if (signupForm) {
     signupForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -281,11 +279,13 @@ document.addEventListener("DOMContentLoaded", () => {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
+        const fullName = `${firstName} ${lastName}`;
+
         const profile = {
-          name: `${firstName} ${lastName}`,
-          firstName,
-          lastName,
-          email,
+          name: fullName,
+          firstName: firstName,
+          lastName: lastName,
+          email: email,
           role: "student",
           educationType: eduType,
           createdAt: Date.now()
@@ -298,19 +298,18 @@ document.addEventListener("DOMContentLoaded", () => {
           profile.level = level;
         }
 
+        // Save profile to Realtime Database
         await set(ref(rtdb, `users/${user.uid}`), profile);
-        // Auth state listener below will handle redirect seamlessly
+        // Redirect will trigger automatically from onAuthStateChanged below
 
       } catch (err) {
-        console.error(err);
-        let msg = "Sign up failed. Please try again.";
+        console.error("Signup error:", err);
+        let msg = "Sign up failed. " + (err.message || "");
 
         if (err.code === "auth/email-already-in-use") {
           msg = "This email is already registered. Please login instead.";
-        } else if (err.code === "auth/invalid-email") {
-          msg = "Please enter a valid email address.";
-        } else if (err.code === "auth/weak-password") {
-          msg = "Password is too weak.";
+        } else if (err.code === "PERMISSION_DENIED") {
+          msg = "Database permission denied. Check your Firebase database rules.";
         }
 
         showError(msg);
@@ -325,5 +324,11 @@ document.addEventListener("DOMContentLoaded", () => {
       window.location.replace("dashboard.html");
     }
   });
+}
 
-});
+// Execute initialization
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initAuthUI);
+} else {
+  initAuthUI();
+    }
