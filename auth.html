@@ -23,141 +23,40 @@
       box-shadow: 0 10px 30px rgba(0,0,0,0.08);
       padding: 32px;
     }
-    h1 {
-      font-size: 1.5rem;
-      margin-bottom: 8px;
-      text-align: center;
-    }
-    .subtitle {
-      text-align: center;
-      color: #6b7280;
-      margin-bottom: 24px;
-      font-size: 0.95rem;
-    }
-    .tabs {
-      display: flex;
-      margin-bottom: 24px;
-      border-bottom: 2px solid #e5e7eb;
-    }
+    h1 { font-size: 1.5rem; margin-bottom: 8px; text-align: center; }
+    .subtitle { text-align: center; color: #6b7280; margin-bottom: 24px; font-size: 0.95rem; }
+    .tabs { display: flex; margin-bottom: 24px; border-bottom: 2px solid #e5e7eb; }
     .tab {
-      flex: 1;
-      text-align: center;
-      padding: 12px;
-      cursor: pointer;
-      font-weight: 600;
-      color: #6b7280;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -2px;
+      flex: 1; text-align: center; padding: 12px; cursor: pointer;
+      font-weight: 600; color: #6b7280; border-bottom: 2px solid transparent; margin-bottom: -2px;
     }
-    .tab.active {
-      color: #2563eb;
-      border-bottom-color: #2563eb;
-    }
+    .tab.active { color: #2563eb; border-bottom-color: #2563eb; }
     .form-section { display: none; }
     .form-section.active { display: block; }
-    .form-group {
-      margin-bottom: 16px;
-    }
-    label {
-      display: block;
-      font-size: 0.875rem;
-      font-weight: 500;
-      margin-bottom: 6px;
-      color: #374151;
-    }
-    input, select {
-      width: 100%;
-      padding: 11px 14px;
-      border: 1px solid #d1d5db;
-      border-radius: 8px;
-      font-size: 0.95rem;
-    }
-    input:focus, select:focus {
-      outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
-    }
-    .row {
-      display: flex;
-      gap: 12px;
-    }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 6px; color: #374151; }
+    input, select { width: 100%; padding: 11px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; }
+    input:focus, select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+    .row { display: flex; gap: 12px; }
     .row .form-group { flex: 1; }
-    .password-wrapper {
-      position: relative;
-    }
+    .password-wrapper { position: relative; }
     .toggle-password {
-      position: absolute;
-      right: 12px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      color: #6b7280;
-      font-size: 0.9rem;
-      user-select: none;
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      cursor: pointer; color: #6b7280; font-size: 0.9rem; user-select: none;
     }
     button[type="submit"], .btn {
-      width: 100%;
-      padding: 13px;
-      background: #2563eb;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      font-size: 1rem;
-      font-weight: 600;
-      cursor: pointer;
-      margin-top: 8px;
+      width: 100%; padding: 13px; background: #2563eb; color: white;
+      border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px;
     }
-    button[type="submit"]:hover, .btn:hover {
-      background: #1d4ed8;
-    }
-    button:disabled, .btn:disabled {
-      background: #93c5fd;
-      cursor: not-allowed;
-    }
-    .error {
-      background: #fef2f2;
-      color: #b91c1c;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 0.875rem;
-      margin-bottom: 16px;
-      display: none;
-    }
-    .success {
-      background: #ecfdf5;
-      color: #047857;
-      padding: 10px 14px;
-      border-radius: 8px;
-      font-size: 0.875rem;
-      margin-bottom: 16px;
-      display: none;
-    }
+    button[type="submit"]:hover, .btn:hover { background: #1d4ed8; }
+    button:disabled, .btn:disabled { background: #93c5fd; cursor: not-allowed; }
+    .error { background: #fef2f2; color: #b91c1c; padding: 10px 14px; border-radius: 8px; font-size: 0.875rem; margin-bottom: 16px; display: none; }
+    .success { background: #ecfdf5; color: #047857; padding: 10px 14px; border-radius: 8px; font-size: 0.875rem; margin-bottom: 16px; display: none; }
     .hidden { display: none !important; }
-    .education-fields { margin-top: 4px; }
-    .forgot-link {
-      display: block;
-      text-align: right;
-      font-size: 0.875rem;
-      color: #2563eb;
-      margin-top: -8px;
-      margin-bottom: 16px;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .forgot-link:hover {
-      text-decoration: underline;
-    }
-    .back-link {
-      display: block;
-      text-align: center;
-      margin-top: 16px;
-      font-size: 0.875rem;
-      color: #2563eb;
-      cursor: pointer;
-    }
-    .back-link:hover {
-      text-decoration: underline;
-    }
+    .forgot-link { display: block; text-align: right; font-size: 0.875rem; color: #2563eb; margin-top: -8px; margin-bottom: 16px; cursor: pointer; text-decoration: none; }
+    .forgot-link:hover { text-decoration: underline; }
+    .back-link { display: block; text-align: center; margin-top: 16px; font-size: 0.875rem; color: #2563eb; cursor: pointer; }
+    .back-link:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
@@ -173,7 +72,7 @@
     <div id="error-message" class="error"></div>
     <div id="success-message" class="success"></div>
 
-    <!-- ========== LOGIN FORM ========== -->
+    <!-- LOGIN FORM -->
     <form id="login-form" class="form-section active">
       <div class="form-group">
         <label for="login-email">Email</label>
@@ -193,7 +92,7 @@
       <button type="submit" id="btn-login">Sign In</button>
     </form>
 
-    <!-- ========== FORGOT PASSWORD FORM ========== -->
+    <!-- FORGOT PASSWORD FORM -->
     <form id="forgot-form" class="form-section">
       <div class="form-group">
         <label for="forgot-email">Email</label>
@@ -204,7 +103,7 @@
       <a class="back-link" id="back-to-login">← Back to Login</a>
     </form>
 
-    <!-- ========== SIGN UP FORM ========== -->
+    <!-- SIGN UP FORM -->
     <form id="signup-form" class="form-section">
       <div class="row">
         <div class="form-group">
@@ -226,7 +125,6 @@
         </select>
       </div>
 
-      <!-- Secondary fields -->
       <div id="secondary-fields" class="education-fields hidden">
         <div class="form-group">
           <label for="secondary-class">Class</label>
@@ -239,7 +137,6 @@
         </div>
       </div>
 
-      <!-- Tertiary fields -->
       <div id="tertiary-fields" class="education-fields hidden">
         <div class="form-group">
           <label for="course">Course</label>
@@ -285,6 +182,19 @@
     </form>
   </div>
 
+  <!-- Vercel Environment Variables Injected via Window Config -->
+  <script>
+    window.ENV = {
+      FIREBASE_API_KEY: "YOUR_VERCEL_ENV_API_KEY",
+      FIREBASE_AUTH_DOMAIN: "YOUR_VERCEL_ENV_AUTH_DOMAIN",
+      FIREBASE_DATABASE_URL: "YOUR_VERCEL_ENV_DATABASE_URL",
+      FIREBASE_PROJECT_ID: "YOUR_VERCEL_ENV_PROJECT_ID",
+      FIREBASE_STORAGE_BUCKET: "YOUR_VERCEL_ENV_STORAGE_BUCKET",
+      FIREBASE_MESSAGING_SENDER_ID: "YOUR_VERCEL_ENV_SENDER_ID",
+      FIREBASE_APP_ID: "YOUR_VERCEL_ENV_APP_ID"
+    };
+  </script>
+
   <script type="module" src="auth.js"></script>
 </body>
-    </html>
+        </html>
