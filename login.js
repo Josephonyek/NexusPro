@@ -1,3 +1,6 @@
+import { auth } from "./firebase-config.js";
+import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
 // DOM Handles
 const loginForm = document.getElementById("login-form");
 const emailInput = document.getElementById("login-email");
@@ -62,17 +65,16 @@ loginForm?.addEventListener("submit", async (e) => {
             },
             body: JSON.stringify({ 
                 email: email, 
-                hashedPassword: rawPassword // Matches const { email, hashedPassword } = req.body in api/login.js
+                hashedPassword: rawPassword
             })
         });
 
         const data = await response.json();
 
-        // 2. Handle failures returned by api/login.js (status codes 400, 403, 405, 500)
+        // 2. Handle failures returned by api/login.js
         if (!response.ok || !data.success) {
             let errorMsg = data.message || "Login failed. Please check your credentials.";
             
-            // Map Firebase Identity Toolkit backend error strings to friendly UI text
             if (errorMsg.includes("INVALID_PASSWORD") || errorMsg.includes("EMAIL_NOT_FOUND")) {
                 errorMsg = "Incorrect email or password.";
             } else if (errorMsg.includes("USER_DISABLED")) {
@@ -89,8 +91,16 @@ loginForm?.addEventListener("submit", async (e) => {
         if (data.userId) localStorage.setItem("nx_uid", data.userId);
         if (data.token) localStorage.setItem("nx_token", data.token);
 
-        // 4. Redirect to Dashboard
-        window.location.href = "dashboard.html";
+        // 4. Create a real Firebase client session (this was the missing piece)
+        try {
+            await signInWithEmailAndPassword(auth, email, rawPassword);
+        } catch (firebaseErr) {
+            console.error("Client sign-in failed:", firebaseErr);
+            // Continue anyway — the API already verified the credentials
+        }
+
+        // 5. Redirect (use replace to avoid back-button loops)
+        window.location.replace("dashboard.html");
 
     } catch (error) {
         console.error("Login failure:", error);
