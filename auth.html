@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login / Sign Up</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f3f4f6;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      width: 100%;
+      max-width: 420px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      padding: 32px;
+    }
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .subtitle {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 24px;
+      font-size: 0.95rem;
+    }
+    .tabs {
+      display: flex;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    .tab {
+      flex: 1;
+      text-align: center;
+      padding: 12px;
+      cursor: pointer;
+      font-weight: 600;
+      color: #6b7280;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+    }
+    .tab.active {
+      color: #2563eb;
+      border-bottom-color: #2563eb;
+    }
+    .form-section { display: none; }
+    .form-section.active { display: block; }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 6px;
+      color: #374151;
+    }
+    input, select {
+      width: 100%;
+      padding: 11px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+    }
+    .row .form-group { flex: 1; }
+    .password-wrapper {
+      position: relative;
+    }
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #6b7280;
+      font-size: 0.9rem;
+      user-select: none;
+    }
+    button[type="submit"], .btn {
+      width: 100%;
+      padding: 13px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+    button[type="submit"]:hover, .btn:hover {
+      background: #1d4ed8;
+    }
+    button:disabled, .btn:disabled {
+      background: #93c5fd;
+      cursor: not-allowed;
+    }
+    .error {
+      background: #fef2f2;
+      color: #b91c1c;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .success {
+      background: #ecfdf5;
+      color: #047857;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.875rem;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .hidden { display: none !important; }
+    .education-fields { margin-top: 4px; }
+    .forgot-link {
+      display: block;
+      text-align: right;
+      font-size: 0.875rem;
+      color: #2563eb;
+      margin-top: -8px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
+    .back-link {
+      display: block;
+      text-align: center;
+      margin-top: 16px;
+      font-size: 0.875rem;
+      color: #2563eb;
+      cursor: pointer;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1 id="page-title">Welcome</h1>
+    <p class="subtitle" id="page-subtitle">Sign in to your account or create a new one</p>
+
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-tab="login">Login</div>
+      <div class="tab" data-tab="signup">Sign Up</div>
+    </div>
+
+    <div id="error-message" class="error"></div>
+    <div id="success-message" class="success"></div>
+
+    <!-- ========== LOGIN FORM ========== -->
+    <form id="login-form" class="form-section active">
+      <div class="form-group">
+        <label for="login-email">Email</label>
+        <input type="email" id="login-email" required placeholder="you@example.com" />
+      </div>
+
+      <div class="form-group">
+        <label for="login-password">Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="login-password" required placeholder="Enter password" />
+          <span class="toggle-password" data-target="login-password">Show</span>
+        </div>
+      </div>
+
+      <a class="forgot-link" id="forgot-password-link">Forgot password?</a>
+
+      <button type="submit" id="btn-login">Sign In</button>
+    </form>
+
+    <!-- ========== FORGOT PASSWORD FORM ========== -->
+    <form id="forgot-form" class="form-section">
+      <div class="form-group">
+        <label for="forgot-email">Email</label>
+        <input type="email" id="forgot-email" required placeholder="Enter your account email" />
+      </div>
+
+      <button type="submit" id="btn-forgot">Send Reset Link</button>
+      <a class="back-link" id="back-to-login">← Back to Login</a>
+    </form>
+
+    <!-- ========== SIGN UP FORM ========== -->
+    <form id="signup-form" class="form-section">
+      <div class="row">
+        <div class="form-group">
+          <label for="first-name">First Name</label>
+          <input type="text" id="first-name" required placeholder="First name" />
+        </div>
+        <div class="form-group">
+          <label for="last-name">Last Name</label>
+          <input type="text" id="last-name" required placeholder="Last name" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="education-type">Education Level</label>
+        <select id="education-type" required>
+          <option value="">Select...</option>
+          <option value="secondary">Secondary</option>
+          <option value="tertiary">Tertiary</option>
+        </select>
+      </div>
+
+      <!-- Secondary fields -->
+      <div id="secondary-fields" class="education-fields hidden">
+        <div class="form-group">
+          <label for="secondary-class">Class</label>
+          <select id="secondary-class">
+            <option value="">Select class</option>
+            <option value="SS1">SS1</option>
+            <option value="SS2">SS2</option>
+            <option value="SS3">SS3</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Tertiary fields -->
+      <div id="tertiary-fields" class="education-fields hidden">
+        <div class="form-group">
+          <label for="course">Course</label>
+          <input type="text" id="course" placeholder="e.g. Computer Science" />
+        </div>
+        <div class="form-group">
+          <label for="level">Level</label>
+          <select id="level">
+            <option value="">Select level</option>
+            <option value="Fresher">I am a Fresher</option>
+            <option value="100">100 Level</option>
+            <option value="200">200 Level</option>
+            <option value="300">300 Level</option>
+            <option value="400">400 Level</option>
+            <option value="500">500 Level</option>
+            <option value="600">600 Level</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="signup-email">Email</label>
+        <input type="email" id="signup-email" required placeholder="you@example.com" />
+      </div>
+
+      <div class="form-group">
+        <label for="signup-password">Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="signup-password" required placeholder="Create password" minlength="6" />
+          <span class="toggle-password" data-target="signup-password">Show</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirm-password">Confirm Password</label>
+        <div class="password-wrapper">
+          <input type="password" id="confirm-password" required placeholder="Confirm password" minlength="6" />
+          <span class="toggle-password" data-target="confirm-password">Show</span>
+        </div>
+      </div>
+
+      <button type="submit" id="btn-signup">Create Account</button>
+    </form>
+  </div>
+
+  <script type="module" src="auth.js"></script>
+</body>
+    </html>
