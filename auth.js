@@ -1,6 +1,6 @@
-// ========== UI CONTROL FUNCTIONS ==========
+// ================= UI SWITCHERS =================
 
-// 1. Tab Switcher
+// Tab Switching (Login / Signup)
 function switchTab(tab) {
   const loginForm = document.getElementById("login-form");
   const signupForm = document.getElementById("signup-form");
@@ -20,7 +20,7 @@ function switchTab(tab) {
   }
 }
 
-// 2. Hide/Show Password Toggle
+// Password Visibility Toggle
 function togglePassword(inputId, btn) {
   const input = document.getElementById(inputId);
   if (input.type === "password") {
@@ -32,7 +32,21 @@ function togglePassword(inputId, btn) {
   }
 }
 
-// 3. Modal Handlers
+// Dynamic Education Dropdown Toggle
+function handleEducationChange(selectedType) {
+  const secondaryFields = document.getElementById("secondary-fields");
+  const tertiaryFields = document.getElementById("tertiary-fields");
+
+  if (selectedType === "secondary") {
+    secondaryFields.style.display = "block";
+    tertiaryFields.style.display = "none";
+  } else if (selectedType === "tertiary") {
+    secondaryFields.style.display = "none";
+    tertiaryFields.style.display = "flex";
+  }
+}
+
+// Modal Toggle Handlers
 function openForgotModal() {
   document.getElementById("forgot-modal").classList.add("active");
 }
@@ -44,13 +58,13 @@ function closeForgotModal() {
 function handleForgotSubmit(e) {
   e.preventDefault();
   const email = document.getElementById("forgot-email").value;
-  alert(`If an account with ${email} exists, password reset instructions have been sent.`);
+  alert(`If an account exists for ${email}, password reset details will be sent.`);
   closeForgotModal();
 }
 
-// ========== API REQUEST HANDLERS ==========
+// ================= API SUBMISSIONS =================
 
-// 1. Submit Login Form
+// Login Submission
 document.getElementById("login-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -67,7 +81,7 @@ document.getElementById("login-form")?.addEventListener("submit", async (e) => {
     const data = await response.json();
     if (!response.ok) throw new Error(data.error);
 
-    // Save JWT token and profile details locally
+    // Save tokens locally
     localStorage.setItem("nx_token", data.token);
     localStorage.setItem("nx_role", data.user.role);
     localStorage.setItem("nx_name", data.user.name);
@@ -79,16 +93,29 @@ document.getElementById("login-form")?.addEventListener("submit", async (e) => {
   }
 });
 
-// 2. Submit Sign Up Form
+// Signup Submission
 document.getElementById("signup-form")?.addEventListener("submit", async (e) => {
   e.preventDefault();
+
+  const password = document.getElementById("signup-password").value;
+  const confirmPassword = document.getElementById("confirm-password").value;
+
+  if (password !== confirmPassword) {
+    alert("Passwords do not match!");
+    return;
+  }
+
+  const edType = document.getElementById("education-type").value;
 
   const payload = {
     firstName: document.getElementById("first-name").value.trim(),
     lastName: document.getElementById("last-name").value.trim(),
     email: document.getElementById("signup-email").value.trim(),
-    password: document.getElementById("signup-password").value,
-    educationType: document.getElementById("education-type").value
+    password: password,
+    educationType: edType,
+    studentClass: edType === "secondary" ? document.getElementById("secondary-class").value : null,
+    course: edType === "tertiary" ? document.getElementById("tertiary-course").value.trim() : null,
+    level: edType === "tertiary" ? document.getElementById("tertiary-level").value : null
   };
 
   try {
@@ -101,7 +128,7 @@ document.getElementById("signup-form")?.addEventListener("submit", async (e) => 
     const data = await response.json();
     if (!response.ok) throw new Error(data.error);
 
-    // Save JWT token and profile details locally
+    // Save tokens locally
     localStorage.setItem("nx_token", data.token);
     localStorage.setItem("nx_role", data.user.role);
     localStorage.setItem("nx_name", data.user.name);
