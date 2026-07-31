@@ -1,102 +1,31 @@
-import { auth, rtdb } from "./firebase-config.js";
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-import { ref, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+async function checkAuthSession() {
+  const token = localStorage.getItem("nx_token");
+  const loadingScreen = document.getElementById("loading-screen");
 
-// DOM elements
-const loadingScreen   = document.getElementById("loading-screen");
-const adminSection    = document.getElementById("admin-section");
-const studentSection  = document.getElementById("student-section");
-const headerRolePill  = document.getElementById("header-role-pill");
-const displayNameEl   = document.getElementById("user-display-name");
-const welcomeNameEl   = document.getElementById("welcome-name");
-const roleDescEl      = document.getElementById("user-role-description");
-const btnLogout       = document.getElementById("btn-logout");
-
-// Apply role to the UI
-function applyState(role, name) {
-  const cleanRole = (role || "student").toLowerCase().trim();
-  const cleanName = name || "User";
-
-  // Update name displays
-  if (displayNameEl) displayNameEl.textContent = cleanName;
-  if (welcomeNameEl) welcomeNameEl.textContent = cleanName;
-
-  if (!adminSection || !studentSection || !headerRolePill || !roleDescEl) return;
-
-  if (cleanRole === "admin") {
-    headerRolePill.textContent = "Admin";
-    headerRolePill.className = "role-pill admin";
-    roleDescEl.textContent = "You have administrator access.";
-    adminSection.classList.add("active");
-    studentSection.classList.remove("active");
-  } else {
-    headerRolePill.textContent = "Student";
-    headerRolePill.className = "role-pill student";
-    roleDescEl.textContent = "Student dashboard – access your learning tools below.";
-    studentSection.classList.add("active");
-    adminSection.classList.remove("active");
-  }
-}
-
-// Show cached data instantly if available
-const cachedRole = localStorage.getItem("nx_role") || "student";
-const cachedName = localStorage.getItem("nx_name") || "User";
-applyState(cachedRole, cachedName);
-
-// ========== AUTH GUARD ==========
-onAuthStateChanged(auth, async (user) => {
-  // Not logged in → force back to auth page
-  if (!user) {
-    localStorage.clear();
-    sessionStorage.clear();
+  if (!token) {
     window.location.replace("auth.html");
     return;
   }
 
-  // User is logged in – load their profile safely
   try {
-    const userRef = ref(rtdb, `users/${user.uid}`);
-    const snapshot = await get(userRef);
+    const res = await fetch("/api/user-auth?action=verify", {
+      headers: { Authorization: `Bearer ${token}` }
+    });
 
-    let role = "student";
-    let name = user.displayName || (user.email ? user.email.split("@")[0] : "User");
-
-    if (snapshot.exists()) {
-      const data = snapshot.val();
-      role = (data.role || "student").toLowerCase().trim();
-      name = data.name || name;
+    const data = await res.json();
+    if (!data.authenticated) {
+      throw new Error("Session expired");
     }
 
-    // Save to localStorage for fast future loads
-    localStorage.setItem("nx_role", role);
-    localStorage.setItem("nx_name", name);
-    localStorage.setItem("nx_uid", user.uid);
+    // Update UI elements with verified profile
+    applyState(data.user.role, data.user.name);
 
-    applyState(role, name);
-
-  } catch (error) {
-    console.error("Error loading user profile:", error);
-    // Fallback to cached state
-    applyState(cachedRole, cachedName);
+  } catch (err) {
+    localStorage.clear();
+    window.location.replace("auth.html");
   } finally {
-    // ALWAYS hide loading screen once auth evaluation completes
-    if (loadingScreen) {
-      loadingScreen.classList.add("hidden");
-    }
+    if (loadingScreen) loadingScreen.classList.add("hidden");
   }
-});
-
-// ========== LOGOUT ==========
-if (btnLogout) {
-  btnLogout.addEventListener("click", async () => {
-    try {
-      localStorage.clear();
-      sessionStorage.clear();
-      await signOut(auth);
-      window.location.replace("auth.html");
-    } catch (err) {
-      console.error("Logout error:", err);
-      window.location.replace("auth.html");
-    }
-  });
 }
+
+checkAuthSession();
