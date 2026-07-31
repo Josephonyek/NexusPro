@@ -1,200 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login / Sign Up</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Authentication | Nexus Pro</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #f3f4f6;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
+    :root {
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: #334155;
+      --danger: #ef4444;
     }
-    .card {
-      background: white;
-      width: 100%;
-      max-width: 420px;
-      border-radius: 16px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
-      padding: 32px;
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 1rem; }
+    
+    .auth-container { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; width: 100%; max-width: 440px; padding: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+    .auth-header { text-align: center; margin-bottom: 1.5rem; }
+    .auth-header h2 { font-size: 1.5rem; margin-bottom: 0.25rem; }
+    .auth-header p { color: var(--text-muted); font-size: 0.875rem; }
+
+    /* Tabs */
+    .tab-group { display: flex; background: var(--bg); padding: 4px; border-radius: 8px; margin-bottom: 1.5rem; }
+    .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-muted); font-weight: 600; cursor: pointer; border-radius: 6px; transition: all 0.2s; }
+    .tab-btn.active { background: var(--primary); color: #fff; }
+
+    /* Forms */
+    .auth-form { display: none; flex-direction: column; gap: 1rem; }
+    .auth-form.active { display: flex; }
+
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; }
+    .form-group label { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+
+    .input-wrapper { position: relative; display: flex; align-items: center; }
+    .input-wrapper input, select {
+      width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text); font-size: 0.95rem; outline: none;
     }
-    h1 { font-size: 1.5rem; margin-bottom: 8px; text-align: center; }
-    .subtitle { text-align: center; color: #6b7280; margin-bottom: 24px; font-size: 0.95rem; }
-    .tabs { display: flex; margin-bottom: 24px; border-bottom: 2px solid #e5e7eb; }
-    .tab {
-      flex: 1; text-align: center; padding: 12px; cursor: pointer;
-      font-weight: 600; color: #6b7280; border-bottom: 2px solid transparent; margin-bottom: -2px;
-    }
-    .tab.active { color: #2563eb; border-bottom-color: #2563eb; }
-    .form-section { display: none; }
-    .form-section.active { display: block; }
-    .form-group { margin-bottom: 16px; }
-    label { display: block; font-size: 0.875rem; font-weight: 500; margin-bottom: 6px; color: #374151; }
-    input, select { width: 100%; padding: 11px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 0.95rem; }
-    input:focus, select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
-    .row { display: flex; gap: 12px; }
-    .row .form-group { flex: 1; }
-    .password-wrapper { position: relative; }
-    .toggle-password {
-      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-      cursor: pointer; color: #6b7280; font-size: 0.9rem; user-select: none;
-    }
-    button[type="submit"], .btn {
-      width: 100%; padding: 13px; background: #2563eb; color: white;
-      border: none; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; margin-top: 8px;
-    }
-    button[type="submit"]:hover, .btn:hover { background: #1d4ed8; }
-    button:disabled, .btn:disabled { background: #93c5fd; cursor: not-allowed; }
-    .error { background: #fef2f2; color: #b91c1c; padding: 10px 14px; border-radius: 8px; font-size: 0.875rem; margin-bottom: 16px; display: none; }
-    .success { background: #ecfdf5; color: #047857; padding: 10px 14px; border-radius: 8px; font-size: 0.875rem; margin-bottom: 16px; display: none; }
-    .hidden { display: none !important; }
-    .forgot-link { display: block; text-align: right; font-size: 0.875rem; color: #2563eb; margin-top: -8px; margin-bottom: 16px; cursor: pointer; text-decoration: none; }
+    .input-wrapper input:focus, select:focus { border-color: var(--primary); }
+    
+    /* Eye icon button */
+    .toggle-pw { position: absolute; right: 10px; background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 0.85rem; user-select: none; }
+
+    .forgot-link { align-self: flex-end; font-size: 0.8rem; color: var(--primary); text-decoration: none; cursor: pointer; }
     .forgot-link:hover { text-decoration: underline; }
-    .back-link { display: block; text-align: center; margin-top: 16px; font-size: 0.875rem; color: #2563eb; cursor: pointer; }
-    .back-link:hover { text-decoration: underline; }
+
+    .submit-btn { padding: 12px; background: var(--primary); color: #fff; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; margin-top: 0.5rem; }
+    .submit-btn:hover { background: var(--primary-hover); }
+
+    /* Modal */
+    .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); align-items: center; justify-content: center; padding: 1rem; }
+    .modal.active { display: flex; }
+    .modal-content { background: var(--card-bg); border: 1px solid var(--border); padding: 1.5rem; border-radius: 8px; width: 100%; max-width: 380px; position: relative; }
+    .close-modal { position: absolute; top: 12px; right: 12px; background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1 id="page-title">Welcome</h1>
-    <p class="subtitle" id="page-subtitle">Sign in to your account or create a new one</p>
 
-    <div class="tabs" id="tabs">
-      <div class="tab active" data-tab="login">Login</div>
-      <div class="tab" data-tab="signup">Sign Up</div>
+  <div class="auth-container">
+    <div class="auth-header">
+      <h2>Nexus Pro</h2>
+      <p>Access your dashboard and learning portal</p>
     </div>
 
-    <div id="error-message" class="error"></div>
-    <div id="success-message" class="success"></div>
+    <!-- Navigation Tabs -->
+    <div class="tab-group">
+      <button type="button" class="tab-btn active" id="tab-login" onclick="switchTab('login')">Log In</button>
+      <button type="button" class="tab-btn" id="tab-signup" onclick="switchTab('signup')">Sign Up</button>
+    </div>
 
     <!-- LOGIN FORM -->
-    <form id="login-form" class="form-section active">
+    <form id="login-form" class="auth-form active">
       <div class="form-group">
-        <label for="login-email">Email</label>
-        <input type="email" id="login-email" required placeholder="you@example.com" />
+        <label for="login-email">Email Address</label>
+        <div class="input-wrapper">
+          <input type="email" id="login-email" required placeholder="name@example.com">
+        </div>
       </div>
 
       <div class="form-group">
         <label for="login-password">Password</label>
-        <div class="password-wrapper">
-          <input type="password" id="login-password" required placeholder="Enter password" />
-          <span class="toggle-password" data-target="login-password">Show</span>
+        <div class="input-wrapper">
+          <input type="password" id="login-password" required placeholder="••••••••">
+          <button type="button" class="toggle-pw" onclick="togglePassword('login-password', this)">Show</button>
         </div>
       </div>
 
-      <a class="forgot-link" id="forgot-password-link">Forgot password?</a>
-
-      <button type="submit" id="btn-login">Sign In</button>
+      <a class="forgot-link" onclick="openForgotModal()">Forgot Password?</a>
+      <button type="submit" class="submit-btn">Log In</button>
     </form>
 
-    <!-- FORGOT PASSWORD FORM -->
-    <form id="forgot-form" class="form-section">
-      <div class="form-group">
-        <label for="forgot-email">Email</label>
-        <input type="email" id="forgot-email" required placeholder="Enter your account email" />
-      </div>
-
-      <button type="submit" id="btn-forgot">Send Reset Link</button>
-      <a class="back-link" id="back-to-login">← Back to Login</a>
-    </form>
-
-    <!-- SIGN UP FORM -->
-    <form id="signup-form" class="form-section">
-      <div class="row">
+    <!-- SIGNUP FORM -->
+    <form id="signup-form" class="auth-form">
+      <div class="form-row">
         <div class="form-group">
           <label for="first-name">First Name</label>
-          <input type="text" id="first-name" required placeholder="First name" />
+          <div class="input-wrapper">
+            <input type="text" id="first-name" required placeholder="John">
+          </div>
         </div>
         <div class="form-group">
           <label for="last-name">Last Name</label>
-          <input type="text" id="last-name" required placeholder="Last name" />
+          <div class="input-wrapper">
+            <input type="text" id="last-name" required placeholder="Doe">
+          </div>
         </div>
       </div>
 
       <div class="form-group">
-        <label for="education-type">Education Level</label>
-        <select id="education-type" required>
-          <option value="">Select...</option>
-          <option value="secondary">Secondary</option>
-          <option value="tertiary">Tertiary</option>
-        </select>
-      </div>
-
-      <div id="secondary-fields" class="education-fields hidden">
-        <div class="form-group">
-          <label for="secondary-class">Class</label>
-          <select id="secondary-class">
-            <option value="">Select class</option>
-            <option value="SS1">SS1</option>
-            <option value="SS2">SS2</option>
-            <option value="SS3">SS3</option>
-          </select>
+        <label for="signup-email">Email Address</label>
+        <div class="input-wrapper">
+          <input type="email" id="signup-email" required placeholder="name@example.com">
         </div>
-      </div>
-
-      <div id="tertiary-fields" class="education-fields hidden">
-        <div class="form-group">
-          <label for="course">Course</label>
-          <input type="text" id="course" placeholder="e.g. Computer Science" />
-        </div>
-        <div class="form-group">
-          <label for="level">Level</label>
-          <select id="level">
-            <option value="">Select level</option>
-            <option value="Fresher">I am a Fresher</option>
-            <option value="100">100 Level</option>
-            <option value="200">200 Level</option>
-            <option value="300">300 Level</option>
-            <option value="400">400 Level</option>
-            <option value="500">500 Level</option>
-            <option value="600">600 Level</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="signup-email">Email</label>
-        <input type="email" id="signup-email" required placeholder="you@example.com" />
       </div>
 
       <div class="form-group">
         <label for="signup-password">Password</label>
-        <div class="password-wrapper">
-          <input type="password" id="signup-password" required placeholder="Create password" minlength="6" />
-          <span class="toggle-password" data-target="signup-password">Show</span>
+        <div class="input-wrapper">
+          <input type="password" id="signup-password" required placeholder="••••••••">
+          <button type="button" class="toggle-pw" onclick="togglePassword('signup-password', this)">Show</button>
         </div>
       </div>
 
       <div class="form-group">
-        <label for="confirm-password">Confirm Password</label>
-        <div class="password-wrapper">
-          <input type="password" id="confirm-password" required placeholder="Confirm password" minlength="6" />
-          <span class="toggle-password" data-target="confirm-password">Show</span>
+        <label for="education-type">Education Path</label>
+        <div class="input-wrapper">
+          <select id="education-type">
+            <option value="secondary">Secondary / High School</option>
+            <option value="tertiary">University / Tertiary</option>
+          </select>
         </div>
       </div>
 
-      <button type="submit" id="btn-signup">Create Account</button>
+      <button type="submit" class="submit-btn">Create Account</button>
     </form>
   </div>
 
-  <!-- Vercel Environment Variables Injected via Window Config -->
-  <script>
-    window.ENV = {
-      FIREBASE_API_KEY: "YOUR_VERCEL_ENV_API_KEY",
-      FIREBASE_AUTH_DOMAIN: "YOUR_VERCEL_ENV_AUTH_DOMAIN",
-      FIREBASE_DATABASE_URL: "YOUR_VERCEL_ENV_DATABASE_URL",
-      FIREBASE_PROJECT_ID: "YOUR_VERCEL_ENV_PROJECT_ID",
-      FIREBASE_STORAGE_BUCKET: "YOUR_VERCEL_ENV_STORAGE_BUCKET",
-      FIREBASE_MESSAGING_SENDER_ID: "YOUR_VERCEL_ENV_SENDER_ID",
-      FIREBASE_APP_ID: "YOUR_VERCEL_ENV_APP_ID"
-    };
-  </script>
+  <!-- FORGOT PASSWORD MODAL -->
+  <div class="modal" id="forgot-modal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeForgotModal()">&times;</button>
+      <h3>Reset Password</h3>
+      <p style="font-size: 0.85rem; color: var(--text-muted); margin: 0.5rem 0 1rem;">
+        Enter your registered email address to receive password recovery instructions.
+      </p>
+      <form id="forgot-form" onsubmit="handleForgotSubmit(event)">
+        <div class="form-group" style="margin-bottom: 1rem;">
+          <label for="forgot-email">Email Address</label>
+          <div class="input-wrapper">
+            <input type="email" id="forgot-email" required placeholder="name@example.com">
+          </div>
+        </div>
+        <button type="submit" class="submit-btn" style="width: 100%;">Send Instructions</button>
+      </form>
+    </div>
+  </div>
 
-  <script type="module" src="auth.js"></script>
+  <script src="auth.js"></script>
 </body>
-        </html>
+              </html>
