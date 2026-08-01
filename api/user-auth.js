@@ -12,7 +12,7 @@ const db = createClient({
 });
 
 export default async function handler(req, res) {
-  // Global CORS
+  // CORS Headers
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,POST");
@@ -37,7 +37,7 @@ export default async function handler(req, res) {
       const cleanEmail = email.trim().toLowerCase();
 
       const result = await db.execute({
-        sql: "SELECT id, name, email, password_hash, role FROM users WHERE LOWER(email) = ? LIMIT 1",
+        sql: "SELECT id, name, email, password_hash, role, status FROM users WHERE LOWER(email) = ? LIMIT 1",
         args: [cleanEmail]
       });
 
@@ -46,8 +46,13 @@ export default async function handler(req, res) {
       }
 
       const user = result.rows[0];
-      const validPassword = await bcrypt.compare(password, String(user.password_hash));
 
+      // Block suspended users from logging in
+      if (String(user.status || "active").toLowerCase() === "suspended") {
+        return res.status(403).json({ error: "Account suspended. Please contact platform support." });
+      }
+
+      const validPassword = await bcrypt.compare(password, String(user.password_hash));
       if (!validPassword) {
         return res.status(401).json({ error: "Invalid email or password." });
       }
@@ -92,13 +97,14 @@ export default async function handler(req, res) {
       const userId = "usr_" + Math.random().toString(36).substring(2, 11);
       const fullName = `${firstName.trim()} ${lastName.trim()}`;
       const defaultRole = "student";
+      const defaultStatus = "active";
 
       await db.execute({
-        sql: `INSERT INTO users (id, name, first_name, last_name, email, password_hash, role, education_type, class, course, level, created_at)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        sql: `INSERT INTO users (id, name, first_name, last_name, email, password_hash, role, status, education_type, class, course, level, created_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         args: [
           userId, fullName, firstName.trim(), lastName.trim(), cleanEmail,
-          passwordHash, defaultRole, educationType || null, studentClass || null,
+          passwordHash, defaultRole, defaultStatus, educationType || null, studentClass || null,
           course || null, level || null, Date.now()
         ]
       });
@@ -127,16 +133,16 @@ export default async function handler(req, res) {
       });
 
       if (userResult.rows.length === 0) {
-        return res.status(200).json({ message: "If an account exists with this email, reset instructions have been dispatched." });
+        return res.status(200).json({ message: "If an account exists, reset instructions have been generated." });
       }
 
       return res.status(200).json({
         success: true,
-        message: "Password reset key requested. Contact support or check email for steps."
+        message: "Password reset key requested."
       });
     }
 
-    // ================= 4. LIST USERS (ADMIN ONLY) =================
+    // ================= 4. LIST ALL USERS (ADMIN ONLY) =================
     if (action === "list-users") {
       const result = await db.execute(
         "SELECT id, name, email, role, status, education_type, class, course, level, created_at FROM users ORDER BY created_at DESC"
@@ -158,11 +164,14 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, users });
     }
 
-    // ================= 5. UPDATE USER ROLE =================
+    // ================= 5. UPDATE USER ROLE (ADMIN ONLY) =================
     if (action === "update-role") {
       if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
       const { userId, role } = req.body || {};
-      if (!userId || !role) return res.status(400).json({ error: "Missing parameters." });
+      if (!userId || !role) {
+        return res.status(400).json({ error: "Missing required parameters." });
+      }
 
       await db.execute({
         sql: "UPDATE users SET role = ? WHERE id = ?",
@@ -172,11 +181,14 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: "User role updated successfully." });
     }
 
-    // ================= 6. SUSPEND / ACTIVATE USER =================
+    // ================= 6. UPDATE USER STATUS / SUSPEND (ADMIN ONLY) =================
     if (action === "update-status") {
       if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
       const { userId, status } = req.body || {};
-      if (!userId || !status) return res.status(400).json({ error: "Missing parameters." });
+      if (!userId || !status) {
+        return res.status(400).json({ error: "Missing required parameters." });
+      }
 
       await db.execute({
         sql: "UPDATE users SET status = ? WHERE id = ?",
@@ -186,16 +198,27 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: "User status updated successfully." });
     }
 
-    // ================= 7. DELETE USER =================
+    // ================= 7. DELETE USER (ADMIN ONLY) =================
     if (action === "delete-user") {
       if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
       const { userId } = req.body || {};
-      if (!userId) return res.status(400).json({ error: "Missing user ID." });
+      if (!userId) {
+        return res.status(400).json({ error: "Missing required user ID." });
+      }
 
       await db.execute({
         sql: "DELETE FROM users WHERE id = ?",
         args: [userId]
       });
 
-      return res.status(200).json({ success: true, message: "User account permanently removed." });
-          }
+      return res.status(200).json({ success: true, message: "User permanently deleted." });
+    }
+
+    return res.status(400).json({ error: "Invalid action parameter." });
+
+  } catch (error) {
+    console.error("Auth Endpoint Error:", error);
+    return res.status(500).json({ error: error.message || "Internal server error." });
+  }
+             }
