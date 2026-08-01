@@ -1,65 +1,59 @@
 document.addEventListener("DOMContentLoaded", () => {
   const API_ENDPOINT = "/api/user-auth.js";
-  
-  // DOM Elements
   const userTableBody = document.getElementById("userTableBody");
   const searchInput = document.getElementById("searchInput");
   const roleFilter = document.getElementById("roleFilter");
-  const statusFilter = document.getElementById("statusFilter");
+  const categoryFilter = document.getElementById("categoryFilter");
 
-  // Stats Elements
-  const statTotal = document.getElementById("statTotal");
-  const statStudents = document.getElementById("statStudents");
-  const statAdmins = document.getElementById("statAdmins");
-  const statSuspended = document.getElementById("statSuspended");
-
-  // Modal Elements
-  const userModal = document.getElementById("userModal");
   let allUsers = [];
 
-  // ================= 1. FETCH USERS FROM BACKEND =================
-  window.fetchUsers = async function() {
-    renderLoadingState();
+  // ================= 1. GUARD: ENSURE ADMIN ACCESS =================
+  function checkAdminAccess() {
+    const role = (localStorage.getItem("userRole") || "").toLowerCase();
+    const token = localStorage.getItem("nexusToken") || localStorage.getItem("token");
+
+    if (!token || role !== "admin") {
+      alert("Access Denied: Administrative privileges required.");
+      window.location.href = "dashboard.html";
+    }
+  }
+
+  checkAdminAccess();
+
+  // ================= 2. FETCH USERS FROM API =================
+  async function fetchUsers() {
     try {
-      const token = localStorage.getItem("nexusToken") || localStorage.getItem("token") || "";
-      
+      const token = localStorage.getItem("nexusToken") || localStorage.getItem("token");
       const res = await fetch(`${API_ENDPOINT}?action=list-users`, {
-        headers: { "Authorization": `Bearer ${token}` }
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
       });
 
-      if (!res.ok) throw new Error("Failed to fetch users");
+      if (!res.ok) throw new Error("Failed to load user list");
 
       const data = await res.json();
-      allUsers = data.users || (Array.isArray(data) ? data : []);
-
-      updateStats(allUsers);
-      applyFilters();
+      allUsers = data.users || [];
+      renderUsers(allUsers);
     } catch (err) {
-      console.error("Error loading users:", err);
+      console.error(err);
       userTableBody.innerHTML = `
         <tr>
-          <td colspan="5" class="empty-msg" style="color: var(--danger);">
-            <i class="fas fa-exclamation-triangle"></i> Error loading users. Please try refreshing.
+          <td colspan="5" style="text-align: center; color: var(--danger); padding: 20px;">
+            Unable to fetch user record list.
           </td>
         </tr>
       `;
     }
-  };
-
-  // ================= 2. STATS & RENDER =================
-  function updateStats(users) {
-    if (statTotal) statTotal.textContent = users.length;
-    if (statStudents) statStudents.textContent = users.filter(u => (u.role || "student").toLowerCase() === "student").length;
-    if (statAdmins) statAdmins.textContent = users.filter(u => (u.role || "").toLowerCase() === "admin").length;
-    if (statSuspended) statSuspended.textContent = users.filter(u => (u.status || "").toLowerCase() === "suspended").length;
   }
 
+  // ================= 3. RENDER USER TABLE =================
   function renderUsers(users) {
-    if (!users || users.length === 0) {
+    if (users.length === 0) {
       userTableBody.innerHTML = `
         <tr>
-          <td colspan="5" class="empty-msg">
-            No users found.
+          <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 20px;">
+            No registered users found matching the selected criteria.
           </td>
         </tr>
       `;
@@ -67,55 +61,45 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     userTableBody.innerHTML = users.map(user => {
-      const role = (user.role || "student").toLowerCase();
-      const status = (user.status || "active").toLowerCase();
-      const isSuspended = status === "suspended";
-      const nextRole = role === "admin" ? "student" : "admin";
-      const dateStr = user.created_at ? new Date(Number(user.created_at) || user.created_at).toLocaleDateString() : "N/A";
+      const isSelf = user.email === getActiveUserEmail();
+      const nextRole = user.role === "admin" ? "student" : "admin";
+      const btnText = user.role === "admin" ? "Demote to Student" : "Promote to Admin";
 
       return `
         <tr>
+          <td><strong>${escapeHtml(user.name || "N/A")}</strong></td>
+          <td>${escapeHtml(user.email)}</td>
+          <td>${escapeHtml(user.education_type || "Standard")} ${user.class ? `(${user.class})` : ""}</td>
           <td>
-            <div class="user-info">
-              <div class="name">${escapeHtml(user.name || "Unnamed User")}</div>
-              <div class="email">${escapeHtml(user.email || "No Email")}</div>
-            </div>
+            <span class="role-badge ${user.role}">
+              ${user.role}
+            </span>
           </td>
           <td>
-            <span class="badge ${role}">${role}</span>
-          </td>
-          <td>
-            <span class="badge ${isSuspended ? "suspended" : "active"}">${isSuspended ? "Suspended" : "Active"}</span>
-          </td>
-          <td>${dateStr}</td>
-          <td>
-            <div style="display:flex; gap:6px;">
-              <button class="btn-action" onclick="viewUserDetails('${user.id}')">Info</button>
-              <button class="btn-action" onclick="toggleRole('${user.id}', '${nextRole}')">${role === "admin" ? "Demote" : "Promote"}</button>
-              <button class="btn-action warn" onclick="toggleStatus('${user.id}', '${isSuspended ? "active" : "suspended"}')">${isSuspended ? "Activate" : "Suspend"}</button>
-              <button class="btn-action danger" onclick="deleteUser('${user.id}')">Delete</button>
-            </div>
+            ${isSelf ? `<span style="color: var(--text-muted); font-size: 0.8rem;">Current Account</span>` : `
+              <button class="action-btn" onclick="toggleUserRole('${user.id}', '${nextRole}')">
+                ${btnText}
+              </button>
+            `}
           </td>
         </tr>
       `;
     }).join("");
   }
 
-  // ================= 3. FILTERING =================
+  // ================= 4. FILTERING & SEARCH LOGIC =================
   function applyFilters() {
-    const search = searchInput.value.toLowerCase().trim();
-    const role = roleFilter.value.toLowerCase();
-    const status = statusFilter.value.toLowerCase();
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    const selectedRole = roleFilter.value;
+    const selectedCategory = categoryFilter.value;
 
-    const filtered = allUsers.filter(u => {
-      const matchName = u.name && u.name.toLowerCase().includes(search);
-      const matchEmail = u.email && u.email.toLowerCase().includes(search);
-      const matchSearch = search === "" || matchName || matchEmail;
+    const filtered = allUsers.filter(user => {
+      const matchesSearch = (user.name && user.name.toLowerCase().includes(searchTerm)) || 
+                            user.email.toLowerCase().includes(searchTerm);
+      const matchesRole = selectedRole === "all" || user.role === selectedRole;
+      const matchesCategory = selectedCategory === "all" || user.education_type === selectedCategory;
 
-      const matchRole = role === "all" || (u.role || "student").toLowerCase() === role;
-      const matchStatus = status === "all" || (u.status || "active").toLowerCase() === status;
-
-      return matchSearch && matchRole && matchStatus;
+      return matchesSearch && matchesRole && matchesCategory;
     });
 
     renderUsers(filtered);
@@ -123,76 +107,51 @@ document.addEventListener("DOMContentLoaded", () => {
 
   searchInput.addEventListener("input", applyFilters);
   roleFilter.addEventListener("change", applyFilters);
-  statusFilter.addEventListener("change", applyFilters);
+  categoryFilter.addEventListener("change", applyFilters);
 
-  // ================= 4. MODAL & ACTIONS =================
-  window.viewUserDetails = function(userId) {
-    const user = allUsers.find(u => String(u.id) === String(userId));
-    if (!user) return;
+  // ================= 5. TOGGLE ROLE ACTION =================
+  window.toggleUserRole = async function(userId, newRole) {
+    if (!confirm(`Are you sure you want to change this user's role to ${newRole.toUpperCase()}?`)) {
+      return;
+    }
 
-    document.getElementById("modalUserName").textContent = user.name || "Unnamed User";
-    document.getElementById("modalUserEmail").textContent = user.email || "N/A";
-    document.getElementById("modalUserId").textContent = user.id || "N/A";
-    document.getElementById("modalUserRole").textContent = (user.role || "student").toUpperCase();
-    document.getElementById("modalUserStatus").textContent = (user.status || "active").toUpperCase();
-    
-    if (document.getElementById("modalUserEdu")) document.getElementById("modalUserEdu").textContent = user.education_type || "N/A";
-    if (document.getElementById("modalUserClass")) document.getElementById("modalUserClass").textContent = user.class || "N/A";
-
-    userModal.style.display = "flex";
-  };
-
-  window.closeModal = function() {
-    userModal.style.display = "none";
-  };
-
-  window.toggleRole = async function(userId, newRole) {
-    if (!confirm(`Change role to ${newRole.toUpperCase()}?`)) return;
-    await executeAction("update-role", { userId, role: newRole });
-  };
-
-  window.toggleStatus = async function(userId, newStatus) {
-    if (!confirm(`Set status to ${newStatus.toUpperCase()}?`)) return;
-    await executeAction("update-status", { userId, status: newStatus });
-  };
-
-  window.deleteUser = async function(userId) {
-    if (!confirm("Permanently delete this user?")) return;
-    await executeAction("delete-user", { userId });
-  };
-
-  async function executeAction(action, payload) {
     try {
-      const token = localStorage.getItem("nexusToken") || localStorage.getItem("token") || "";
-      const res = await fetch(`${API_ENDPOINT}?action=${action}`, {
+      const token = localStorage.getItem("nexusToken") || localStorage.getItem("token");
+      const res = await fetch(`${API_ENDPOINT}?action=update-role`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ userId, role: newRole })
       });
 
-      if (!res.ok) throw new Error("Action failed");
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Failed to update role");
+      }
+
+      // Refresh list
       fetchUsers();
     } catch (err) {
-      alert("Error: " + err.message);
+      alert("Error updating role: " + err.message);
     }
-  }
+  };
 
-  function renderLoadingState() {
-    userTableBody.innerHTML = `
-      <tr>
-        <td colspan="5" class="empty-msg">
-          <i class="fas fa-spinner fa-spin"></i> Loading users...
-        </td>
-      </tr>
-    `;
+  // Helper Utilities
+  function getActiveUserEmail() {
+    try {
+      const u = JSON.parse(localStorage.getItem("nexusUser"));
+      return u?.email || "";
+    } catch (e) {
+      return "";
+    }
   }
 
   function escapeHtml(str) {
     return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
+  // Initial load
   fetchUsers();
 });
