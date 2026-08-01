@@ -121,7 +121,6 @@ export default async function handler(req, res) {
       const { email } = req.body || {};
       if (!email) return res.status(400).json({ error: "Email is required." });
 
-      // Check if email exists
       const userResult = await db.execute({
         sql: "SELECT id FROM users WHERE LOWER(email) = ? LIMIT 1",
         args: [email.trim().toLowerCase()]
@@ -137,15 +136,7 @@ export default async function handler(req, res) {
       });
     }
 
-    return res.status(400).json({ error: "Invalid action." });
-
-  } catch (error) {
-    console.error("Auth Endpoint Error:", error);
-    return res.status(500).json({ error: error.message || "Internal server error." });
-  }
-        }
-
-// ================= 4. LIST USERS (ADMIN ONLY) =================
+    // ================= 4. LIST USERS (ADMIN ONLY) =================
     if (action === "list-users") {
       const result = await db.execute(
         "SELECT id, name, email, role, education_type, class, created_at FROM users ORDER BY created_at DESC"
@@ -179,3 +170,11 @@ export default async function handler(req, res) {
 
       return res.status(200).json({ success: true, message: "User role updated successfully." });
     }
+
+    return res.status(400).json({ error: "Invalid action." });
+
+  } catch (error) {
+    console.error("Auth Endpoint Error:", error);
+    return res.status(500).json({ error: error.message || "Internal server error." });
+  }
+        }
