@@ -89,6 +89,12 @@
       margin-top: 2px;
     }
 
+    .header-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
     .btn-back {
       display: inline-flex;
       align-items: center;
@@ -101,6 +107,7 @@
       font-size: 0.875rem;
       font-weight: 500;
       text-decoration: none;
+      cursor: pointer;
       transition: all 0.2s ease;
     }
 
@@ -145,10 +152,10 @@
       flex-shrink: 0;
     }
 
-    .stat-icon.total   { background: var(--accent-soft); color: var(--accent); }
-    .stat-icon.students{ background: rgba(148, 163, 184, 0.12); color: #94a3b8; }
-    .stat-icon.admins  { background: rgba(168, 85, 247, 0.12); color: #c084fc; }
-    .stat-icon.suspended{ background: var(--danger-soft); color: var(--danger); }
+    .stat-icon.total     { background: var(--accent-soft); color: var(--accent); }
+    .stat-icon.students  { background: rgba(148, 163, 184, 0.12); color: #94a3b8; }
+    .stat-icon.admins    { background: rgba(168, 85, 247, 0.12); color: #c084fc; }
+    .stat-icon.suspended { background: var(--danger-soft); color: var(--danger); }
 
     .stat-info h3 {
       font-size: 1.75rem;
@@ -378,6 +385,11 @@
       padding: 48px 24px !important;
     }
 
+    /* Spinner */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     /* ========== MODAL ========== */
     .modal-overlay {
       position: fixed;
@@ -518,10 +530,17 @@
           <p>Manage accounts, roles, and access permissions</p>
         </div>
       </div>
-      <a href="dashboard.html" class="btn-back">
-        <i class="fas fa-arrow-left"></i>
-        Back to Dashboard
-      </a>
+
+      <div class="header-actions">
+        <button onclick="fetchUsers()" class="btn-back" title="Refresh data">
+          <i class="fas fa-sync-alt"></i>
+          Refresh
+        </button>
+        <a href="dashboard.html" class="btn-back">
+          <i class="fas fa-arrow-left"></i>
+          Back to Dashboard
+        </a>
+      </div>
     </div>
 
     <!-- Stats -->
@@ -591,8 +610,10 @@
         <tbody id="userTableBody">
           <tr>
             <td colspan="5" class="table-message">
-              <i class="fas fa-spinner fa-spin" style="margin-right: 8px;"></i>
-              Loading user records...
+              <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
+                <div style="width:36px; height:36px; border:3px solid #334155; border-top-color:#38bdf8; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
+                <div>Loading user records...</div>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -652,103 +673,7 @@
     </div>
   </div>
 
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const API_ENDPOINT = "/api/user-auth.js";
-      const userTableBody = document.getElementById("userTableBody");
-      const searchInput = document.getElementById("searchInput");
-      const roleFilter = document.getElementById("roleFilter");
-      const statusFilter = document.getElementById("statusFilter");
-
-      const statTotal = document.getElementById("statTotal");
-      const statStudents = document.getElementById("statStudents");
-      const statAdmins = document.getElementById("statAdmins");
-      const statSuspended = document.getElementById("statSuspended");
-
-      const userModal = document.getElementById("userModal");
-      const closeModalBtn = document.getElementById("closeModalBtn");
-      const closeModalBtn2 = document.getElementById("closeModalBtn2");
-
-      let allUsers = [];
-
-      // 1. Check Access
-      function checkAdminAccess() {
-        const role = (localStorage.getItem("userRole") || "").toLowerCase();
-        const token = localStorage.getItem("nexusToken") || localStorage.getItem("token");
-
-        if (!token || role !== "admin") {
-          alert("Access Denied: Admin authorization required.");
-          window.location.href = "dashboard.html";
-        }
-      }
-      checkAdminAccess();
-
-      // 2. Fetch Users
-      async function fetchUsers() {
-        try {
-          const token = localStorage.getItem("nexusToken") || localStorage.getItem("token");
-          const res = await fetch(`${API_ENDPOINT}?action=list-users`, {
-            headers: { "Authorization": `Bearer ${token}` }
-          });
-
-          if (!res.ok) throw new Error("Failed to fetch registry.");
-
-          const data = await res.json();
-          allUsers = data.users || [];
-
-          updateStats(allUsers);
-          renderUsers(allUsers);
-        } catch (err) {
-          console.error(err);
-          userTableBody.innerHTML = `
-            <tr>
-              <td colspan="5" class="table-message" style="color: var(--danger);">
-                <i class="fas fa-exclamation-circle" style="margin-right: 8px;"></i>
-                Error loading user directory.
-              </td>
-            </tr>
-          `;
-        }
-      }
-
-      // 3. Stats Calculator
-      function updateStats(users) {
-        if (statTotal) statTotal.textContent = users.length;
-        if (statStudents) statStudents.textContent = users.filter(u => u.role === "student").length;
-        if (statAdmins) statAdmins.textContent = users.filter(u => u.role === "admin").length;
-        if (statSuspended) statSuspended.textContent = users.filter(u => u.status === "suspended").length;
-      }
-
-      // 4. Render Table Data
-      function renderUsers(users) {
-        if (users.length === 0) {
-          userTableBody.innerHTML = `
-            <tr>
-              <td colspan="5" class="table-message">
-                <i class="fas fa-search" style="margin-right: 8px;"></i>
-                No matching accounts found.
-              </td>
-            </tr>
-          `;
-          return;
-        }
-
-        const currentEmail = getActiveUserEmail();
-
-        userTableBody.innerHTML = users.map(user => {
-          const isSelf = user.email.toLowerCase() === currentEmail.toLowerCase();
-          const nextRole = user.role === "admin" ? "student" : "admin";
-          const isSuspended = user.status === "suspended";
-          const formattedDate = user.created_at ? new Date(Number(user.created_at)).toLocaleDateString() : "N/A";
-
-          return `
-            <tr>
-              <td>
-                <div class="user-name">${escapeHtml(user.name || "Unnamed Account")}</div>
-                <div class="user-email">${escapeHtml(user.email)}</div>
-              </td>
-              <td><span class="badge ${user.role}">${user.role}</span></td>
-              <td><span class="badge ${isSuspended ? "suspended" : "active"}">${isSuspended ? "Suspended" : "Active"}</span></td>
-              <td style="color: var(--text-muted); font-size: 0.85rem;">${formattedDate}</td>
-              <td>
-                <div class="action-gr
+  <!-- External JavaScript -->
+  <script src="admin_users.js"></script>
+</body>
+  </html>
