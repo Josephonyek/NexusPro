@@ -31,38 +31,17 @@ document.addEventListener("DOMContentLoaded", () => {
   }
   checkAdminAccess();
 
-  // ========== SHOW LOADING STATE ==========
-  function showLoading() {
-    userTableBody.innerHTML = `
-      <tr>
-        <td colspan="5" class="table-message">
-          <div style="display:flex; flex-direction:column; align-items:center; gap:12px;">
-            <div style="width:36px; height:36px; border:3px solid #334155; border-top-color:#38bdf8; border-radius:50%; animation:spin 0.8s linear infinite;"></div>
-            <div>Loading user records...</div>
-          </div>
-        </td>
-      </tr>
-    `;
-  }
-
-  // ========== FETCH USERS (with timeout) ==========
+  // ========== FETCH USERS ==========
   async function fetchUsers() {
     if (isLoading) return;
     isLoading = true;
-    showLoading();
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 12000); // 12s timeout
 
     try {
       const token = localStorage.getItem("nexusToken") || localStorage.getItem("token");
 
       const res = await fetch(`${API_ENDPOINT}?action=list-users`, {
-        headers: { "Authorization": `Bearer ${token}` },
-        signal: controller.signal
+        headers: { "Authorization": `Bearer ${token}` }
       });
-
-      clearTimeout(timeoutId);
 
       if (!res.ok) throw new Error("Failed to fetch registry.");
 
@@ -72,17 +51,14 @@ document.addEventListener("DOMContentLoaded", () => {
       updateStats(allUsers);
       renderUsers(allUsers);
     } catch (err) {
-      clearTimeout(timeoutId);
       console.error(err);
-
-      const isTimeout = err.name === "AbortError";
       userTableBody.innerHTML = `
         <tr>
           <td colspan="5" class="table-message" style="color: var(--danger);">
             <div style="display:flex; flex-direction:column; align-items:center; gap:14px;">
               <div>
                 <i class="fas fa-exclamation-circle" style="font-size:1.4rem; margin-bottom:6px;"></i><br>
-                ${isTimeout ? "Request timed out. The server is taking too long." : "Error loading user directory."}
+                Error loading user directory.
               </div>
               <button class="btn" onclick="fetchUsers()" style="padding:9px 18px;">
                 <i class="fas fa-redo"></i> Try Again
@@ -96,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Make fetchUsers available globally (for Refresh & Retry buttons)
+  // Make fetchUsers available globally
   window.fetchUsers = fetchUsers;
 
   // ========== STATS ==========
@@ -267,6 +243,6 @@ document.addEventListener("DOMContentLoaded", () => {
     return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
-  // Start loading
+  // Load data immediately
   fetchUsers();
 });
