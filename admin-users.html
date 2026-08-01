@@ -1,13 +1,34 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexus Pro - User Management</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Nexus Pro - Admin User Management</title>
   <style>
+    :root {
+      --bg-main: #0f172a;
+      --card-bg: #1e293b;
+      --input-bg: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent: #38bdf8;
+      --border-color: #334155;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --success: #22c55e;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      padding: 32px 16px;
+      min-height: 100vh;
+    }
+
     .admin-container {
-      padding: 24px;
       max-width: 1200px;
       margin: 0 auto;
     }
@@ -18,48 +39,50 @@
       align-items: center;
       flex-wrap: wrap;
       gap: 16px;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
 
     .admin-title h1 {
-      margin: 0 0 4px 0;
-      font-size: 1.75rem;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 4px;
     }
 
     .admin-title p {
-      margin: 0;
       color: var(--text-muted);
+      font-size: 0.95rem;
     }
 
-    /* Stats Overview */
+    /* Stats Dashboard */
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 16px;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
 
     .stat-card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: var(--radius);
-      padding: 16px;
+      padding: 20px;
       text-align: center;
     }
 
     .stat-card h3 {
-      margin: 0;
-      font-size: 1.8rem;
+      font-size: 2rem;
       color: var(--accent);
+      margin-bottom: 4px;
     }
 
     .stat-card p {
-      margin: 4px 0 0 0;
-      font-size: 0.85rem;
       color: var(--text-muted);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
-    /* Filters Bar */
+    /* Filter Controls */
     .filters-bar {
       display: flex;
       gap: 12px;
@@ -73,15 +96,30 @@
 
     .search-input {
       flex: 2;
-      min-width: 220px;
+      min-width: 240px;
     }
 
     .filter-select {
       flex: 1;
-      min-width: 150px;
+      min-width: 160px;
     }
 
-    /* User Table */
+    input, select {
+      background: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--accent);
+    }
+
+    /* Table Component */
     .table-responsive {
       width: 100%;
       overflow-x: auto;
@@ -99,12 +137,12 @@
 
     .user-table th, 
     .user-table td {
-      padding: 14px 18px;
+      padding: 16px 20px;
       border-bottom: 1px solid var(--border-color);
     }
 
     .user-table th {
-      background: var(--input-bg);
+      background: rgba(15, 23, 42, 0.4);
       color: var(--text-muted);
       font-weight: 600;
       text-transform: uppercase;
@@ -116,7 +154,7 @@
       border-bottom: none;
     }
 
-    /* Badges */
+    /* Status & Role Badges */
     .badge {
       display: inline-block;
       padding: 4px 10px;
@@ -126,82 +164,76 @@
       text-transform: capitalize;
     }
 
-    .badge.admin {
-      background: rgba(56, 189, 248, 0.15);
-      color: var(--accent);
-      border: 1px solid var(--accent);
-    }
+    .badge.admin { background: rgba(56, 189, 248, 0.15); color: var(--accent); border: 1px solid var(--accent); }
+    .badge.student { background: rgba(148, 163, 184, 0.15); color: var(--text-muted); border: 1px solid var(--border-color); }
+    .badge.active { background: rgba(34, 197, 94, 0.15); color: var(--success); border: 1px solid var(--success); }
+    .badge.suspended { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid var(--danger); }
 
-    .badge.student {
-      background: rgba(148, 163, 184, 0.15);
-      color: var(--text-muted);
-      border: 1px solid var(--border-color);
-    }
-
-    .badge.active {
-      background: rgba(34, 197, 94, 0.15);
-      color: #22c55e;
-      border: 1px solid #22c55e;
-    }
-
-    .badge.suspended {
-      background: rgba(239, 68, 68, 0.15);
-      color: #ef4444;
-      border: 1px solid #ef4444;
-    }
-
-    /* Actions Grid */
+    /* Action Buttons */
     .action-group {
       display: flex;
       gap: 6px;
     }
 
-    .btn-action {
-      padding: 6px 10px;
-      font-size: 0.75rem;
+    .btn {
+      padding: 8px 14px;
+      font-size: 0.8rem;
+      font-weight: 600;
       border-radius: 6px;
       cursor: pointer;
       border: 1px solid var(--border-color);
       background: var(--input-bg);
       color: var(--text-main);
+      text-decoration: none;
       transition: all 0.2s ease;
     }
 
-    .btn-action:hover {
-      border-color: var(--accent);
-      color: var(--accent);
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn.warn:hover { border-color: var(--warning); color: var(--warning); }
+    .btn.danger:hover { border-color: var(--danger); color: var(--danger); }
+
+    /* Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      z-index: 1000;
     }
 
-    .btn-action.warn:hover {
-      border-color: #f59e0b;
-      color: #f59e0b;
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      padding: 24px;
+      width: 100%;
+      max-width: 520px;
     }
 
-    .btn-action.danger:hover {
-      border-color: #ef4444;
-      color: #ef4444;
-    }
-
-    /* Info Drawer / Modal */
     .modal-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-top: 16px;
+      margin-top: 20px;
     }
 
     .modal-field {
       background: var(--input-bg);
-      padding: 10px;
-      border-radius: 6px;
+      padding: 10px 14px;
+      border-radius: 8px;
       border: 1px solid var(--border-color);
     }
 
     .modal-field label {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--text-muted);
       display: block;
       margin-bottom: 2px;
+      text-transform: uppercase;
     }
 
     .modal-field span {
@@ -213,20 +245,19 @@
 <body>
 
   <div class="admin-container">
-    <!-- Top Header -->
     <div class="admin-header">
       <div class="admin-title">
         <h1>User Directory</h1>
-        <p>Manage permissions, inspect profile data, suspend accounts, or delete users.</p>
+        <p>Inspect account profiles, adjust permissions, suspend access, or delete records.</p>
       </div>
-      <a href="dashboard.html" class="btn-action">← Back to Dashboard</a>
+      <a href="dashboard.html" class="btn">← Back to Dashboard</a>
     </div>
 
-    <!-- Quick Stats -->
+    <!-- Stats Section -->
     <div class="stats-grid">
       <div class="stat-card">
         <h3 id="statTotal">0</h3>
-        <p>Total Registered Users</p>
+        <p>Total Users</p>
       </div>
       <div class="stat-card">
         <h3 id="statStudents">0</h3>
@@ -242,29 +273,29 @@
       </div>
     </div>
 
-    <!-- Filters & Search -->
+    <!-- Filters -->
     <div class="filters-bar">
-      <input type="text" id="searchInput" class="search-input form-group input" placeholder="Search by name or email...">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search by name or email address...">
       
-      <select id="roleFilter" class="filter-select form-group select">
+      <select id="roleFilter" class="filter-select">
         <option value="all">All Roles</option>
         <option value="student">Students</option>
         <option value="admin">Admins</option>
       </select>
 
-      <select id="statusFilter" class="filter-select form-group select">
+      <select id="statusFilter" class="filter-select">
         <option value="all">All Statuses</option>
         <option value="active">Active</option>
         <option value="suspended">Suspended</option>
       </select>
     </div>
 
-    <!-- User Data Table -->
+    <!-- Table -->
     <div class="table-responsive">
       <table class="user-table">
         <thead>
           <tr>
-            <th>User</th>
+            <th>User Details</th>
             <th>Role</th>
             <th>Status</th>
             <th>Registered</th>
@@ -273,8 +304,8 @@
         </thead>
         <tbody id="userTableBody">
           <tr>
-            <td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">
-              Loading user registry...
+            <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">
+              Loading user records...
             </td>
           </tr>
         </tbody>
@@ -282,11 +313,11 @@
     </div>
   </div>
 
-  <!-- USER DETAILS MODAL -->
+  <!-- User Details Modal -->
   <div id="userModal" class="modal-overlay" style="display: none;">
-    <div class="modal-card" style="max-width: 500px;">
-      <h3 id="modalUserName">User Details</h3>
-      <p id="modalUserEmail" style="color: var(--text-muted); font-size: 0.85rem; margin-top: -4px;"></p>
+    <div class="modal-card">
+      <h3 id="modalUserName">User Profile</h3>
+      <p id="modalUserEmail" style="color: var(--text-muted); font-size: 0.85rem; margin-top: 2px;"></p>
       
       <div class="modal-grid">
         <div class="modal-field">
@@ -323,12 +354,226 @@
         </div>
       </div>
 
-      <div class="modal-actions" style="margin-top: 24px;">
-        <button type="button" id="closeModalBtn" class="btn-secondary">Close</button>
+      <div style="margin-top: 24px; text-align: right;">
+        <button type="button" id="closeModalBtn" class="btn">Close</button>
       </div>
     </div>
   </div>
 
-  <script src="admin-users.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const API_ENDPOINT = "/api/user-auth.js";
+      const userTableBody = document.getElementById("userTableBody");
+      const searchInput = document.getElementById("searchInput");
+      const roleFilter = document.getElementById("roleFilter");
+      const statusFilter = document.getElementById("statusFilter");
+
+      const statTotal = document.getElementById("statTotal");
+      const statStudents = document.getElementById("statStudents");
+      const statAdmins = document.getElementById("statAdmins");
+      const statSuspended = document.getElementById("statSuspended");
+
+      const userModal = document.getElementById("userModal");
+      const closeModalBtn = document.getElementById("closeModalBtn");
+
+      let allUsers = [];
+
+      // 1. Check Access
+      function checkAdminAccess() {
+        const role = (localStorage.getItem("userRole") || "").toLowerCase();
+        const token = localStorage.getItem("nexusToken") || localStorage.getItem("token");
+
+        if (!token || role !== "admin") {
+          alert("Access Denied: Admin authorization required.");
+          window.location.href = "dashboard.html";
+        }
+      }
+      checkAdminAccess();
+
+      // 2. Fetch Users
+      async function fetchUsers() {
+        try {
+          const token = localStorage.getItem("nexusToken") || localStorage.getItem("token");
+          const res = await fetch(`${API_ENDPOINT}?action=list-users`, {
+            headers: { "Authorization": `Bearer ${token}` }
+          });
+
+          if (!res.ok) throw new Error("Failed to fetch registry.");
+
+          const data = await res.json();
+          allUsers = data.users || [];
+
+          updateStats(allUsers);
+          renderUsers(allUsers);
+        } catch (err) {
+          console.error(err);
+          userTableBody.innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--danger); padding: 24px;">
+                Error loading user directory.
+              </td>
+            </tr>
+          `;
+        }
+      }
+
+      // 3. Stats Calculator
+      function updateStats(users) {
+        if (statTotal) statTotal.textContent = users.length;
+        if (statStudents) statStudents.textContent = users.filter(u => u.role === "student").length;
+        if (statAdmins) statAdmins.textContent = users.filter(u => u.role === "admin").length;
+        if (statSuspended) statSuspended.textContent = users.filter(u => u.status === "suspended").length;
+      }
+
+      // 4. Render Table Data
+      function renderUsers(users) {
+        if (users.length === 0) {
+          userTableBody.innerHTML = `
+            <tr>
+              <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 24px;">
+                No matching accounts found.
+              </td>
+            </tr>
+          `;
+          return;
+        }
+
+        const currentEmail = getActiveUserEmail();
+
+        userTableBody.innerHTML = users.map(user => {
+          const isSelf = user.email.toLowerCase() === currentEmail.toLowerCase();
+          const nextRole = user.role === "admin" ? "student" : "admin";
+          const isSuspended = user.status === "suspended";
+          const formattedDate = user.created_at ? new Date(Number(user.created_at)).toLocaleDateString() : "N/A";
+
+          return `
+            <tr>
+              <td>
+                <strong>${escapeHtml(user.name || "Unnamed Account")}</strong>
+                <br><small style="color: var(--text-muted);">${escapeHtml(user.email)}</small>
+              </td>
+              <td><span class="badge ${user.role}">${user.role}</span></td>
+              <td><span class="badge ${isSuspended ? "suspended" : "active"}">${isSuspended ? "Suspended" : "Active"}</span></td>
+              <td>${formattedDate}</td>
+              <td>
+                <div class="action-group">
+                  <button class="btn" onclick="viewUserDetails('${user.id}')">Info</button>
+                  
+                  ${isSelf ? `<span style="color: var(--text-muted); font-size: 0.75rem; align-self: center; margin-left: 6px;">(You)</span>` : `
+                    <button class="btn" onclick="toggleRole('${user.id}', '${nextRole}')">
+                      ${user.role === "admin" ? "Demote" : "Promote"}
+                    </button>
+
+                    <button class="btn warn" onclick="toggleStatus('${user.id}', '${isSuspended ? "active" : "suspended"}')">
+                      ${isSuspended ? "Activate" : "Suspend"}
+                    </button>
+
+                    <button class="btn danger" onclick="deleteUser('${user.id}', '${escapeHtml(user.name)}')">Delete</button>
+                  `}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join("");
+      }
+
+      // 5. Filtering
+      function applyFilters() {
+        const search = searchInput.value.toLowerCase().trim();
+        const role = roleFilter.value;
+        const status = statusFilter.value;
+
+        const filtered = allUsers.filter(u => {
+          const matchesSearch = (u.name && u.name.toLowerCase().includes(search)) || u.email.toLowerCase().includes(search);
+          const matchesRole = role === "all" || u.role === role;
+          const matchesStatus = status === "all" || (u.status || "active") === status;
+          return matchesSearch && matchesRole && matchesStatus;
+        });
+
+        renderUsers(filtered);
+      }
+
+      searchInput.addEventListener("input", applyFilters);
+      roleFilter.addEventListener("change", applyFilters);
+      statusFilter.addEventListener("change", applyFilters);
+
+      // 6. View Details Modal
+      window.viewUserDetails = function(userId) {
+        const user = allUsers.find(u => u.id === userId);
+        if (!user) return;
+
+        document.getElementById("modalUserName").textContent = user.name || "N/A";
+        document.getElementById("modalUserEmail").textContent = user.email;
+        document.getElementById("modalUserId").textContent = user.id;
+        document.getElementById("modalUserRole").textContent = user.role.toUpperCase();
+        document.getElementById("modalUserStatus").textContent = (user.status || "active").toUpperCase();
+        document.getElementById("modalUserEdu").textContent = user.education_type || "N/A";
+        document.getElementById("modalUserClass").textContent = user.class || "N/A";
+        document.getElementById("modalUserCourse").textContent = user.course || "N/A";
+        document.getElementById("modalUserLevel").textContent = user.level || "N/A";
+        document.getElementById("modalUserJoined").textContent = user.created_at ? new Date(Number(user.created_at)).toLocaleString() : "N/A";
+
+        userModal.style.display = "flex";
+      };
+
+      if (closeModalBtn) {
+        closeModalBtn.addEventListener("click", () => {
+          userModal.style.display = "none";
+        });
+      }
+
+      // 7. API Mutators
+      window.toggleRole = async function(userId, newRole) {
+        if (!confirm(`Switch this user's role to ${newRole.toUpperCase()}?`)) return;
+        await executeAdminAction("update-role", { userId, role: newRole });
+      };
+
+      window.toggleStatus = async function(userId, newStatus) {
+        if (!confirm(`Set this account status to ${newStatus.toUpperCase()}?`)) return;
+        await executeAdminAction("update-status", { userId, status: newStatus });
+      };
+
+      window.deleteUser = async function(userId, userName) {
+        if (!confirm(`PERMANENT DELETION: Are you sure you want to delete "${userName}"?`)) return;
+        await executeAdminAction("delete-user", { userId });
+      };
+
+      async function executeAdminAction(action, payload) {
+        try {
+          const token = localStorage.getItem("nexusToken") || localStorage.getItem("token");
+          const res = await fetch(`${API_ENDPOINT}?action=${action}`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await res.json();
+          if (!res.ok || !data.success) throw new Error(data.error || "Execution failed.");
+
+          fetchUsers();
+        } catch (err) {
+          alert("Error: " + err.message);
+        }
+      }
+
+      function getActiveUserEmail() {
+        try {
+          const u = JSON.parse(localStorage.getItem("nexusUser"));
+          return u?.email || "";
+        } catch (e) {
+          return "";
+        }
+      }
+
+      function escapeHtml(str) {
+        return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      }
+
+      fetchUsers();
+    });
+  </script>
 </body>
-</html>
+        </html>
