@@ -35,7 +35,27 @@ document.addEventListener("DOMContentLoaded", () => {
       setTheme(nextTheme);
     });
   }
+// ================= LOGOUT HANDLER =================
+const logoutBtn = document.getElementById("logoutBtn");
 
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    
+    // Purge session tokens and local user data
+    localStorage.removeItem("nexusToken");
+    localStorage.removeItem("nexusUser");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    // Clear everything if necessary
+    localStorage.clear();
+
+    // Redirect to auth login page
+    window.location.href = "auth.html";
+  });
+}
   // ================= 2. AUTOMATIC ROLE DETECTION =================
   const roleBadge = document.getElementById("roleBadge");
   const studentView = document.getElementById("studentView");
