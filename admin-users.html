@@ -1,106 +1,190 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro | Control Center</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <style>
-        .animate-fast-pulse { animation: pulse 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus Pro - User Management</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* User Management Specific Styling */
+    .admin-container {
+      padding: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .admin-title h1 {
+      margin: 0 0 4px 0;
+      font-size: 1.75rem;
+    }
+
+    .admin-title p {
+      margin: 0;
+      color: var(--text-muted);
+    }
+
+    /* Filters Bar */
+    .filters-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+    }
+
+    .search-input {
+      flex: 2;
+      min-width: 220px;
+    }
+
+    .filter-select {
+      flex: 1;
+      min-width: 150px;
+    }
+
+    /* User Table */
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+    }
+
+    .user-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    .user-table th, 
+    .user-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .user-table th {
+      background: var(--input-bg);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    .user-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .role-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    .role-badge.admin {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    .role-badge.student {
+      background: rgba(148, 163, 184, 0.15);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+    }
+
+    .action-btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid var(--border-color);
+      background: var(--input-bg);
+      color: var(--text-main);
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .action-btn.danger:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
+  </style>
 </head>
-<body class="bg-neutral-950 text-neutral-100 min-h-screen antialiased">
+<body>
 
-    <div id="nexusPreloader" class="fixed inset-0 bg-neutral-950 z-50 flex flex-col justify-center items-center p-6 transition-all duration-300">
-        <div class="w-full max-w-5xl space-y-4 animate-fast-pulse">
-            <div class="h-8 bg-neutral-900 rounded-xl w-1/4"></div>
-            <div class="h-64 bg-neutral-900 rounded-2xl w-full"></div>
-        </div>
+  <div class="admin-container">
+    <!-- Navigation / Top Header -->
+    <div class="admin-header">
+      <div class="admin-title">
+        <h1>User Management</h1>
+        <p>View, promote, or manage registered students and platform administrators.</p>
+      </div>
+      <a href="dashboard.html" class="action-btn">← Back to Dashboard</a>
     </div>
 
-    <div class="flex min-h-screen">
-        <aside class="hidden lg:flex flex-col w-64 bg-neutral-900 border-r border-neutral-800/60 p-5 shrink-0">
-            <div class="flex items-center gap-3 mb-8 px-2">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-red-600 to-amber-600 flex items-center justify-center font-black shadow-md">A</div>
-                <span class="text-lg font-bold tracking-tight">Nexus Admin</span>
-            </div>
-            <nav class="space-y-1.5 flex-1">
-                <a href="admin-dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">← Core Console</a>
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-neutral-800 text-red-400 rounded-xl font-medium text-sm transition-all">Manage Students</a>
-            </nav>
-        </aside>
+    <!-- Filters & Search -->
+    <div class="filters-bar">
+      <input type="text" id="searchInput" class="search-input form-group input" placeholder="Search by name or email...">
+      
+      <select id="roleFilter" class="filter-select form-group select">
+        <option value="all">All Roles</option>
+        <option value="student">Students</option>
+        <option value="admin">Admins</option>
+      </select>
 
-        <main class="flex-1 min-w-0 flex flex-col">
-            <header class="h-16 border-b border-neutral-800/60 flex items-center justify-between px-6 bg-neutral-900/40 backdrop-blur-md sticky top-0 z-30">
-                <h2 class="text-lg font-bold tracking-tight text-neutral-200">Student Account Control Deck</h2>
-                <div id="userCounter" class="text-xs text-neutral-500 font-medium">Syncing database matrix...</div>
-            </header>
-
-            <div class="p-6 space-y-6 flex-1 overflow-y-auto max-w-6xl w-full mx-auto">
-                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    <div class="bg-neutral-900 border border-neutral-800/60 p-4 rounded-xl">
-                        <span class="block text-[10px] uppercase font-bold text-neutral-500 tracking-wider">Total Accounts</span>
-                        <span class="text-2xl font-black text-neutral-100" id="statTotal">0</span>
-                    </div>
-                    <div class="bg-neutral-900 border border-neutral-800/60 p-4 rounded-xl">
-                        <span class="block text-[10px] uppercase font-bold text-neutral-500 tracking-wider">Active Students</span>
-                        <span class="text-2xl font-black text-green-400" id="statActive">0</span>
-                    </div>
-                    <div class="bg-neutral-900 border border-neutral-800/60 p-4 rounded-xl">
-                        <span class="block text-[10px] uppercase font-bold text-neutral-500 tracking-wider">Suspended/Banned</span>
-                        <span class="text-2xl font-black text-red-400" id="statBanned">0</span>
-                    </div>
-                </div>
-
-                <div class="bg-neutral-900 border border-neutral-800/80 rounded-2xl overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="border-b border-neutral-800 bg-neutral-950/40 text-[11px] font-bold uppercase tracking-wider text-neutral-400">
-                                    <th class="p-4">Student Details</th>
-                                    <th class="p-4">Assigned Role</th>
-                                    <th class="p-4">Account Status</th>
-                                    <th class="p-4 text-right">Administrative Flags</th>
-                                </tr>
-                            </thead>
-                            <tbody id="studentTableBody" class="divide-y divide-neutral-800/60 text-sm">
-                                </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </main>
+      <select id="categoryFilter" class="filter-select form-group select">
+        <option value="all">All Categories</option>
+        <option value="secondary">Secondary (WAEC/JAMB)</option>
+        <option value="tertiary">Tertiary / University</option>
+      </select>
     </div>
 
-    <div id="emailModal" class="fixed inset-0 z-50 bg-neutral-950/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
-        <div class="bg-neutral-900 border border-neutral-800 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
-            <div class="p-5 border-b border-neutral-800 flex items-center justify-between">
-                <h3 class="text-base font-bold text-neutral-200">Compose Student Direct Dispatch</h3>
-                <button id="closeEmailModalBtn" class="text-neutral-500 hover:text-neutral-300 text-sm font-bold cursor-pointer">✕</button>
-            </div>
-            <form id="emailForm" class="p-5 space-y-4">
-                <input type="hidden" id="targetStudentId">
-                <div>
-                    <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wide mb-1">Recipient Address</label>
-                    <input type="text" id="targetStudentEmail" class="w-full bg-neutral-950 border border-neutral-800 focus:border-neutral-700 rounded-xl px-4 py-2.5 text-xs text-neutral-400 font-semibold outline-none transition-all" readonly>
-                </div>
-                <div>
-                    <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wide mb-1">Message Subject</label>
-                    <input type="text" id="emailSubject" placeholder="e.g., Nexus Portal Notification / System Notice" class="w-full bg-neutral-950 border border-neutral-800 focus:border-blue-900/50 rounded-xl px-4 py-2.5 text-xs text-neutral-200 placeholder-neutral-600 outline-none transition-all" required>
-                </div>
-                <div>
-                    <label class="block text-[11px] font-bold text-neutral-400 uppercase tracking-wide mb-1">Message Body</label>
-                    <textarea id="emailBody" rows="5" placeholder="Type notification instructions directly to the student here..." class="w-full bg-neutral-950 border border-neutral-800 focus:border-blue-900/50 rounded-xl px-4 py-2.5 text-xs text-neutral-200 placeholder-neutral-600 outline-none transition-all resize-none" required></textarea>
-                </div>
-                <div class="flex items-center justify-end gap-2 pt-2">
-                    <button type="button" id="cancelEmailBtn" class="px-4 py-2 bg-neutral-800 text-neutral-300 hover:text-neutral-100 text-xs font-bold rounded-xl cursor-pointer transition-all">Cancel</button>
-                    <button type="submit" id="sendEmailSubmitBtn" class="px-4 py-2 bg-blue-950 text-blue-400 hover:bg-blue-900/60 border border-blue-900/40 text-xs font-bold rounded-xl cursor-pointer transition-all">Dispatch Mail</button>
-                </div>
-            </form>
-        </div>
+    <!-- User Data Table -->
+    <div class="table-responsive">
+      <table class="user-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Education Level</th>
+            <th>Role</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="userTableBody">
+          <!-- Dynamically populated by JS -->
+          <tr>
+            <td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">
+              Loading user registry...
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+  </div>
 
-    <script type="module" src="admin-users.js"></script>
+  <script src="admin-users.js"></script>
 </body>
-                </html>
+    </html>
