@@ -1,191 +1,183 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexus Pro - User Management Console</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <title>Nexus Pro - User Management</title>
+  <link rel="stylesheet" href="style.css">
   <style>
-    :root {
-      --bg-dark: #090d16;
-      --card-bg: #131c2e;
-      --card-border: #1e2d4a;
-      --accent-blue: #38bdf8;
-      --accent-glow: rgba(56, 189, 248, 0.15);
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --danger: #ef4444;
-      --warning: #f59e0b;
-      --success: #10b981;
-      --radius: 12px;
+    /* User Management Specific Styling */
+    .admin-container {
+      padding: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; }
-    body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding: 24px 16px; }
-    .container { max-width: 1200px; margin: 0 auto; }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
 
-    /* Header & Navigation */
-    .header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; }
-    .brand-title { display: flex; align-items: center; gap: 14px; }
-    .brand-icon { width: 44px; height: 44px; background: linear-gradient(135deg, #0284c7, #38bdf8); border-radius: 10px; display: grid; place-items: center; font-size: 1.2rem; color: #fff; box-shadow: 0 0 20px rgba(56,189,248,0.3); }
-    .brand-text h1 { font-size: 1.5rem; font-weight: 700; }
-    .brand-text p { font-size: 0.85rem; color: var(--text-muted); }
+    .admin-title h1 {
+      margin: 0 0 4px 0;
+      font-size: 1.75rem;
+    }
 
-    .nav-btns { display: flex; gap: 10px; }
-    .btn-nav { padding: 8px 16px; background: var(--card-bg); border: 1px solid var(--card-border); color: var(--text-main); border-radius: 8px; text-decoration: none; font-size: 0.85rem; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
-    .btn-nav:hover { border-color: var(--accent-blue); color: var(--accent-blue); background: var(--accent-glow); }
+    .admin-title p {
+      margin: 0;
+      color: var(--text-muted);
+    }
 
-    /* Diagnostic / Alert Banner */
-    .debug-banner { display: none; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; font-size: 0.85rem; border: 1px solid transparent; align-items: center; justify-content: space-between; }
-    .debug-banner.error { display: flex; background: rgba(239, 68, 68, 0.1); border-color: var(--danger); color: #fca5a5; }
-    .debug-banner.warning { display: flex; background: rgba(245, 158, 11, 0.1); border-color: var(--warning); color: #fcd34d; }
+    /* Filters Bar */
+    .filters-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      background: var(--card-bg);
+      padding: 16px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+    }
 
-    /* Stats Grid */
-    .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-    .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 18px; border-radius: var(--radius); display: flex; align-items: center; gap: 16px; }
-    .stat-icon { width: 42px; height: 42px; border-radius: 10px; display: grid; place-items: center; font-size: 1.1rem; }
-    .stat-icon.blue { background: rgba(56, 189, 248, 0.1); color: var(--accent-blue); }
-    .stat-icon.green { background: rgba(16, 185, 129, 0.1); color: var(--success); }
-    .stat-icon.purple { background: rgba(168, 85, 247, 0.1); color: #c084fc; }
-    .stat-icon.red { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
-    .stat-val { font-size: 1.5rem; font-weight: 700; line-height: 1; }
-    .stat-lbl { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-top: 4px; }
+    .search-input {
+      flex: 2;
+      min-width: 220px;
+    }
 
-    /* Controls Bar */
-    .controls { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; background: var(--card-bg); padding: 12px; border-radius: var(--radius); border: 1px solid var(--card-border); }
-    .search-box { flex: 2; min-width: 200px; position: relative; }
-    .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
-    .search-box input { width: 100%; padding: 10px 10px 10px 36px; background: var(--bg-dark); border: 1px solid var(--card-border); color: #fff; border-radius: 6px; outline: none; }
-    .filter-select { flex: 1; min-width: 140px; padding: 10px; background: var(--bg-dark); border: 1px solid var(--card-border); color: #fff; border-radius: 6px; outline: none; cursor: pointer; }
+    .filter-select {
+      flex: 1;
+      min-width: 150px;
+    }
 
     /* User Table */
-    .table-wrapper { width: 100%; overflow-x: auto; background: var(--card-bg); border-radius: var(--radius); border: 1px solid var(--card-border); }
-    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88rem; }
-    th { background: rgba(9, 13, 22, 0.6); color: var(--text-muted); padding: 14px 18px; font-weight: 600; text-transform: uppercase; font-size: 0.72rem; letter-spacing: 0.05em; border-bottom: 1px solid var(--card-border); }
-    td { padding: 14px 18px; border-bottom: 1px solid var(--card-border); vertical-align: middle; }
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: rgba(56, 189, 248, 0.02); }
+    .table-responsive {
+      width: 100%;
+      overflow-x: auto;
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
+    }
 
-    .user-info .name { font-weight: 600; color: var(--text-main); }
-    .user-info .email { font-size: 0.8rem; color: var(--text-muted); }
+    .user-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
 
-    /* Badges */
-    .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.72rem; font-weight: 600; display: inline-flex; align-items: center; gap: 4px; text-transform: capitalize; }
-    .badge.admin { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
-    .badge.student { background: rgba(148, 163, 184, 0.15); color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.3); }
-    .badge.active { background: rgba(16, 185, 129, 0.15); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.3); }
-    .badge.suspended { background: rgba(239, 68, 68, 0.15); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.3); }
+    .user-table th, 
+    .user-table td {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border-color);
+    }
 
-    /* Action Buttons */
-    .btn-action { padding: 6px 12px; font-size: 0.75rem; border-radius: 6px; border: 1px solid var(--card-border); background: var(--bg-dark); color: var(--text-main); cursor: pointer; transition: 0.2s; }
-    .btn-action:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
-    .btn-action.warn:hover { border-color: var(--warning); color: var(--warning); }
-    .btn-action.danger:hover { border-color: var(--danger); color: var(--danger); }
+    .user-table th {
+      background: var(--input-bg);
+      color: var(--text-muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
 
-    /* Empty state */
-    .empty-msg { text-align: center; padding: 40px !important; color: var(--text-muted); }
+    .user-table tr:last-child td {
+      border-bottom: none;
+    }
 
-    /* Modal */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none; align-items: center; justify-content: center; z-index: 999; backdrop-filter: blur(4px); }
-    .modal-card { background: var(--card-bg); border: 1px solid var(--card-border); width: 90%; max-width: 500px; border-radius: var(--radius); padding: 24px; }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-    .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
-    .modal-field { background: var(--bg-dark); padding: 10px; border-radius: 8px; border: 1px solid var(--card-border); }
-    .modal-field label { font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase; display: block; }
-    .modal-field span { font-size: 0.85rem; font-weight: 600; }
+    .role-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: capitalize;
+    }
+
+    .role-badge.admin {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+
+    .role-badge.student {
+      background: rgba(148, 163, 184, 0.15);
+      color: var(--text-muted);
+      border: 1px solid var(--border-color);
+    }
+
+    .action-btn {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 1px solid var(--border-color);
+      background: var(--input-bg);
+      color: var(--text-main);
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .action-btn.danger:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <!-- Header -->
-    <div class="header">
-      <div class="brand-title">
-        <div class="brand-icon"><i class="fas fa-users-gear"></i></div>
-        <div class="brand-text">
-          <h1>User Directory</h1>
-          <p>Nexus Pro Administration & Permissions</p>
-        </div>
+  <div class="admin-container">
+    <!-- Navigation / Top Header -->
+    <div class="admin-header">
+      <div class="admin-title">
+        <h1>User Management</h1>
+        <p>View, promote, or manage registered students and platform administrators.</p>
       </div>
-      <div class="nav-btns">
-        <button onclick="fetchUsers()" class="btn-nav"><i class="fas fa-sync-alt"></i> Refresh Data</button>
-        <a href="dashboard.html" class="btn-nav"><i class="fas fa-arrow-left"></i> Dashboard</a>
-      </div>
+      <a href="dashboard.html" class="action-btn">← Back to Dashboard</a>
     </div>
 
-    <!-- Live Status / Debugging Alert -->
-    <div id="debugBanner" class="debug-banner">
-      <span id="debugText"><i class="fas fa-info-circle"></i> Initializing directory...</span>
-      <button onclick="document.getElementById('debugBanner').style.display='none'" style="background:none;border:none;color:inherit;cursor:pointer;"><i class="fas fa-times"></i></button>
-    </div>
-
-    <!-- Stats Bar -->
-    <div class="stats-container">
-      <div class="stat-card">
-        <div class="stat-icon blue"><i class="fas fa-users"></i></div>
-        <div>
-          <div class="stat-val" id="statTotal">0</div>
-          <div class="stat-lbl">Total Registered</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon green"><i class="fas fa-user-graduate"></i></div>
-        <div>
-          <div class="stat-val" id="statStudents">0</div>
-          <div class="stat-lbl">Students</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon purple"><i class="fas fa-user-shield"></i></div>
-        <div>
-          <div class="stat-val" id="statAdmins">0</div>
-          <div class="stat-lbl">Admins</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon red"><i class="fas fa-user-slash"></i></div>
-        <div>
-          <div class="stat-val" id="statSuspended">0</div>
-          <div class="stat-lbl">Suspended</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Controls -->
-    <div class="controls">
-      <div class="search-box">
-        <i class="fas fa-search"></i>
-        <input type="text" id="searchInput" placeholder="Search by name or email address...">
-      </div>
-      <select id="roleFilter" class="filter-select">
+    <!-- Filters & Search -->
+    <div class="filters-bar">
+      <input type="text" id="searchInput" class="search-input form-group input" placeholder="Search by name or email...">
+      
+      <select id="roleFilter" class="filter-select form-group select">
         <option value="all">All Roles</option>
         <option value="student">Students</option>
         <option value="admin">Admins</option>
       </select>
-      <select id="statusFilter" class="filter-select">
-        <option value="all">All Statuses</option>
-        <option value="active">Active</option>
-        <option value="suspended">Suspended</option>
+
+      <select id="categoryFilter" class="filter-select form-group select">
+        <option value="all">All Categories</option>
+        <option value="secondary">Secondary (WAEC/JAMB)</option>
+        <option value="tertiary">Tertiary / University</option>
       </select>
     </div>
 
-    <!-- Table -->
-    <div class="table-wrapper">
-      <table>
+    <!-- User Data Table -->
+    <div class="table-responsive">
+      <table class="user-table">
         <thead>
           <tr>
-            <th>User Info</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Education Level</th>
             <th>Role</th>
-            <th>Status</th>
-            <th>Registered</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody id="userTableBody">
+          <!-- Dynamically populated by JS -->
           <tr>
-            <td colspan="5" class="empty-msg">
-              <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; color: var(--accent-blue); margin-bottom: 8px; display: block;"></i>
-              Fetching records from database...
+            <td colspan="5" style="text-align: center; padding: 24px; color: var(--text-muted);">
+              Loading user registry...
             </td>
           </tr>
         </tbody>
@@ -193,29 +185,6 @@
     </div>
   </div>
 
-  <!-- Profile Details Modal -->
-  <div id="userModal" class="modal-overlay">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3 id="modalUserName">User Profile</h3>
-        <button onclick="closeModal()" style="background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1.2rem;"><i class="fas fa-times"></i></button>
-      </div>
-      <p id="modalUserEmail" style="color:var(--text-muted);font-size:0.85rem;"></p>
-      <div class="modal-grid">
-        <div class="modal-field"><label>User ID</label><span id="modalUserId">-</span></div>
-        <div class="modal-field"><label>Role</label><span id="modalUserRole">-</span></div>
-        <div class="modal-field"><label>Status</label><span id="modalUserStatus">-</span></div>
-        <div class="modal-field"><label>Edu Type</label><span id="modalUserEdu">-</span></div>
-        <div class="modal-field"><label>Target Exam/Class</label><span id="modalUserClass">-</span></div>
-        <div class="modal-field"><label>Joined Date</label><span id="modalUserJoined">-</span></div>
-      </div>
-      <div style="margin-top:20px;text-align:right;">
-        <button onclick="closeModal()" class="btn-action">Close</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- JavaScript Script -->
-  <script src="admin_users.js"></script>
+  <script src="admin-users.js"></script>
 </body>
-                                      </html>
+                      </html>
