@@ -1,82 +1,68 @@
 document.addEventListener("DOMContentLoaded", () => {
   const API_ENDPOINT = "/api/user-auth.js";
 
-  // --- UI Elements ---
-  const authForm = document.getElementById("authForm");
+  // Elements
   const loginTab = document.getElementById("loginTab");
   const signupTab = document.getElementById("signupTab");
   const loginFields = document.getElementById("loginFields");
   const signupFields = document.getElementById("signupFields");
+  const authForm = document.getElementById("authForm");
+  const submitBtn = document.getElementById("submitBtn");
+  const authAlert = document.getElementById("authAlert");
+
   const educationTypeSelect = document.getElementById("educationType");
   const secondaryOptions = document.getElementById("secondaryOptions");
   const tertiaryOptions = document.getElementById("tertiaryOptions");
-  const togglePasswordBtns = document.querySelectorAll(".toggle-password");
-  const authAlert = document.getElementById("authAlert");
-  const submitBtn = document.getElementById("submitBtn");
 
-  let currentMode = "login"; // Default active tab
+  const forgotPasswordLink = document.getElementById("forgotPasswordLink");
+  const forgotModal = document.getElementById("forgotModal");
+  const closeResetModal = document.getElementById("closeResetModal");
+  const sendResetBtn = document.getElementById("sendResetBtn");
 
-  // ================= 1. RELIABLE TAB SWITCHING =================
-  function switchTab(mode) {
-    currentMode = mode;
+  let activeTab = "login";
+
+  // ================= 1. TAB SWITCHING LOGIC =================
+  function setTab(tab) {
+    activeTab = tab;
     hideAlert();
 
-    if (mode === "login") {
-      if (loginTab) loginTab.classList.add("active");
-      if (signupTab) signupTab.classList.remove("active");
-
-      if (loginFields) loginFields.style.display = "block";
-      if (signupFields) signupFields.style.display = "none";
-
-      if (submitBtn) submitBtn.textContent = "Log In";
+    if (tab === "login") {
+      loginTab.classList.add("active");
+      signupTab.classList.remove("active");
+      loginFields.style.display = "block";
+      signupFields.style.display = "none";
+      submitBtn.textContent = "Log In";
     } else {
-      if (signupTab) signupTab.classList.add("active");
-      if (loginTab) loginTab.classList.remove("active");
-
-      if (loginFields) loginFields.style.display = "none";
-      if (signupFields) signupFields.style.display = "block";
-
-      if (submitBtn) submitBtn.textContent = "Create Account";
+      signupTab.classList.add("active");
+      loginTab.classList.remove("active");
+      loginFields.style.display = "none";
+      signupFields.style.display = "block";
+      submitBtn.textContent = "Create Account";
     }
   }
 
-  // Event Listeners for Tab Buttons
-  if (loginTab) {
-    loginTab.addEventListener("click", (e) => {
-      e.preventDefault();
-      switchTab("login");
-    });
-  }
-
-  if (signupTab) {
-    signupTab.addEventListener("click", (e) => {
-      e.preventDefault();
-      switchTab("signup");
-    });
-  }
-
-  // Initialize default state
-  switchTab("login");
+  if (loginTab) loginTab.addEventListener("click", () => setTab("login"));
+  if (signupTab) signupTab.addEventListener("click", () => setTab("signup"));
 
   // ================= 2. CONDITIONAL EDUCATION FIELDS =================
   if (educationTypeSelect) {
     educationTypeSelect.addEventListener("change", (e) => {
       const val = e.target.value;
       if (val === "secondary") {
-        if (secondaryOptions) secondaryOptions.style.display = "block";
-        if (tertiaryOptions) tertiaryOptions.style.display = "none";
+        secondaryOptions.style.display = "block";
+        tertiaryOptions.style.display = "none";
       } else if (val === "tertiary") {
-        if (tertiaryOptions) tertiaryOptions.style.display = "block";
-        if (secondaryOptions) secondaryOptions.style.display = "none";
+        tertiaryOptions.style.display = "block";
+        secondaryOptions.style.display = "none";
       } else {
-        if (secondaryOptions) secondaryOptions.style.display = "none";
-        if (tertiaryOptions) tertiaryOptions.style.display = "none";
+        secondaryOptions.style.display = "none";
+        tertiaryOptions.style.display = "none";
       }
     });
   }
 
-  // ================= 3. PASSWORD VISIBILITY TOGGLE =================
-  togglePasswordBtns.forEach((btn) => {
+  // ================= 3. PASSWORD VISIBILITY TOGGLES =================
+  document.querySelectorAll(".toggle-password").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.preventDefault();
       const targetId = btn.getAttribute("data-target");
@@ -93,37 +79,74 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ================= 4. FORM SUBMISSION & ROLE STORAGE =================
+  // ================= 4. FORGOT PASSWORD MODAL =================
+  if (forgotPasswordLink && forgotModal && closeResetModal) {
+    forgotPasswordLink.addEventListener("click", (e) => {
+      e.preventDefault();
+      forgotModal.style.display = "flex";
+    });
+
+    closeResetModal.addEventListener("click", () => {
+      forgotModal.style.display = "none";
+    });
+  }
+
+  if (sendResetBtn) {
+    sendResetBtn.addEventListener("click", async () => {
+      const email = document.getElementById("resetEmail")?.value?.trim();
+      if (!email) {
+        alert("Please enter your email address.");
+        return;
+      }
+
+      sendResetBtn.disabled = true;
+      sendResetBtn.textContent = "Sending...";
+
+      try {
+        const res = await fetch(`${API_ENDPOINT}?action=forgot-password`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email })
+        });
+        const data = await res.json();
+        
+        alert(data.message || "Instructions sent if account exists.");
+        forgotModal.style.display = "none";
+      } catch (err) {
+        alert("Error requesting password reset. Try again later.");
+      } finally {
+        sendResetBtn.disabled = false;
+        sendResetBtn.textContent = "Request Reset";
+      }
+    });
+  }
+
+  // ================= 5. FORM SUBMISSION HANDLER =================
   if (authForm) {
     authForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       hideAlert();
 
-      const action = currentMode;
       let payload = {};
+      const action = activeTab;
 
       if (action === "login") {
         const email = document.getElementById("loginEmail")?.value?.trim();
         const password = document.getElementById("loginPassword")?.value;
 
         if (!email || !password) {
-          showAlert("Please enter both email and password.");
+          showAlert("Please enter your email and password.");
           return;
         }
-
         payload = { email, password };
       } else {
         const firstName = document.getElementById("firstName")?.value?.trim();
         const lastName = document.getElementById("lastName")?.value?.trim();
         const email = document.getElementById("signupEmail")?.value?.trim();
         const password = document.getElementById("signupPassword")?.value;
-        const educationType = document.getElementById("educationType")?.value;
-        const studentClass = document.getElementById("studentClass")?.value;
-        const course = document.getElementById("course")?.value;
-        const level = document.getElementById("level")?.value;
 
         if (!firstName || !lastName || !email || !password) {
-          showAlert("Please fill in all required registration fields.");
+          showAlert("Please fill out all required signup fields.");
           return;
         }
 
@@ -132,40 +155,34 @@ document.addEventListener("DOMContentLoaded", () => {
           lastName,
           email,
           password,
-          educationType,
-          studentClass,
-          course,
-          level
+          educationType: educationTypeSelect?.value || "",
+          studentClass: document.getElementById("studentClass")?.value || "",
+          course: document.getElementById("course")?.value || "",
+          level: document.getElementById("level")?.value || ""
         };
       }
 
-      setLoading(true);
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Processing...";
 
       try {
         const response = await fetch(`${API_ENDPOINT}?action=${action}`, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(payload)
         });
 
         const data = await response.json();
 
         if (!response.ok || !data.success) {
-          throw new Error(data.error || "Authentication failed. Please check your credentials.");
+          throw new Error(data.error || "Authentication failed.");
         }
 
-        // --- PURGE ALL STALE STORAGE KEYS ---
+        // Reset Storage and save fresh credentials
         localStorage.clear();
-
-        // --- SAVE FRESH TOKEN AND ROLE ---
-        const userRole = String(data.user.role || "student").toLowerCase();
-
         localStorage.setItem("nexusToken", data.token);
-        localStorage.setItem("token", data.token); // Backup key
         localStorage.setItem("nexusUser", JSON.stringify(data.user));
-        localStorage.setItem("userRole", userRole); // Direct role key ('admin' or 'student')
+        localStorage.setItem("userRole", String(data.user.role).toLowerCase());
 
         // Redirect to dashboard
         window.location.href = "dashboard.html";
@@ -173,18 +190,16 @@ document.addEventListener("DOMContentLoaded", () => {
       } catch (err) {
         showAlert(err.message);
       } finally {
-        setLoading(false);
+        submitBtn.disabled = false;
+        submitBtn.textContent = activeTab === "login" ? "Log In" : "Create Account";
       }
     });
   }
 
-  // --- Helper Alert & Loading Functions ---
   function showAlert(msg) {
     if (authAlert) {
       authAlert.textContent = msg;
       authAlert.style.display = "block";
-    } else {
-      alert(msg);
     }
   }
 
@@ -192,18 +207,6 @@ document.addEventListener("DOMContentLoaded", () => {
     if (authAlert) {
       authAlert.style.display = "none";
       authAlert.textContent = "";
-    }
-  }
-
-  function setLoading(isLoading) {
-    if (!submitBtn) return;
-    if (isLoading) {
-      submitBtn.disabled = true;
-      submitBtn.dataset.origText = submitBtn.textContent;
-      submitBtn.textContent = "Processing...";
-    } else {
-      submitBtn.disabled = false;
-      submitBtn.textContent = submitBtn.dataset.origText || "Submit";
     }
   }
 });
