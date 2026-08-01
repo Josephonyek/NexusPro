@@ -139,7 +139,7 @@ export default async function handler(req, res) {
     // ================= 4. LIST USERS (ADMIN ONLY) =================
     if (action === "list-users") {
       const result = await db.execute(
-        "SELECT id, name, email, role, education_type, class, created_at FROM users ORDER BY created_at DESC"
+        "SELECT id, name, email, role, status, education_type, class, course, level, created_at FROM users ORDER BY created_at DESC"
       );
 
       const users = result.rows.map(row => ({
@@ -147,21 +147,22 @@ export default async function handler(req, res) {
         name: String(row.name || ""),
         email: String(row.email),
         role: String(row.role || "student").toLowerCase(),
+        status: String(row.status || "active").toLowerCase(),
         education_type: String(row.education_type || ""),
-        class: String(row.class || "")
+        class: String(row.class || ""),
+        course: String(row.course || ""),
+        level: String(row.level || ""),
+        created_at: row.created_at ? String(row.created_at) : null
       }));
 
       return res.status(200).json({ success: true, users });
     }
 
-    // ================= 5. UPDATE USER ROLE (ADMIN ONLY) =================
+    // ================= 5. UPDATE USER ROLE =================
     if (action === "update-role") {
       if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
-
       const { userId, role } = req.body || {};
-      if (!userId || !role) {
-        return res.status(400).json({ error: "Missing required parameters." });
-      }
+      if (!userId || !role) return res.status(400).json({ error: "Missing parameters." });
 
       await db.execute({
         sql: "UPDATE users SET role = ? WHERE id = ?",
@@ -171,10 +172,30 @@ export default async function handler(req, res) {
       return res.status(200).json({ success: true, message: "User role updated successfully." });
     }
 
-    return res.status(400).json({ error: "Invalid action." });
+    // ================= 6. SUSPEND / ACTIVATE USER =================
+    if (action === "update-status") {
+      if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+      const { userId, status } = req.body || {};
+      if (!userId || !status) return res.status(400).json({ error: "Missing parameters." });
 
-  } catch (error) {
-    console.error("Auth Endpoint Error:", error);
-    return res.status(500).json({ error: error.message || "Internal server error." });
-  }
-        }
+      await db.execute({
+        sql: "UPDATE users SET status = ? WHERE id = ?",
+        args: [status.toLowerCase(), userId]
+      });
+
+      return res.status(200).json({ success: true, message: "User status updated successfully." });
+    }
+
+    // ================= 7. DELETE USER =================
+    if (action === "delete-user") {
+      if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+      const { userId } = req.body || {};
+      if (!userId) return res.status(400).json({ error: "Missing user ID." });
+
+      await db.execute({
+        sql: "DELETE FROM users WHERE id = ?",
+        args: [userId]
+      });
+
+      return res.status(200).json({ success: true, message: "User account permanently removed." });
+          }
