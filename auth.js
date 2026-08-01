@@ -1,141 +1,190 @@
-// ================= UI SWITCHERS =================
+document.addEventListener("DOMContentLoaded", () => {
+  // Config: Adjust if your API runs on a relative route or custom serverless domain
+  const API_ENDPOINT = "/api/user-auth.js";
 
-// Tab Switching (Login / Signup)
-function switchTab(tab) {
-  const loginForm = document.getElementById("login-form");
-  const signupForm = document.getElementById("signup-form");
-  const loginTabBtn = document.getElementById("tab-login");
-  const signupTabBtn = document.getElementById("tab-signup");
+  // --- UI Elements ---
+  const authForm = document.getElementById("authForm");
+  const loginTab = document.getElementById("loginTab");
+  const signupTab = document.getElementById("signupTab");
+  const loginFields = document.getElementById("loginFields");
+  const signupFields = document.getElementById("signupFields");
+  const educationTypeSelect = document.getElementById("educationType");
+  const secondaryOptions = document.getElementById("secondaryOptions");
+  const tertiaryOptions = document.getElementById("tertiaryOptions");
+  const togglePasswordBtns = document.querySelectorAll(".toggle-password");
+  const authAlert = document.getElementById("authAlert");
+  const submitBtn = document.getElementById("submitBtn");
 
-  if (tab === "login") {
-    loginForm.classList.add("active");
-    signupForm.classList.remove("active");
-    loginTabBtn.classList.add("active");
-    signupTabBtn.classList.remove("active");
-  } else {
-    signupForm.classList.add("active");
-    loginForm.classList.remove("active");
-    signupTabBtn.classList.add("active");
-    loginTabBtn.classList.remove("active");
+  let currentMode = "login"; // 'login' or 'signup'
+
+  // ================= 1. TAB SWITCHING LOGIC =================
+  if (loginTab && signupTab) {
+    loginTab.addEventListener("click", () => switchTab("login"));
+    signupTab.addEventListener("click", () => switchTab("signup"));
   }
-}
 
-// Password Visibility Toggle
-function togglePassword(inputId, btn) {
-  const input = document.getElementById(inputId);
-  if (input.type === "password") {
-    input.type = "text";
-    btn.textContent = "Hide";
-  } else {
-    input.type = "password";
-    btn.textContent = "Show";
+  function switchTab(mode) {
+    currentMode = mode;
+    hideAlert();
+
+    if (mode === "login") {
+      loginTab.classList.add("active");
+      signupTab.classList.remove("active");
+      loginFields.style.display = "block";
+      signupFields.style.display = "none";
+      if (submitBtn) submitBtn.textContent = "Log In";
+    } else {
+      signupTab.classList.add("active");
+      loginTab.classList.remove("active");
+      loginFields.style.display = "none";
+      signupFields.style.display = "block";
+      if (submitBtn) submitBtn.textContent = "Create Account";
+    }
   }
-}
 
-// Dynamic Education Dropdown Toggle
-function handleEducationChange(selectedType) {
-  const secondaryFields = document.getElementById("secondary-fields");
-  const tertiaryFields = document.getElementById("tertiary-fields");
-
-  if (selectedType === "secondary") {
-    secondaryFields.style.display = "block";
-    tertiaryFields.style.display = "none";
-  } else if (selectedType === "tertiary") {
-    secondaryFields.style.display = "none";
-    tertiaryFields.style.display = "flex";
-  }
-}
-
-// Modal Toggle Handlers
-function openForgotModal() {
-  document.getElementById("forgot-modal").classList.add("active");
-}
-
-function closeForgotModal() {
-  document.getElementById("forgot-modal").classList.remove("active");
-}
-
-function handleForgotSubmit(e) {
-  e.preventDefault();
-  const email = document.getElementById("forgot-email").value;
-  alert(`If an account exists for ${email}, password reset details will be sent.`);
-  closeForgotModal();
-}
-
-// ================= API SUBMISSIONS =================
-
-// Login Submission
-document.getElementById("login-form")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const email = document.getElementById("login-email").value.trim();
-  const password = document.getElementById("login-password").value;
-
-  try {
-    const response = await fetch("/api/user-auth?action=login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password })
+  // ================= 2. CONDITIONAL EDUCATION FIELDS =================
+  if (educationTypeSelect) {
+    educationTypeSelect.addEventListener("change", (e) => {
+      const val = e.target.value;
+      if (val === "secondary") {
+        if (secondaryOptions) secondaryOptions.style.display = "block";
+        if (tertiaryOptions) tertiaryOptions.style.display = "none";
+      } else if (val === "tertiary") {
+        if (tertiaryOptions) tertiaryOptions.style.display = "block";
+        if (secondaryOptions) secondaryOptions.style.display = "none";
+      } else {
+        if (secondaryOptions) secondaryOptions.style.display = "none";
+        if (tertiaryOptions) tertiaryOptions.style.display = "none";
+      }
     });
-
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error);
-
-    // Save tokens locally
-    localStorage.setItem("nx_token", data.token);
-    localStorage.setItem("nx_role", data.user.role);
-    localStorage.setItem("nx_name", data.user.name);
-    localStorage.setItem("nx_uid", data.user.uid);
-
-    window.location.replace("dashboard.html");
-  } catch (err) {
-    alert(err.message || "Login failed.");
-  }
-});
-
-// Signup Submission
-document.getElementById("signup-form")?.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const password = document.getElementById("signup-password").value;
-  const confirmPassword = document.getElementById("confirm-password").value;
-
-  if (password !== confirmPassword) {
-    alert("Passwords do not match!");
-    return;
   }
 
-  const edType = document.getElementById("education-type").value;
-
-  const payload = {
-    firstName: document.getElementById("first-name").value.trim(),
-    lastName: document.getElementById("last-name").value.trim(),
-    email: document.getElementById("signup-email").value.trim(),
-    password: password,
-    educationType: edType,
-    studentClass: edType === "secondary" ? document.getElementById("secondary-class").value : null,
-    course: edType === "tertiary" ? document.getElementById("tertiary-course").value.trim() : null,
-    level: edType === "tertiary" ? document.getElementById("tertiary-level").value : null
-  };
-
-  try {
-    const response = await fetch("/api/user-auth?action=signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+  // ================= 3. PASSWORD VISIBILITY TOGGLE =================
+  togglePasswordBtns.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const targetId = btn.getAttribute("data-target");
+      const input = document.getElementById(targetId);
+      if (input) {
+        if (input.type === "password") {
+          input.type = "text";
+          btn.textContent = "Hide";
+        } else {
+          input.type = "password";
+          btn.textContent = "Show";
+        }
+      }
     });
+  });
 
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error);
+  // ================= 4. FORM SUBMISSION HANDLER =================
+  if (authForm) {
+    authForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      hideAlert();
 
-    // Save tokens locally
-    localStorage.setItem("nx_token", data.token);
-    localStorage.setItem("nx_role", data.user.role);
-    localStorage.setItem("nx_name", data.user.name);
-    localStorage.setItem("nx_uid", data.user.uid);
+      const action = currentMode;
+      let payload = {};
 
-    window.location.replace("dashboard.html");
-  } catch (err) {
-    alert(err.message || "Sign up failed.");
+      if (action === "login") {
+        const email = document.getElementById("loginEmail")?.value;
+        const password = document.getElementById("loginPassword")?.value;
+
+        if (!email || !password) {
+          showAlert("Please enter both email and password.");
+          return;
+        }
+
+        payload = { email, password };
+      } else {
+        const firstName = document.getElementById("firstName")?.value;
+        const lastName = document.getElementById("lastName")?.value;
+        const email = document.getElementById("signupEmail")?.value;
+        const password = document.getElementById("signupPassword")?.value;
+        const educationType = document.getElementById("educationType")?.value;
+        const studentClass = document.getElementById("studentClass")?.value;
+        const course = document.getElementById("course")?.value;
+        const level = document.getElementById("level")?.value;
+
+        if (!firstName || !lastName || !email || !password) {
+          showAlert("Please fill in all required registration fields.");
+          return;
+        }
+
+        payload = {
+          firstName,
+          lastName,
+          email,
+          password,
+          educationType,
+          studentClass,
+          course,
+          level
+        };
+      }
+
+      setLoading(true);
+
+      try {
+        const response = await fetch(`${API_ENDPOINT}?action=${action}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+          throw new Error(data.error || "Authentication failed. Please check your details.");
+        }
+
+        // --- CLEAR OLD STALE KEYS & SAVE FRESH DATA ---
+        localStorage.removeItem("nexusToken");
+        localStorage.removeItem("nexusUser");
+        localStorage.removeItem("userRole");
+
+        localStorage.setItem("nexusToken", data.token);
+        localStorage.setItem("nexusUser", JSON.stringify(data.user));
+        localStorage.setItem("userRole", data.user.role); // Save role directly ('admin' or 'student')
+
+        // Redirect directly to dashboard
+        window.location.href = "dashboard.html";
+
+      } catch (err) {
+        showAlert(err.message);
+      } finally {
+        setLoading(false);
+      }
+    });
+  }
+
+  // --- Helper Alert Functions ---
+  function showAlert(msg) {
+    if (authAlert) {
+      authAlert.textContent = msg;
+      authAlert.style.display = "block";
+    } else {
+      alert(msg);
+    }
+  }
+
+  function hideAlert() {
+    if (authAlert) {
+      authAlert.style.display = "none";
+      authAlert.textContent = "";
+    }
+  }
+
+  function setLoading(isLoading) {
+    if (!submitBtn) return;
+    if (isLoading) {
+      submitBtn.disabled = true;
+      submitBtn.dataset.origText = submitBtn.textContent;
+      submitBtn.textContent = "Please wait...";
+    } else {
+      submitBtn.disabled = false;
+      submitBtn.textContent = submitBtn.dataset.origText || "Submit";
+    }
   }
 });
