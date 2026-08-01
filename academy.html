@@ -1,73 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro | Academy Hub</title>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
-<script>
-    // Point the library to its worker thread file for ultra-fast background processing
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
-</script>
-    <script src="https://unpkg.com/jszip/dist/jszip.min.js"></script>
-<script src="https://unpkg.com/docx-preview/dist/docx-preview.min.js"></script>
-    <style>
-        .animate-fast-pulse { animation: pulse 0.8s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .4; } }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus Pro - Academy Library</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: #131c2e;
+      --card-border: #1e2d4a;
+      --accent-blue: #38bdf8;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding: 24px 16px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    
+    .header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+    .header h1 { font-size: 1.6rem; display: flex; align-items: center; gap: 10px; }
+
+    /* Controls Bar */
+    .controls { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
+    .search-box { flex: 2; min-width: 220px; position: relative; }
+    .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+    .search-box input { width: 100%; padding: 10px 10px 10px 36px; background: var(--card-bg); border: 1px solid var(--card-border); color: #fff; border-radius: 8px; outline: none; }
+    .filter-select { flex: 1; min-width: 140px; padding: 10px; background: var(--card-bg); border: 1px solid var(--card-border); color: #fff; border-radius: 8px; outline: none; cursor: pointer; }
+
+    /* Grid Layout */
+    .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+    .book-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); overflow: hidden; display: flex; flex-direction: column; }
+    .book-cover { height: 160px; background: #000; overflow: hidden; position: relative; }
+    .book-cover img { width: 100%; height: 100%; object-fit: cover; }
+    .book-body { padding: 16px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+    .category-tag { font-size: 0.68rem; font-weight: 700; color: var(--accent-blue); background: rgba(56, 189, 248, 0.12); padding: 3px 8px; border-radius: 4px; display: inline-block; text-transform: uppercase; margin-bottom: 8px; }
+    .book-title { font-size: 0.95rem; font-weight: 600; line-height: 1.3; margin-bottom: 4px; }
+    .book-author { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 16px; }
+    .btn-read { display: block; text-align: center; background: #0284c7; color: #fff; text-decoration: none; padding: 8px; border-radius: 6px; font-size: 0.85rem; font-weight: 500; transition: 0.2s; }
+    .btn-read:hover { background: #0369a1; }
+    
+    .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 0; color: var(--text-muted); }
+  </style>
 </head>
-<body class="bg-neutral-950 text-neutral-100 min-h-screen antialiased">
-
-    <div id="nexusPreloader" class="fixed inset-0 bg-neutral-950 z-50 flex flex-col justify-center items-center p-6 transition-all duration-300">
-        <div class="w-full max-w-5xl space-y-6 animate-fast-pulse">
-            <div class="h-8 bg-neutral-900 rounded-xl w-1/4"></div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="h-48 bg-neutral-900 rounded-2xl"></div>
-                <div class="h-48 bg-neutral-900 rounded-2xl"></div>
-            </div>
-        </div>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-book-open" style="color: var(--accent-blue);"></i> Academy Digital Library</h1>
     </div>
 
-    <div class="flex min-h-screen">
-        <aside class="hidden lg:flex flex-col w-64 bg-neutral-900 border-r border-neutral-800/60 p-5 shrink-0">
-            <div class="flex items-center gap-3 mb-8 px-2">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center font-black shadow-md">N</div>
-                <span class="text-lg font-bold tracking-tight">Nexus Pro</span>
-            </div>
-            <nav class="space-y-1.5 flex-1">
-                <a href="dashboard.html" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-neutral-200 hover:bg-neutral-800/40 rounded-xl font-medium text-sm transition-all">← Back to Hub</a>
-                <a href="#" class="flex items-center gap-3 px-3 py-2.5 bg-neutral-800 text-blue-400 rounded-xl font-medium text-sm transition-all">Academy View</a>
-            </nav>
-        </aside>
-
-        <main class="flex-1 min-w-0 flex flex-col">
-            <header class="h-16 border-b border-neutral-800/60 flex items-center justify-between px-6 bg-neutral-900/40 backdrop-blur-md sticky top-0 z-30">
-                <h2 class="text-lg font-bold tracking-tight text-neutral-200">E-Library Viewer Portal</h2>
-                <div id="activeCounter" class="text-xs text-neutral-500 font-medium">Loading items...</div>
-            </header>
-
-            <div class="p-6 space-y-6 flex-1 overflow-y-auto max-w-5xl w-full mx-auto">
-                
-                <div class="flex items-center gap-2 overflow-x-auto pb-2" id="subjectFilterRow">
-                    <button data-subject="all" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-blue-900/40 bg-blue-950 text-blue-400 whitespace-nowrap cursor-pointer transition-all">All Fields</button>
-                    <button data-subject="Physics" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200 whitespace-nowrap cursor-pointer transition-all">Physics</button>
-                    <button data-subject="Chemistry" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200 whitespace-nowrap cursor-pointer transition-all">Chemistry</button>
-                    <button data-subject="Mathematics" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200 whitespace-nowrap cursor-pointer transition-all">Mathematics</button>
-                    <button data-subject="English" class="filter-btn px-4 py-2 text-xs font-bold rounded-xl border border-neutral-800 bg-neutral-900 text-neutral-400 hover:text-neutral-200 whitespace-nowrap cursor-pointer transition-all">English</button>
-                </div>
-
-                <div id="libraryContainer" class="grid grid-cols-1 gap-6">
-                    </div>
-
-                <div id="emptyStateBox" class="hidden text-center py-12 border border-neutral-800 rounded-2xl bg-neutral-900/20">
-                    <p class="text-neutral-400 text-sm font-medium">No learning assets active under this subject matrix yet.</p>
-                </div>
-
-            </div>
-        </main>
+    <!-- Controls -->
+    <div class="controls">
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchBookInput" placeholder="Search books by title or author...">
+      </div>
+      <select id="categoryFilter" class="filter-select">
+        <option value="all">All Categories</option>
+        <option value="Physics">Physics</option>
+        <option value="Chemistry">Chemistry</option>
+        <option value="Mathematics">Mathematics</option>
+        <option value="English">English</option>
+        <option value="General">General</option>
+      </select>
     </div>
 
-    <script type="module" src="academy.js"></script>
+    <!-- Book Grid Container -->
+    <div class="books-grid" id="booksGrid">
+      <div class="empty-state">
+        <i class="fas fa-spinner fa-spin" style="font-size: 2rem; margin-bottom: 12px; color: var(--accent-blue);"></i>
+        <p>Fetching digital assets...</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="academy_books.js"></script>
 </body>
-            </html>
+</html>
