@@ -144,3 +144,38 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: error.message || "Internal server error." });
   }
         }
+
+// ================= 4. LIST USERS (ADMIN ONLY) =================
+    if (action === "list-users") {
+      const result = await db.execute(
+        "SELECT id, name, email, role, education_type, class, created_at FROM users ORDER BY created_at DESC"
+      );
+
+      const users = result.rows.map(row => ({
+        id: String(row.id),
+        name: String(row.name || ""),
+        email: String(row.email),
+        role: String(row.role || "student").toLowerCase(),
+        education_type: String(row.education_type || ""),
+        class: String(row.class || "")
+      }));
+
+      return res.status(200).json({ success: true, users });
+    }
+
+    // ================= 5. UPDATE USER ROLE (ADMIN ONLY) =================
+    if (action === "update-role") {
+      if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+      const { userId, role } = req.body || {};
+      if (!userId || !role) {
+        return res.status(400).json({ error: "Missing required parameters." });
+      }
+
+      await db.execute({
+        sql: "UPDATE users SET role = ? WHERE id = ?",
+        args: [role.toLowerCase(), userId]
+      });
+
+      return res.status(200).json({ success: true, message: "User role updated successfully." });
+    }
