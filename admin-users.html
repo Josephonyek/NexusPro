@@ -6,88 +6,194 @@
   <title>Nexus Pro - User Management</title>
   
   <style>
+    /* ─── Base ─────────────────────────────────────────────── */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg, #0f1117);
+      color: var(--text-main, #e2e8f0);
+      line-height: 1.5;
+    }
+
     .admin-container {
-      padding: 24px;
-      max-width: 1200px;
+      padding: 28px 24px 48px;
+      max-width: 1180px;
       margin: 0 auto;
     }
 
+    /* ─── Header ───────────────────────────────────────────── */
     .admin-header {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       flex-wrap: wrap;
       gap: 16px;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
 
     .admin-title h1 {
-      margin: 0 0 4px 0;
-      font-size: 1.75rem;
+      margin: 0 0 6px 0;
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: var(--text-main);
     }
 
     .admin-title p {
       margin: 0;
       color: var(--text-muted);
+      font-size: 0.925rem;
+      max-width: 480px;
     }
 
-    /* Stats Overview */
+    .admin-header .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 9px 16px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--card-bg);
+      color: var(--text-main);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .admin-header .btn-action:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(56, 189, 248, 0.06);
+    }
+
+    /* ─── Stats Overview ───────────────────────────────────── */
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 16px;
-      margin-bottom: 24px;
+      margin-bottom: 28px;
     }
 
     .stat-card {
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: var(--radius);
-      padding: 16px;
-      text-align: center;
+      padding: 20px 18px;
+      text-align: left;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .stat-card:hover {
+      border-color: color-mix(in srgb, var(--accent) 40%, var(--border-color));
+      transform: translateY(-1px);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--accent);
+      opacity: 0.7;
+      border-radius: 3px 0 0 3px;
     }
 
     .stat-card h3 {
       margin: 0;
-      font-size: 1.8rem;
+      font-size: 1.9rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
       color: var(--accent);
+      line-height: 1.15;
     }
 
     .stat-card p {
-      margin: 4px 0 0 0;
-      font-size: 0.85rem;
+      margin: 6px 0 0 0;
+      font-size: 0.8rem;
+      font-weight: 500;
       color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
-    /* Filters Bar */
+    /* ─── Filters Bar ──────────────────────────────────────── */
     .filters-bar {
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
       margin-bottom: 20px;
       background: var(--card-bg);
-      padding: 16px;
+      padding: 14px 16px;
       border-radius: var(--radius);
       border: 1px solid var(--border-color);
+      align-items: center;
     }
 
     .search-input {
       flex: 2;
       min-width: 220px;
+      padding: 10px 14px 10px 38px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zm-5.242.656a5 5 0 1 1 0-10 5 5 0 0 1 0 10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: 12px center;
+    }
+
+    .search-input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
     }
 
     .filter-select {
       flex: 1;
       min-width: 150px;
+      padding: 10px 36px 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--input-bg);
+      color: var(--text-main);
+      font-size: 0.9rem;
+      outline: none;
+      cursor: pointer;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
     }
 
-    /* User Table */
+    .filter-select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+
+    /* ─── User Table ───────────────────────────────────────── */
     .table-responsive {
       width: 100%;
       overflow-x: auto;
       background: var(--card-bg);
       border-radius: var(--radius);
       border: 1px solid var(--border-color);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
     }
 
     .user-table {
@@ -97,10 +203,11 @@
       font-size: 0.9rem;
     }
 
-    .user-table th, 
+    .user-table th,
     .user-table td {
-      padding: 14px 18px;
+      padding: 15px 18px;
       border-bottom: 1px solid var(--border-color);
+      vertical-align: middle;
     }
 
     .user-table th {
@@ -108,105 +215,248 @@
       color: var(--text-muted);
       font-weight: 600;
       text-transform: uppercase;
-      font-size: 0.75rem;
-      letter-spacing: 0.05em;
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
+      white-space: nowrap;
+    }
+
+    .user-table tbody tr {
+      transition: background 0.15s ease;
+    }
+
+    .user-table tbody tr:hover {
+      background: rgba(56, 189, 248, 0.04);
     }
 
     .user-table tr:last-child td {
       border-bottom: none;
     }
 
-    /* Badges */
+    .user-table td:first-child {
+      font-weight: 500;
+    }
+
+    /* ─── Badges ───────────────────────────────────────────── */
     .badge {
-      display: inline-block;
-      padding: 4px 10px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 11px;
       border-radius: 50px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-weight: 600;
       text-transform: capitalize;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
     }
 
     .badge.admin {
-      background: rgba(56, 189, 248, 0.15);
+      background: rgba(56, 189, 248, 0.12);
       color: var(--accent);
-      border: 1px solid var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.35);
     }
 
     .badge.student {
-      background: rgba(148, 163, 184, 0.15);
+      background: rgba(148, 163, 184, 0.12);
       color: var(--text-muted);
       border: 1px solid var(--border-color);
     }
 
     .badge.active {
-      background: rgba(34, 197, 94, 0.15);
+      background: rgba(34, 197, 94, 0.12);
       color: #22c55e;
-      border: 1px solid #22c55e;
+      border: 1px solid rgba(34, 197, 94, 0.35);
     }
 
     .badge.suspended {
-      background: rgba(239, 68, 68, 0.15);
+      background: rgba(239, 68, 68, 0.12);
       color: #ef4444;
-      border: 1px solid #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.35);
     }
 
-    /* Actions Grid */
+    /* ─── Actions ──────────────────────────────────────────── */
     .action-group {
       display: flex;
       gap: 6px;
+      flex-wrap: wrap;
     }
 
     .btn-action {
-      padding: 6px 10px;
+      padding: 6px 11px;
       font-size: 0.75rem;
+      font-weight: 500;
       border-radius: 6px;
       cursor: pointer;
       border: 1px solid var(--border-color);
       background: var(--input-bg);
       color: var(--text-main);
-      transition: all 0.2s ease;
+      transition: all 0.18s ease;
+      white-space: nowrap;
     }
 
     .btn-action:hover {
       border-color: var(--accent);
       color: var(--accent);
+      background: rgba(56, 189, 248, 0.08);
     }
 
     .btn-action.warn:hover {
       border-color: #f59e0b;
       color: #f59e0b;
+      background: rgba(245, 158, 11, 0.08);
     }
 
     .btn-action.danger:hover {
       border-color: #ef4444;
       color: #ef4444;
+      background: rgba(239, 68, 68, 0.08);
     }
 
-    /* Info Drawer / Modal */
+    /* ─── Modal ────────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: calc(var(--radius) + 4px);
+      padding: 28px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+      animation: slideUp 0.25s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .modal-card h3 {
+      margin: 0 0 2px 0;
+      font-size: 1.3rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-main);
+    }
+
+    #modalUserEmail {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin: 0 0 4px 0;
+    }
+
     .modal-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
-      margin-top: 16px;
+      margin-top: 20px;
     }
 
     .modal-field {
       background: var(--input-bg);
-      padding: 10px;
-      border-radius: 6px;
+      padding: 12px 14px;
+      border-radius: 8px;
       border: 1px solid var(--border-color);
+      transition: border-color 0.15s ease;
+    }
+
+    .modal-field:hover {
+      border-color: color-mix(in srgb, var(--accent) 30%, var(--border-color));
     }
 
     .modal-field label {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
+      font-weight: 600;
       color: var(--text-muted);
       display: block;
-      margin-bottom: 2px;
+      margin-bottom: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
     .modal-field span {
       font-weight: 600;
       font-size: 0.9rem;
+      color: var(--text-main);
+      word-break: break-word;
+    }
+
+    .modal-actions {
+      margin-top: 28px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn-secondary {
+      padding: 10px 20px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+      background: var(--input-bg);
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+    }
+
+    /* ─── Empty / Loading State ────────────────────────────── */
+    .user-table tbody tr td[colspan] {
+      text-align: center;
+      padding: 40px 24px !important;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* ─── Responsive ───────────────────────────────────────── */
+    @media (max-width: 640px) {
+      .admin-container {
+        padding: 20px 16px 40px;
+      }
+
+      .admin-title h1 {
+        font-size: 1.5rem;
+      }
+
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .modal-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .filters-bar {
+        flex-direction: column;
+      }
+
+      .search-input,
+      .filter-select {
+        width: 100%;
+        min-width: 0;
+      }
     }
   </style>
 </head>
@@ -331,4 +581,4 @@
 
   <script src="admin-users.js"></script>
 </body>
-</html>
+  </html>
