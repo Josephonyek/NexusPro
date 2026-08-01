@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Config: Adjust if your API runs on a relative route or custom serverless domain
   const API_ENDPOINT = "/api/user-auth.js";
 
   // --- UI Elements ---
@@ -15,32 +14,49 @@ document.addEventListener("DOMContentLoaded", () => {
   const authAlert = document.getElementById("authAlert");
   const submitBtn = document.getElementById("submitBtn");
 
-  let currentMode = "login"; // 'login' or 'signup'
+  let currentMode = "login"; // Default active tab
 
-  // ================= 1. TAB SWITCHING LOGIC =================
-  if (loginTab && signupTab) {
-    loginTab.addEventListener("click", () => switchTab("login"));
-    signupTab.addEventListener("click", () => switchTab("signup"));
-  }
-
+  // ================= 1. RELIABLE TAB SWITCHING =================
   function switchTab(mode) {
     currentMode = mode;
     hideAlert();
 
     if (mode === "login") {
-      loginTab.classList.add("active");
-      signupTab.classList.remove("active");
-      loginFields.style.display = "block";
-      signupFields.style.display = "none";
+      if (loginTab) loginTab.classList.add("active");
+      if (signupTab) signupTab.classList.remove("active");
+
+      if (loginFields) loginFields.style.display = "block";
+      if (signupFields) signupFields.style.display = "none";
+
       if (submitBtn) submitBtn.textContent = "Log In";
     } else {
-      signupTab.classList.add("active");
-      loginTab.classList.remove("active");
-      loginFields.style.display = "none";
-      signupFields.style.display = "block";
+      if (signupTab) signupTab.classList.add("active");
+      if (loginTab) loginTab.classList.remove("active");
+
+      if (loginFields) loginFields.style.display = "none";
+      if (signupFields) signupFields.style.display = "block";
+
       if (submitBtn) submitBtn.textContent = "Create Account";
     }
   }
+
+  // Event Listeners for Tab Buttons
+  if (loginTab) {
+    loginTab.addEventListener("click", (e) => {
+      e.preventDefault();
+      switchTab("login");
+    });
+  }
+
+  if (signupTab) {
+    signupTab.addEventListener("click", (e) => {
+      e.preventDefault();
+      switchTab("signup");
+    });
+  }
+
+  // Initialize default state
+  switchTab("login");
 
   // ================= 2. CONDITIONAL EDUCATION FIELDS =================
   if (educationTypeSelect) {
@@ -61,7 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // ================= 3. PASSWORD VISIBILITY TOGGLE =================
   togglePasswordBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
       const targetId = btn.getAttribute("data-target");
       const input = document.getElementById(targetId);
       if (input) {
@@ -76,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ================= 4. FORM SUBMISSION HANDLER =================
+  // ================= 4. FORM SUBMISSION & ROLE STORAGE =================
   if (authForm) {
     authForm.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -86,7 +103,7 @@ document.addEventListener("DOMContentLoaded", () => {
       let payload = {};
 
       if (action === "login") {
-        const email = document.getElementById("loginEmail")?.value;
+        const email = document.getElementById("loginEmail")?.value?.trim();
         const password = document.getElementById("loginPassword")?.value;
 
         if (!email || !password) {
@@ -96,9 +113,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
         payload = { email, password };
       } else {
-        const firstName = document.getElementById("firstName")?.value;
-        const lastName = document.getElementById("lastName")?.value;
-        const email = document.getElementById("signupEmail")?.value;
+        const firstName = document.getElementById("firstName")?.value?.trim();
+        const lastName = document.getElementById("lastName")?.value?.trim();
+        const email = document.getElementById("signupEmail")?.value?.trim();
         const password = document.getElementById("signupPassword")?.value;
         const educationType = document.getElementById("educationType")?.value;
         const studentClass = document.getElementById("studentClass")?.value;
@@ -136,19 +153,21 @@ document.addEventListener("DOMContentLoaded", () => {
         const data = await response.json();
 
         if (!response.ok || !data.success) {
-          throw new Error(data.error || "Authentication failed. Please check your details.");
+          throw new Error(data.error || "Authentication failed. Please check your credentials.");
         }
 
-        // --- CLEAR OLD STALE KEYS & SAVE FRESH DATA ---
-        localStorage.removeItem("nexusToken");
-        localStorage.removeItem("nexusUser");
-        localStorage.removeItem("userRole");
+        // --- PURGE ALL STALE STORAGE KEYS ---
+        localStorage.clear();
+
+        // --- SAVE FRESH TOKEN AND ROLE ---
+        const userRole = String(data.user.role || "student").toLowerCase();
 
         localStorage.setItem("nexusToken", data.token);
+        localStorage.setItem("token", data.token); // Backup key
         localStorage.setItem("nexusUser", JSON.stringify(data.user));
-        localStorage.setItem("userRole", data.user.role); // Save role directly ('admin' or 'student')
+        localStorage.setItem("userRole", userRole); // Direct role key ('admin' or 'student')
 
-        // Redirect directly to dashboard
+        // Redirect to dashboard
         window.location.href = "dashboard.html";
 
       } catch (err) {
@@ -159,7 +178,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Helper Alert Functions ---
+  // --- Helper Alert & Loading Functions ---
   function showAlert(msg) {
     if (authAlert) {
       authAlert.textContent = msg;
@@ -181,7 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (isLoading) {
       submitBtn.disabled = true;
       submitBtn.dataset.origText = submitBtn.textContent;
-      submitBtn.textContent = "Please wait...";
+      submitBtn.textContent = "Processing...";
     } else {
       submitBtn.disabled = false;
       submitBtn.textContent = submitBtn.dataset.origText || "Submit";
