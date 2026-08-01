@@ -1,109 +1,65 @@
 document.addEventListener("DOMContentLoaded", () => {
+  const API_ENDPOINT = "/api/user-auth.js";
+  
   // DOM Elements
   const userTableBody = document.getElementById("userTableBody");
   const searchInput = document.getElementById("searchInput");
   const roleFilter = document.getElementById("roleFilter");
   const statusFilter = document.getElementById("statusFilter");
-  
-  const debugBanner = document.getElementById("debugBanner");
-  const debugText = document.getElementById("debugText");
 
+  // Stats Elements
+  const statTotal = document.getElementById("statTotal");
+  const statStudents = document.getElementById("statStudents");
+  const statAdmins = document.getElementById("statAdmins");
+  const statSuspended = document.getElementById("statSuspended");
+
+  // Modal Elements
+  const userModal = document.getElementById("userModal");
   let allUsers = [];
 
-  // Display visible banner on screen for instant troubleshooting
-  function showBanner(message, type = "warning") {
-    if (!debugBanner) return;
-    debugText.innerHTML = message;
-    debugBanner.className = `debug-banner ${type}`;
-  }
-
-  function getAuthToken() {
-    return localStorage.getItem("nexusToken") || localStorage.getItem("token") || "";
-  }
-
-  // Fetch users via REST API
+  // ================= 1. FETCH USERS FROM BACKEND =================
   window.fetchUsers = async function() {
     renderLoadingState();
-    let fetchedData = null;
-    let errors = [];
-
-    const token = getAuthToken();
-
-    // Primary route
     try {
-      const res = await fetch("/api/user-auth?action=list-users", {
+      const token = localStorage.getItem("nexusToken") || localStorage.getItem("token") || "";
+      
+      const res = await fetch(`${API_ENDPOINT}?action=list-users`, {
         headers: { "Authorization": `Bearer ${token}` }
       });
-      if (res.ok) {
-        fetchedData = await res.json();
-      } else {
-        errors.push(`/api/user-auth returned status ${res.status}`);
-      }
-    } catch (e) {
-      errors.push(`/api/user-auth error: ${e.message}`);
-    }
 
-    // Fallback route (.js extension)
-    if (!fetchedData) {
-      try {
-        const res = await fetch("/api/user-auth.js?action=list-users", {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (res.ok) {
-          fetchedData = await res.json();
-        } else {
-          errors.push(`/api/user-auth.js returned status ${res.status}`);
-        }
-      } catch (e) {
-        errors.push(`/api/user-auth.js error: ${e.message}`);
-      }
-    }
+      if (!res.ok) throw new Error("Failed to fetch users");
 
-    // Parse Response Payload
-    if (fetchedData) {
-      if (Array.isArray(fetchedData)) {
-        allUsers = fetchedData;
-      } else if (fetchedData.users && Array.isArray(fetchedData.users)) {
-        allUsers = fetchedData.users;
-      } else if (typeof fetchedData === "object") {
-        allUsers = Object.keys(fetchedData).map(k => ({ id: k, ...fetchedData[k] }));
-      }
+      const data = await res.json();
+      allUsers = data.users || (Array.isArray(data) ? data : []);
 
-      showBanner(`<i class="fas fa-check-circle"></i> Successfully loaded ${allUsers.length} user record(s).`, "success");
       updateStats(allUsers);
       applyFilters();
-    } else {
-      console.warn("Failed to retrieve user data:", errors);
-      showBanner(`<i class="fas fa-exclamation-triangle"></i> Could not connect to API. <br><small>${errors.join(" | ")}</small>`, "error");
-      renderErrorState("No data returned from server backend.");
+    } catch (err) {
+      console.error("Error loading users:", err);
+      userTableBody.innerHTML = `
+        <tr>
+          <td colspan="5" class="empty-msg" style="color: var(--danger);">
+            <i class="fas fa-exclamation-triangle"></i> Error loading users. Please try refreshing.
+          </td>
+        </tr>
+      `;
     }
   };
 
-  // Safe Date Formatting
-  function formatDate(rawDate) {
-    if (!rawDate) return "N/A";
-    const num = Number(rawDate);
-    if (!isNaN(num) && num > 0) return new Date(num).toLocaleDateString();
-    const parsed = new Date(rawDate);
-    return isNaN(parsed.getTime()) ? "N/A" : parsed.toLocaleDateString();
-  }
-
-  // Update Top Stats Counter
+  // ================= 2. STATS & RENDER =================
   function updateStats(users) {
-    document.getElementById("statTotal").textContent = users.length;
-    document.getElementById("statStudents").textContent = users.filter(u => (u.role || "student").toLowerCase() === "student").length;
-    document.getElementById("statAdmins").textContent = users.filter(u => (u.role || "").toLowerCase() === "admin").length;
-    document.getElementById("statSuspended").textContent = users.filter(u => (u.status || "").toLowerCase() === "suspended").length;
+    if (statTotal) statTotal.textContent = users.length;
+    if (statStudents) statStudents.textContent = users.filter(u => (u.role || "student").toLowerCase() === "student").length;
+    if (statAdmins) statAdmins.textContent = users.filter(u => (u.role || "").toLowerCase() === "admin").length;
+    if (statSuspended) statSuspended.textContent = users.filter(u => (u.status || "").toLowerCase() === "suspended").length;
   }
 
-  // Render Table Rows
   function renderUsers(users) {
     if (!users || users.length === 0) {
       userTableBody.innerHTML = `
         <tr>
           <td colspan="5" class="empty-msg">
-            <i class="fas fa-user-slash" style="font-size: 1.5rem; margin-bottom: 8px; display: block;"></i>
-            No matching users found in directory.
+            No users found.
           </td>
         </tr>
       `;
@@ -115,34 +71,29 @@ document.addEventListener("DOMContentLoaded", () => {
       const status = (user.status || "active").toLowerCase();
       const isSuspended = status === "suspended";
       const nextRole = role === "admin" ? "student" : "admin";
+      const dateStr = user.created_at ? new Date(Number(user.created_at) || user.created_at).toLocaleDateString() : "N/A";
 
       return `
         <tr>
           <td>
             <div class="user-info">
               <div class="name">${escapeHtml(user.name || "Unnamed User")}</div>
-              <div class="email">${escapeHtml(user.email || "No Email Provided")}</div>
+              <div class="email">${escapeHtml(user.email || "No Email")}</div>
             </div>
           </td>
           <td>
-            <span class="badge ${role}">
-              <i class="fas ${role === "admin" ? "fa-user-shield" : "fa-user-graduate"}"></i>
-              ${role}
-            </span>
+            <span class="badge ${role}">${role}</span>
           </td>
           <td>
-            <span class="badge ${isSuspended ? "suspended" : "active"}">
-              <i class="fas ${isSuspended ? "fa-ban" : "fa-check-circle"}"></i>
-              ${isSuspended ? "Suspended" : "Active"}
-            </span>
+            <span class="badge ${isSuspended ? "suspended" : "active"}">${isSuspended ? "Suspended" : "Active"}</span>
           </td>
-          <td>${formatDate(user.created_at || user.createdAt)}</td>
+          <td>${dateStr}</td>
           <td>
-            <div style="display:flex; gap:6px; flex-wrap:wrap;">
-              <button class="btn-action" onclick="viewUserDetails('${user.id}')"><i class="fas fa-eye"></i> Info</button>
-              <button class="btn-action" onclick="updateRole('${user.id}', '${nextRole}')">${role === "admin" ? "Demote" : "Promote"}</button>
-              <button class="btn-action warn" onclick="updateStatus('${user.id}', '${isSuspended ? "active" : "suspended"}')">${isSuspended ? "Activate" : "Suspend"}</button>
-              <button class="btn-action danger" onclick="deleteUser('${user.id}')"><i class="fas fa-trash"></i></button>
+            <div style="display:flex; gap:6px;">
+              <button class="btn-action" onclick="viewUserDetails('${user.id}')">Info</button>
+              <button class="btn-action" onclick="toggleRole('${user.id}', '${nextRole}')">${role === "admin" ? "Demote" : "Promote"}</button>
+              <button class="btn-action warn" onclick="toggleStatus('${user.id}', '${isSuspended ? "active" : "suspended"}')">${isSuspended ? "Activate" : "Suspend"}</button>
+              <button class="btn-action danger" onclick="deleteUser('${user.id}')">Delete</button>
             </div>
           </td>
         </tr>
@@ -150,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }).join("");
   }
 
-  // Filter Search Controls
+  // ================= 3. FILTERING =================
   function applyFilters() {
     const search = searchInput.value.toLowerCase().trim();
     const role = roleFilter.value.toLowerCase();
@@ -174,7 +125,7 @@ document.addEventListener("DOMContentLoaded", () => {
   roleFilter.addEventListener("change", applyFilters);
   statusFilter.addEventListener("change", applyFilters);
 
-  // Modal View
+  // ================= 4. MODAL & ACTIONS =================
   window.viewUserDetails = function(userId) {
     const user = allUsers.find(u => String(u.id) === String(userId));
     if (!user) return;
@@ -184,37 +135,36 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("modalUserId").textContent = user.id || "N/A";
     document.getElementById("modalUserRole").textContent = (user.role || "student").toUpperCase();
     document.getElementById("modalUserStatus").textContent = (user.status || "active").toUpperCase();
-    document.getElementById("modalUserEdu").textContent = user.education_type || "N/A";
-    document.getElementById("modalUserClass").textContent = user.class || "N/A";
-    document.getElementById("modalUserJoined").textContent = formatDate(user.created_at || user.createdAt);
+    
+    if (document.getElementById("modalUserEdu")) document.getElementById("modalUserEdu").textContent = user.education_type || "N/A";
+    if (document.getElementById("modalUserClass")) document.getElementById("modalUserClass").textContent = user.class || "N/A";
 
-    document.getElementById("userModal").style.display = "flex";
+    userModal.style.display = "flex";
   };
 
   window.closeModal = function() {
-    document.getElementById("userModal").style.display = "none";
+    userModal.style.display = "none";
   };
 
-  // User Management Actions
-  window.updateRole = async function(userId, newRole) {
+  window.toggleRole = async function(userId, newRole) {
     if (!confirm(`Change role to ${newRole.toUpperCase()}?`)) return;
-    await sendAction("update-role", { userId, role: newRole });
+    await executeAction("update-role", { userId, role: newRole });
   };
 
-  window.updateStatus = async function(userId, newStatus) {
-    if (!confirm(`Change status to ${newStatus.toUpperCase()}?`)) return;
-    await sendAction("update-status", { userId, status: newStatus });
+  window.toggleStatus = async function(userId, newStatus) {
+    if (!confirm(`Set status to ${newStatus.toUpperCase()}?`)) return;
+    await executeAction("update-status", { userId, status: newStatus });
   };
 
   window.deleteUser = async function(userId) {
-    if (!confirm("Are you sure you want to permanently delete this user?")) return;
-    await sendAction("delete-user", { userId });
+    if (!confirm("Permanently delete this user?")) return;
+    await executeAction("delete-user", { userId });
   };
 
-  async function sendAction(action, payload) {
+  async function executeAction(action, payload) {
     try {
-      const token = getAuthToken();
-      const res = await fetch(`/api/user-auth?action=${action}`, {
+      const token = localStorage.getItem("nexusToken") || localStorage.getItem("token") || "";
+      const res = await fetch(`${API_ENDPOINT}?action=${action}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -222,10 +172,11 @@ document.addEventListener("DOMContentLoaded", () => {
         },
         body: JSON.stringify(payload)
       });
+
       if (!res.ok) throw new Error("Action failed");
       fetchUsers();
-    } catch (e) {
-      alert("Error performing action: " + e.message);
+    } catch (err) {
+      alert("Error: " + err.message);
     }
   }
 
@@ -233,19 +184,7 @@ document.addEventListener("DOMContentLoaded", () => {
     userTableBody.innerHTML = `
       <tr>
         <td colspan="5" class="empty-msg">
-          <i class="fas fa-spinner fa-spin" style="font-size: 1.5rem; color: var(--accent-blue); margin-bottom: 8px; display: block;"></i>
-          Fetching database records...
-        </td>
-      </tr>
-    `;
-  }
-
-  function renderErrorState(msg) {
-    userTableBody.innerHTML = `
-      <tr>
-        <td colspan="5" class="empty-msg" style="color: var(--danger);">
-          <i class="fas fa-exclamation-triangle" style="font-size: 1.5rem; margin-bottom: 8px; display: block;"></i>
-          ${escapeHtml(msg)}
+          <i class="fas fa-spinner fa-spin"></i> Loading users...
         </td>
       </tr>
     `;
@@ -255,6 +194,5 @@ document.addEventListener("DOMContentLoaded", () => {
     return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   }
 
-  // Initial Fetch
   fetchUsers();
 });
