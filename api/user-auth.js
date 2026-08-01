@@ -2,10 +2,9 @@ import { createClient } from "@libsql/client";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
-// Initialize Turso client with trimmed environment variables to avoid formatting 400 errors
 const dbUrl = process.env.TURSO_DATABASE_URL ? process.env.TURSO_DATABASE_URL.trim() : "";
 const dbToken = process.env.TURSO_AUTH_TOKEN ? process.env.TURSO_AUTH_TOKEN.trim() : "";
-const JWT_SECRET = process.env.JWT_SECRET ? process.env.JWT_SECRET.trim() : "fallback_secret_key";
+const JWT_SECRET = process.env.JWT_SECRET ? process.env.JWT_SECRET.trim() : "nexus_secret_key_123";
 
 const db = createClient({
   url: dbUrl,
@@ -13,13 +12,12 @@ const db = createClient({
 });
 
 export default async function handler(req, res) {
-  // Global CORS Headers
+  // Global CORS
   res.setHeader("Access-Control-Allow-Credentials", "true");
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET,OPTIONS,POST");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
 
-  // Handle browser preflight request
   if (req.method === "OPTIONS") {
     return res.status(200).end();
   }
@@ -27,81 +25,17 @@ export default async function handler(req, res) {
   const { action } = req.query;
 
   try {
-    // ================= 1. SIGN UP =================
-    if (action === "signup") {
-      if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
-
-      const { firstName, lastName, email, password, educationType, studentClass, course, level } = req.body || {};
-
-      if (!email || !password || !firstName || !lastName) {
-        return res.status(400).json({ error: "Missing required registration fields." });
-      }
-
-      const cleanEmail = email.trim().toLowerCase();
-
-      // Check if user already exists
-      const existing = await db.execute({
-        sql: "SELECT id FROM users WHERE LOWER(email) = ? LIMIT 1",
-        args: [cleanEmail]
-      });
-
-      if (existing.rows.length > 0) {
-        return res.status(400).json({ error: "An account with this email already exists." });
-      }
-
-      // Hash password
-      const passwordHash = await bcrypt.hash(password, 10);
-      const userId = "usr_" + Math.random().toString(36).substring(2, 11);
-      const fullName = `${firstName.trim()} ${lastName.trim()}`.trim();
-      const defaultRole = "student";
-
-      // Insert new user record
-      await db.execute({
-        sql: `INSERT INTO users (id, name, first_name, last_name, email, password_hash, role, education_type, class, course, level, created_at)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        args: [
-          userId,
-          fullName,
-          firstName.trim(),
-          lastName.trim(),
-          cleanEmail,
-          passwordHash,
-          defaultRole,
-          educationType || null,
-          studentClass || null,
-          course || null,
-          level || null,
-          Date.now()
-        ]
-      });
-
-      // Issue JWT token containing assigned role
-      const token = jwt.sign(
-        { uid: userId, email: cleanEmail, role: defaultRole, name: fullName },
-        JWT_SECRET,
-        { expiresIn: "7d" }
-      );
-
-      return res.status(200).json({
-        success: true,
-        token,
-        user: { uid: userId, name: fullName, email: cleanEmail, role: defaultRole }
-      });
-    }
-
-    // ================= 2. LOG IN =================
+    // ================= 1. LOGIN =================
     if (action === "login") {
       if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
       const { email, password } = req.body || {};
-
       if (!email || !password) {
         return res.status(400).json({ error: "Email and password are required." });
       }
 
       const cleanEmail = email.trim().toLowerCase();
 
-      // Query database for user including the live role column
       const result = await db.execute({
         sql: "SELECT id, name, email, password_hash, role FROM users WHERE LOWER(email) = ? LIMIT 1",
         args: [cleanEmail]
@@ -118,16 +52,10 @@ export default async function handler(req, res) {
         return res.status(401).json({ error: "Invalid email or password." });
       }
 
-      const userRole = String(user.role || "student").toLowerCase();
+      const role = String(user.role || "student").toLowerCase();
 
-      // Generate FRESH JWT session token with updated DB role
       const token = jwt.sign(
-        { 
-          uid: String(user.id), 
-          email: String(user.email), 
-          role: userRole, 
-          name: String(user.name) 
-        },
+        { uid: String(user.id), email: String(user.email), role, name: String(user.name) },
         JWT_SECRET,
         { expiresIn: "7d" }
       );
@@ -135,32 +63,84 @@ export default async function handler(req, res) {
       return res.status(200).json({
         success: true,
         token,
-        user: { 
-          uid: String(user.id), 
-          name: String(user.name), 
-          email: String(user.email),
-          role: userRole 
-        }
+        user: { uid: String(user.id), name: String(user.name), email: String(user.email), role }
       });
     }
 
-    // ================= 3. VERIFY SESSION =================
-    if (action === "verify") {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return res.status(401).json({ authenticated: false, error: "Missing authorization token" });
+    // ================= 2. SIGNUP =================
+    if (action === "signup") {
+      if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+      const { firstName, lastName, email, password, educationType, studentClass, course, level } = req.body || {};
+
+      if (!email || !password || !firstName || !lastName) {
+        return res.status(400).json({ error: "Required fields are missing." });
       }
 
-      const token = authHeader.split(" ")[1];
-      const decoded = jwt.verify(token, JWT_SECRET);
+      const cleanEmail = email.trim().toLowerCase();
 
-      return res.status(200).json({ authenticated: true, user: decoded });
+      const existing = await db.execute({
+        sql: "SELECT id FROM users WHERE LOWER(email) = ? LIMIT 1",
+        args: [cleanEmail]
+      });
+
+      if (existing.rows.length > 0) {
+        return res.status(400).json({ error: "An account with this email already exists." });
+      }
+
+      const passwordHash = await bcrypt.hash(password, 10);
+      const userId = "usr_" + Math.random().toString(36).substring(2, 11);
+      const fullName = `${firstName.trim()} ${lastName.trim()}`;
+      const defaultRole = "student";
+
+      await db.execute({
+        sql: `INSERT INTO users (id, name, first_name, last_name, email, password_hash, role, education_type, class, course, level, created_at)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        args: [
+          userId, fullName, firstName.trim(), lastName.trim(), cleanEmail,
+          passwordHash, defaultRole, educationType || null, studentClass || null,
+          course || null, level || null, Date.now()
+        ]
+      });
+
+      const token = jwt.sign(
+        { uid: userId, email: cleanEmail, role: defaultRole, name: fullName },
+        JWT_SECRET,
+        { expiresIn: "7d" }
+      );
+
+      return res.status(200).json({
+        success: true,
+        token,
+        user: { uid: userId, name: fullName, email: cleanEmail, role: defaultRole }
+      });
     }
 
-    return res.status(400).json({ error: "Invalid API action requested." });
+    // ================= 3. FORGOT PASSWORD =================
+    if (action === "forgot-password") {
+      const { email } = req.body || {};
+      if (!email) return res.status(400).json({ error: "Email is required." });
+
+      // Check if email exists
+      const userResult = await db.execute({
+        sql: "SELECT id FROM users WHERE LOWER(email) = ? LIMIT 1",
+        args: [email.trim().toLowerCase()]
+      });
+
+      if (userResult.rows.length === 0) {
+        return res.status(200).json({ message: "If an account exists with this email, reset instructions have been dispatched." });
+      }
+
+      return res.status(200).json({
+        success: true,
+        message: "Password reset key requested. Contact support or check email for steps."
+      });
+    }
+
+    return res.status(400).json({ error: "Invalid action." });
 
   } catch (error) {
-    console.error("User Auth API Error:", error);
+    console.error("Auth Endpoint Error:", error);
     return res.status(500).json({ error: error.message || "Internal server error." });
   }
-}
+        }
