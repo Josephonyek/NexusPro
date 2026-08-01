@@ -3,273 +3,372 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard</title>
+  <title>Nexus Pro - Portal Dashboard</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: system-ui, -apple-system, sans-serif;
-      background: #f3f4f6;
-      color: #111827;
-      min-height: 100vh;
+    /* ================= CSS VARIABLES & THEMING ================= */
+    :root {
+      --bg-main: #f8fafc;
+      --card-bg: #ffffff;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --text-dark: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --sidebar-width: 260px;
     }
 
-    /* Header */
-    .header {
-      background: white;
-      border-bottom: 1px solid #e5e7eb;
-      padding: 14px 24px;
+    [data-theme="dark"] {
+      --bg-main: #0f172a;
+      --card-bg: #1e293b;
+      --primary: #3b82f6;
+      --primary-hover: #60a5fa;
+      --text-dark: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+    }
+
+    /* ================= BASE STYLES ================= */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-dark);
+      min-height: 100vh;
+      display: flex;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* ================= SIDEBAR NAVIGATION DRAWER ================= */
+    .sidebar {
+      width: var(--sidebar-width);
+      background-color: var(--card-bg);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 100;
+      transition: transform 0.3s ease, background-color 0.3s ease;
+    }
+
+    .sidebar-header {
+      padding: 1.5rem;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--primary);
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 1rem 0;
+      flex-grow: 1;
+    }
+
+    .sidebar-menu a, .sidebar-menu button {
       display: flex;
       align-items: center;
       justify-content: space-between;
+      width: 100%;
+      padding: 0.75rem 1.5rem;
+      color: var(--text-dark);
+      text-decoration: none;
+      font-weight: 500;
+      background: none;
+      border: none;
+      font-size: 1rem;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .sidebar-menu a:hover, .sidebar-menu button:hover {
+      background-color: rgba(37, 99, 235, 0.1);
+      color: var(--primary);
+    }
+
+    /* ================= MAIN CONTENT WRAPPER ================= */
+    .main-wrapper {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      width: calc(100% - var(--sidebar-width));
+    }
+
+    /* ================= TOP NAVIGATION HEADER ================= */
+    .top-header {
+      height: 64px;
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
       position: sticky;
       top: 0;
-      z-index: 50;
+      z-index: 90;
+      transition: background-color 0.3s ease;
     }
+
     .header-left {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 1rem;
     }
-    .logo {
-      font-weight: 700;
-      font-size: 1.15rem;
-      color: #2563eb;
-    }
-    .role-pill {
-      font-size: 0.75rem;
-      font-weight: 600;
-      padding: 4px 10px;
-      border-radius: 999px;
-      text-transform: uppercase;
-    }
-    .role-pill.student {
-      background: #dbeafe;
-      color: #1d4ed8;
-    }
-    .role-pill.admin {
-      background: #fce7f3;
-      color: #be185d;
-    }
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .user-name {
-      font-size: 0.9rem;
-      font-weight: 500;
-    }
-    .btn-logout {
-      background: #fee2e2;
-      color: #b91c1c;
+
+    .hamburger {
+      display: none;
+      background: none;
       border: none;
-      padding: 8px 14px;
-      border-radius: 8px;
-      font-size: 0.875rem;
-      font-weight: 600;
+      font-size: 1.5rem;
+      color: var(--text-dark);
       cursor: pointer;
     }
-    .btn-logout:hover {
-      background: #fecaca;
-    }
 
-    /* Main */
-    .main {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 32px 20px;
-    }
-    .welcome {
-      margin-bottom: 28px;
-    }
-    .welcome h1 {
-      font-size: 1.6rem;
-      margin-bottom: 6px;
-    }
-    .welcome p {
-      color: #6b7280;
-      font-size: 0.95rem;
-    }
-
-    /* Cards grid */
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-      gap: 20px;
-    }
-    .card {
-      background: white;
-      border-radius: 14px;
-      padding: 24px;
-      border: 1px solid #e5e7eb;
-      text-decoration: none;
-      color: inherit;
-      transition: all 0.2s ease;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .card:hover {
-      border-color: #2563eb;
-      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.1);
-      transform: translateY(-2px);
-    }
-    .card-icon {
-      width: 42px;
-      height: 42px;
-      border-radius: 10px;
+    .header-actions {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 1.3rem;
-      margin-bottom: 4px;
+      gap: 1.25rem;
     }
-    .card h3 {
-      font-size: 1.05rem;
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1.25rem;
+      text-decoration: none;
+      color: var(--text-dark);
+    }
+
+    .role-badge {
+      padding: 0.25rem 0.75rem;
+      background-color: rgba(37, 99, 235, 0.15);
+      color: var(--primary);
+      border-radius: 9999px;
+      font-size: 0.85rem;
       font-weight: 600;
     }
-    .card p {
-      font-size: 0.875rem;
-      color: #6b7280;
-      line-height: 1.4;
+
+    /* ================= GRID & CARDS ================= */
+    .container {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
     }
 
-    /* Icon colors */
-    .icon-blue { background: #dbeafe; }
-    .icon-green { background: #d1fae5; }
-    .icon-purple { background: #ede9fe; }
-    .icon-orange { background: #ffedd5; }
-    .icon-pink { background: #fce7f3; }
-    .icon-teal { background: #ccfbf1; }
-    .icon-indigo { background: #e0e7ff; }
-    .icon-red { background: #fee2e2; }
+    .section-title {
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
 
-    /* Sections */
-    .section { display: none; }
-    .section.active { display: block; }
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
 
-    /* Loading */
-    .loading-screen {
-      position: fixed;
-      inset: 0;
-      background: #f3f4f6;
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
       display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 100;
-      font-size: 1rem;
-      color: #6b7280;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s ease, background-color 0.3s ease;
     }
-    .loading-screen.hidden {
+
+    .card:hover {
+      transform: translateY(-2px);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.4;
+      margin-bottom: 1.5rem;
+    }
+
+    .btn {
+      display: inline-block;
+      text-align: center;
+      background-color: var(--primary);
+      color: #ffffff;
+      padding: 0.65rem 1.25rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: var(--primary-hover);
+    }
+
+    /* Role Visibility Logic */
+    .role-section {
       display: none;
     }
 
-    @media (max-width: 600px) {
-      .header { padding: 12px 16px; }
-      .user-name { display: none; }
-      .main { padding: 24px 16px; }
+    .role-section.active {
+      display: block;
+    }
+
+    /* ================= RESPONSIVE DESIGN ================= */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .main-wrapper {
+        margin-left: 0;
+        width: 100%;
+      }
+      .hamburger {
+        display: block;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- Loading screen while checking auth -->
-  <div class="loading-screen" id="loading-screen">
-    Checking authentication...
+
+  <!-- Sidebar Navigation Drawer -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">Nexus Pro</div>
+    <ul class="sidebar-menu">
+      <li><a href="dashboard.html">Dashboard Home</a></li>
+      <li><a href="contact.html">Support Desk</a></li>
+
+      <!-- Dynamic Light / Dark Mode Toggle Button -->
+      <li>
+        <button id="themeToggleBtn" type="button">
+          <span id="themeText">Dark Mode</span>
+          <span id="themeIcon">🌙</span>
+        </button>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+    <!-- Top Bar -->
+    <header class="top-header">
+      <div class="header-left">
+        <button class="hamburger" id="hamburgerBtn" aria-label="Toggle Navigation">☰</button>
+        <h2>Overview</h2>
+      </div>
+
+      <div class="header-actions">
+        <span class="role-badge" id="roleBadge">Student View</span>
+        <a href="notifications.html" class="icon-btn" title="Notifications">🔔</a>
+      </div>
+    </header>
+
+    <!-- Content Sections -->
+    <main class="container">
+      
+      <!-- 1. STUDENT DASHBOARD VIEW -->
+      <section id="studentView" class="role-section active">
+        <h3 class="section-title">Student Portal</h3>
+        
+        <div class="grid-container">
+          <!-- Content 1: Nexus AI -->
+          <div class="card">
+            <div>
+              <h4 class="card-title">Nexus AI</h4>
+              <p class="card-desc">Interactive AI assistant for step-by-step learning, study guidance, and quick query resolutions.</p>
+            </div>
+            <a href="ai.html" class="btn">Open AI</a>
+          </div>
+
+          <!-- Content 2: E-Library -->
+          <div class="card">
+            <div>
+              <h4 class="card-title">E-Library</h4>
+              <p class="card-desc">Access curated academic textbooks, reference materials, and learning resources.</p>
+            </div>
+            <a href="academy.html" class="btn">Open Library</a>
+          </div>
+
+          <!-- Content 3: Practice Questions -->
+          <div class="card">
+            <div>
+              <h4 class="card-title">Practice Questions</h4>
+              <p class="card-desc">Test your understanding with past exam questions and mock practice modules.</p>
+            </div>
+            <a href="#" class="btn">Start Practice</a>
+          </div>
+
+          <!-- Content 4: Health Hub -->
+          <div class="card">
+            <div>
+              <h4 class="card-title">Health Hub</h4>
+              <p class="card-desc">Learn about wellness guidelines, student health insights, and disease prevention.</p>
+            </div>
+            <a href="health.html" class="btn">Visit Health Hub</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. ADMIN DASHBOARD VIEW -->
+      <section id="adminView" class="role-section">
+        <h3 class="section-title">Admin Controls</h3>
+        
+        <div class="grid-container">
+          <!-- Admin Action 1: User Management -->
+          <div class="card">
+            <div>
+              <h4 class="card-title">User Management</h4>
+              <p class="card-desc">Manage registered student profiles, verify accounts, and update permissions.</p>
+            </div>
+            <a href="admin-users.html" class="btn">Manage Users</a>
+          </div>
+
+          <!-- Admin Action 2: Upload Books -->
+          <div class="card">
+            <div>
+              <h4 class="card-title">Upload Books</h4>
+              <p class="card-desc">Publish new e-books, study guides, and module resources to the E-Library.</p>
+            </div>
+            <a href="admin-upload.html" class="btn">Upload Library Books</a>
+          </div>
+
+          <!-- Admin Action 3: Upload Questions -->
+          <div class="card">
+            <div>
+              <h4 class="card-title">Upload Questions</h4>
+              <p class="card-desc">Add past exam questions, answers, and practice test datasets.</p>
+            </div>
+            <a href="#" class="btn">Upload Question Bank</a>
+          </div>
+        </div>
+      </section>
+
+    </main>
   </div>
 
-  <!-- Header -->
-  <header class="header">
-    <div class="header-left">
-      <div class="logo">Nexora</div>
-      <span class="role-pill student" id="header-role-pill">Student</span>
-    </div>
-    <div class="header-right">
-      <span class="user-name" id="user-display-name">User</span>
-      <button class="btn-logout" id="btn-logout">Logout</button>
-    </div>
-  </header>
-
-  <!-- Main content -->
-  <main class="main">
-    <div class="welcome">
-      <h1>Welcome back, <span id="welcome-name">User</span></h1>
-      <p id="user-role-description">Loading your dashboard...</p>
-    </div>
-
-    <!-- ========== STUDENT SECTION ========== -->
-    <section class="section" id="student-section">
-      <div class="grid">
-        <!-- AI Studio -->
-        <a href="ai_solver.html" class="card">
-          <div class="card-icon icon-blue">🤖</div>
-          <h3>AI Studio</h3>
-          <p>Get help solving questions with AI assistance.</p>
-        </a>
-
-        <!-- E-Library -->
-        <a href="academy.html" class="card">
-          <div class="card-icon icon-green">📚</div>
-          <h3>E-Library</h3>
-          <p>Access books, notes and learning materials.</p>
-        </a>
-
-        <!-- Health Hub -->
-        <a href="health.html" class="card">
-          <div class="card-icon icon-teal">🏥</div>
-          <h3>Health Hub</h3>
-          <p>Health tips, resources and support.</p>
-        </a>
-
-        <!-- Practice Questions -->
-        <a href="#" class="card">
-          <div class="card-icon icon-orange">📝</div>
-          <h3>Practice Questions</h3>
-          <p>Test yourself with practice questions.</p>
-        </a>
-
-        <!-- Support Desk -->
-        <a href="contact.html" class="card">
-          <div class="card-icon icon-purple">💬</div>
-          <h3>Support Desk</h3>
-          <p>Need help? Contact our support team.</p>
-        </a>
-      </div>
-    </section>
-
-    <!-- ========== ADMIN SECTION ========== -->
-    <section class="section" id="admin-section">
-      <div class="grid">
-        <!-- User Directory -->
-        <a href="admin_users.html" class="card">
-          <div class="card-icon icon-indigo">👥</div>
-          <h3>User Directory</h3>
-          <p>View and manage all registered users.</p>
-        </a>
-
-        <!-- Upload Books -->
-        <a href="admin_upload.html" class="card">
-          <div class="card-icon icon-green">📤</div>
-          <h3>Upload Books</h3>
-          <p>Upload new books and materials to the library.</p>
-        </a>
-
-        <!-- Support Desk -->
-        <a href="admin_support.html" class="card">
-          <div class="card-icon icon-pink">🎧</div>
-          <h3>Support Desk</h3>
-          <p>Manage support tickets and user messages.</p>
-        </a>
-
-        <!-- Past Questions -->
-        <a href="#" class="card">
-          <div class="card-icon icon-orange">📋</div>
-          <h3>Past Questions</h3>
-          <p>Manage past questions and exam materials.</p>
-        </a>
-      </div>
-    </section>
-  </main>
-
-  <script type="module" src="dashboard.js"></script>
+  <!-- Connected JavaScript logic -->
+  <script src="dashboard.js"></script>
 </body>
       </html>
