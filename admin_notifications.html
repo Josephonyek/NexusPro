@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus Pro - Admin Broadcast</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    :root {
+      --bg-dark: #090d16;
+      --card-bg: #131c2e;
+      --card-border: #1e2d4a;
+      --accent-blue: #38bdf8;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
+    body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding: 24px 16px; }
+    .container { max-width: 650px; margin: 0 auto; }
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 28px; border-radius: var(--radius); }
+    h1 { font-size: 1.4rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+    
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; font-weight: 600; }
+    input, select, textarea { width: 100%; padding: 12px; background: var(--bg-dark); border: 1px solid var(--card-border); color: #fff; border-radius: 8px; outline: none; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent-blue); }
+    textarea { resize: vertical; min-height: 120px; }
+
+    .btn-submit { width: 100%; padding: 12px; background: #0284c7; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-submit:hover { background: #0369a1; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1><i class="fas fa-bullhorn" style="color: var(--accent-blue);"></i> Broadcast Notification</h1>
+      <form id="broadcastForm">
+        
+        <div class="form-group">
+          <label for="targetAudience">Send To *</label>
+          <select id="targetAudience" onchange="toggleStudentEmailInput()">
+            <option value="all">All Students (App Notification + Email Broadcast)</option>
+            <option value="single">Single Student (Direct Email & In-App)</option>
+          </select>
+        </div>
+
+        <div class="form-group" id="emailGroup" style="display: none;">
+          <label for="studentEmail">Student Email Address *</label>
+          <input type="email" id="studentEmail" placeholder="student@example.com">
+        </div>
+
+        <div class="form-group">
+          <label for="notifTitle">Notification Title / Subject *</label>
+          <input type="text" id="notifTitle" placeholder="e.g., Important Exam Notice" required>
+        </div>
+
+        <div class="form-group">
+          <label for="notifMessage">Message Body *</label>
+          <textarea id="notifMessage" placeholder="Write your announcement details here..." required></textarea>
+        </div>
+
+        <button type="submit" class="btn-submit" id="sendBtn">
+          <i class="fas fa-paper-plane"></i> Send Notification
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function toggleStudentEmailInput() {
+      const target = document.getElementById("targetAudience").value;
+      document.getElementById("emailGroup").style.display = target === "single" ? "block" : "none";
+    }
+
+    document.getElementById("broadcastForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const sendBtn = document.getElementById("sendBtn");
+      sendBtn.disabled = true;
+      sendBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Broadcasting...`;
+
+      const recipientType = document.getElementById("targetAudience").value;
+      const recipientEmail = document.getElementById("studentEmail").value.trim();
+      const title = document.getElementById("notifTitle").value.trim();
+      const message = document.getElementById("notifMessage").value.trim();
+
+      if (recipientType === "single" && !recipientEmail) {
+        alert("Please specify student email.");
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = `<i class="fas fa-paper-plane"></i> Send Notification`;
+        return;
+      }
+
+      try {
+        const token = localStorage.getItem("nexusToken") || localStorage.getItem("token") || "";
+        const res = await fetch("/api/notifications.js?action=send-notification", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${token}`
+          },
+          body: JSON.stringify({ recipientType, recipientEmail, title, message })
+        });
+
+        const data = await res.json();
+        if (!res.ok || !data.success) throw new Error(data.error || "Failed to send notification");
+
+        alert("Notification dispatched successfully!");
+        document.getElementById("broadcastForm").reset();
+        toggleStudentEmailInput();
+      } catch (err) {
+        alert("Error: " + err.message);
+      } finally {
+        sendBtn.disabled = false;
+        sendBtn.innerHTML = `<i class="fas fa-paper-plane"></i> Send Notification`;
+      }
+    });
+  </script>
+</body>
+</html>
