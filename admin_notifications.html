@@ -2,126 +2,143 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexus Pro - Admin Broadcast</title>
+  <title>Nexus Pro - Manage Notifications</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
-    :root {
-      --bg-dark: #090d16;
-      --card-bg: #131c2e;
-      --card-border: #1e2d4a;
-      --accent-blue: #38bdf8;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --radius: 12px;
-    }
+    :root { --bg-dark: #090d16; --card-bg: #131c2e; --card-border: #1e2d4a; --accent-blue: #38bdf8; --text-muted: #94a3b8; --danger: #ef4444; }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
-    body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding: 24px 16px; }
-    .container { max-width: 650px; margin: 0 auto; }
-    .card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 28px; border-radius: var(--radius); }
-    h1 { font-size: 1.4rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-    
-    .form-group { margin-bottom: 16px; }
-    label { display: block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; font-weight: 600; }
-    input, select, textarea { width: 100%; padding: 12px; background: var(--bg-dark); border: 1px solid var(--card-border); color: #fff; border-radius: 8px; outline: none; }
-    input:focus, select:focus, textarea:focus { border-color: var(--accent-blue); }
-    textarea { resize: vertical; min-height: 120px; }
-
-    .btn-submit { width: 100%; padding: 12px; background: #0284c7; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    .btn-submit:hover { background: #0369a1; }
+    body { background: var(--bg-dark); color: #fff; padding: 24px 16px; }
+    .container { max-width: 900px; margin: 0 auto; display: grid; gap: 24px; }
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 20px; border-radius: 12px; }
+    input, select, textarea { width: 100%; padding: 10px; background: var(--bg-dark); border: 1px solid var(--card-border); color: #fff; border-radius: 8px; margin-bottom: 12px; }
+    .btn { padding: 8px 14px; border: none; border-radius: 6px; font-weight: 600; cursor: pointer; }
+    .btn-primary { background: #0284c7; color: #fff; }
+    .btn-action { padding: 4px 8px; font-size: 0.75rem; border: 1px solid var(--card-border); background: var(--bg-dark); color: #fff; border-radius: 4px; cursor: pointer; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.85rem; }
+    td, th { padding: 10px; border-bottom: 1px solid var(--card-border); text-align: left; }
   </style>
 </head>
 <body>
   <div class="container">
+    
+    <!-- Send / Edit Form -->
     <div class="card">
-      <h1><i class="fas fa-bullhorn" style="color: var(--accent-blue);"></i> Broadcast Notification</h1>
-      <form id="broadcastForm">
-        
-        <div class="form-group">
-          <label for="targetAudience">Send To *</label>
-          <select id="targetAudience" onchange="toggleStudentEmailInput()">
-            <option value="all">All Students (App Notification + Email Broadcast)</option>
-            <option value="single">Single Student (Direct Email & In-App)</option>
-          </select>
-        </div>
-
-        <div class="form-group" id="emailGroup" style="display: none;">
-          <label for="studentEmail">Student Email Address *</label>
-          <input type="email" id="studentEmail" placeholder="student@example.com">
-        </div>
-
-        <div class="form-group">
-          <label for="notifTitle">Notification Title / Subject *</label>
-          <input type="text" id="notifTitle" placeholder="e.g., Important Exam Notice" required>
-        </div>
-
-        <div class="form-group">
-          <label for="notifMessage">Message Body *</label>
-          <textarea id="notifMessage" placeholder="Write your announcement details here..." required></textarea>
-        </div>
-
-        <button type="submit" class="btn-submit" id="sendBtn">
-          <i class="fas fa-paper-plane"></i> Send Notification
-        </button>
+      <h2 id="formTitle"><i class="fas fa-bullhorn" style="color:var(--accent-blue);"></i> Broadcast Notification</h2>
+      <form id="notifForm">
+        <input type="hidden" id="editId" value="">
+        <input type="text" id="title" placeholder="Title / Subject" required>
+        <textarea id="message" placeholder="Message Body..." required style="min-height:90px;"></textarea>
+        <button type="submit" class="btn btn-primary" id="saveBtn">Publish Notification</button>
+        <button type="button" class="btn" id="cancelBtn" style="display:none; background:transparent; color:var(--text-muted);" onclick="resetForm()">Cancel</button>
       </form>
     </div>
+
+    <!-- Existing Notifications Table -->
+    <div class="card">
+      <h2>Existing Announcements</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Date</th>
+            <th>Read Receipts</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="adminNotifTable">
+          <tr><td colspan="4">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
-<script>
-  function toggleStudentEmailInput() {
-    const target = document.getElementById("targetAudience").value;
-    document.getElementById("emailGroup").style.display = target === "single" ? "block" : "none";
-  }
 
-  document.getElementById("broadcastForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const sendBtn = document.getElementById("sendBtn");
-    sendBtn.disabled = true;
-    sendBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Broadcasting...`;
+  <script>
+    let notifs = [];
 
-    const recipientType = document.getElementById("targetAudience").value;
-    const recipientEmail = document.getElementById("studentEmail").value.trim();
-    const title = document.getElementById("notifTitle").value.trim();
-    const message = document.getElementById("notifMessage").value.trim();
+    async function loadAdminNotifs() {
+      const res = await fetch('/api/notifications.js?action=admin-list');
+      const data = await res.json();
+      notifs = data.notifications || [];
 
-    if (recipientType === "single" && !recipientEmail) {
-      alert("Please specify student email.");
-      sendBtn.disabled = false;
-      sendBtn.innerHTML = `<i class="fas fa-paper-plane"></i> Send Notification`;
-      return;
+      const tbody = document.getElementById("adminNotifTable");
+      if (!notifs.length) { tbody.innerHTML = `<tr><td colspan="4">No notifications created yet.</td></tr>`; return; }
+
+      tbody.innerHTML = notifs.map(n => `
+        <tr>
+          <td><strong>${escapeHtml(n.title)}</strong></td>
+          <td>${new Date(Number(n.created_at)).toLocaleDateString()}</td>
+          <td>
+            <button class="btn-action" onclick="viewReads('${n.id}')">
+              <i class="fas fa-eye"></i> ${n.read_count || 0} Seen
+            </button>
+          </td>
+          <td>
+            <button class="btn-action" onclick="editNotif('${n.id}')"><i class="fas fa-edit"></i> Edit</button>
+            <button class="btn-action" style="color:var(--danger);" onclick="deleteNotif('${n.id}')"><i class="fas fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join("");
     }
 
-    // Retrieve Token Safely
-    const token = localStorage.getItem("nexusToken") || localStorage.getItem("token") || "";
+    document.getElementById("notifForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const id = document.getElementById("editId").value;
+      const title = document.getElementById("title").value.trim();
+      const message = document.getElementById("message").value.trim();
 
-    try {
-      const headers = { "Content-Type": "application/json" };
-      if (token) {
-        headers["Authorization"] = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
-      }
-
-      const res = await fetch("/api/notifications.js?action=send-notification", {
+      const action = id ? "edit-notification" : "send-notification";
+      await fetch(`/api/notifications.js?action=${action}`, {
         method: "POST",
-        headers: headers,
-        body: JSON.stringify({ recipientType, recipientEmail, title, message })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, recipientType: "all", title, message })
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.error || `Server responded with status ${res.status}`);
-      }
+      resetForm();
+      loadAdminNotifs();
+    });
 
-      alert("Notification dispatched successfully!");
-      document.getElementById("broadcastForm").reset();
-      toggleStudentEmailInput();
-    } catch (err) {
-      console.error("Broadcast Error:", err);
-      alert("Notification Error: " + err.message);
-    } finally {
-      sendBtn.disabled = false;
-      sendBtn.innerHTML = `<i class="fas fa-paper-plane"></i> Send Notification`;
+    function editNotif(id) {
+      const n = notifs.find(item => String(item.id) === String(id));
+      if (!n) return;
+      document.getElementById("editId").value = n.id;
+      document.getElementById("title").value = n.title;
+      document.getElementById("message").value = n.message;
+      document.getElementById("formTitle").innerHTML = `<i class="fas fa-edit"></i> Edit Notification`;
+      document.getElementById("saveBtn").textContent = "Save Changes";
+      document.getElementById("cancelBtn").style.display = "inline-block";
     }
-  });
-</script>
 
+    async function deleteNotif(id) {
+      if (!confirm("Delete this notification?")) return;
+      await fetch('/api/notifications.js?action=delete-notification', {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id })
+      });
+      loadAdminNotifs();
+    }
+
+    async function viewReads(id) {
+      const res = await fetch(`/api/notifications.js?action=get-reads&id=${id}`);
+      const data = await res.json();
+      const readers = data.reads || [];
+      if (!readers.length) { alert("No students have marked this notification as seen yet."); return; }
+      
+      const list = readers.map(r => `• ${r.student_email} (${new Date(Number(r.read_at)).toLocaleString()})`).join("\n");
+      alert(`Students who saw this announcement:\n\n${list}`);
+    }
+
+    function resetForm() {
+      document.getElementById("notifForm").reset();
+      document.getElementById("editId").value = "";
+      document.getElementById("formTitle").innerHTML = `<i class="fas fa-bullhorn" style="color:var(--accent-blue);"></i> Broadcast Notification`;
+      document.getElementById("saveBtn").textContent = "Publish Notification";
+      document.getElementById("cancelBtn").style.display = "none";
+    }
+
+    function escapeHtml(str) { return String(str||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+    loadAdminNotifs();
+  </script>
 </body>
 </html>
