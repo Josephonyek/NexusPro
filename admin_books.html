@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexus Pro - Book Upload Manager</title>
+  <title>Nexus Pro - Book Library Manager</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
     :root {
@@ -13,58 +13,119 @@
       --accent-blue: #38bdf8;
       --text-main: #f8fafc;
       --text-muted: #94a3b8;
+      --danger: #ef4444;
+      --warning: #f59e0b;
       --radius: 12px;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', system-ui, sans-serif; }
     body { background: var(--bg-dark); color: var(--text-main); min-height: 100vh; padding: 24px 16px; }
-    .container { max-width: 600px; margin: 0 auto; }
-    .card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 28px; border-radius: var(--radius); }
-    h1 { font-size: 1.4rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-    .form-group { margin-bottom: 16px; }
-    label { display: block; font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; font-weight: 600; }
-    input, select { width: 100%; padding: 12px; background: var(--bg-dark); border: 1px solid var(--card-border); color: #fff; border-radius: 8px; outline: none; }
+    .container { max-width: 900px; margin: 0 auto; display: grid; gap: 24px; }
+    
+    .card { background: var(--card-bg); border: 1px solid var(--card-border); padding: 24px; border-radius: var(--radius); }
+    h1, h2 { font-size: 1.3rem; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; }
+    
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; font-weight: 600; }
+    input, select { width: 100%; padding: 10px 12px; background: var(--bg-dark); border: 1px solid var(--card-border); color: #fff; border-radius: 8px; outline: none; }
     input:focus, select:focus { border-color: var(--accent-blue); }
-    .btn-submit { width: 100%; padding: 12px; background: #0284c7; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 10px; }
-    .btn-submit:hover { background: #0369a1; }
+    
+    .btn { padding: 10px 16px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 0.85rem; }
+    .btn-primary { background: #0284c7; color: #fff; width: 100%; justify-content: center; }
+    .btn-primary:hover { background: #0369a1; }
+    .btn-cancel { background: transparent; border: 1px solid var(--card-border); color: var(--text-muted); }
+    .btn-action { padding: 6px 10px; font-size: 0.75rem; border-radius: 6px; border: 1px solid var(--card-border); background: var(--bg-dark); color: var(--text-main); cursor: pointer; }
+    .btn-action.danger:hover { border-color: var(--danger); color: var(--danger); }
+    .btn-action.warn:hover { border-color: var(--warning); color: var(--warning); }
+
+    /* Progress Bar */
+    .progress-container { display: none; margin-top: 14px; background: var(--bg-dark); border-radius: 20px; overflow: hidden; height: 10px; border: 1px solid var(--card-border); }
+    .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, #0284c7, #38bdf8); transition: width 0.2s ease; }
+
+    /* Admin Table */
+    .table-wrapper { width: 100%; overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem; }
+    th { color: var(--text-muted); padding: 12px; border-bottom: 1px solid var(--card-border); font-size: 0.72rem; text-transform: uppercase; }
+    td { padding: 12px; border-bottom: 1px solid var(--card-border); vertical-align: middle; }
   </style>
 </head>
 <body>
   <div class="container">
+    
+    <!-- Upload / Edit Form -->
     <div class="card">
-      <h1><i class="fas fa-book-medical" style="color: var(--accent-blue);"></i> Add New Book</h1>
+      <h1 id="formTitle"><i class="fas fa-book-medical" style="color: var(--accent-blue);"></i> Add New Book</h1>
       <form id="bookUploadForm">
+        <input type="hidden" id="editBookId" value="">
+        
         <div class="form-group">
           <label for="bookTitle">Book Title *</label>
           <input type="text" id="bookTitle" placeholder="e.g., Fundamentals of Physics" required>
         </div>
-        <div class="form-group">
-          <label for="bookAuthor">Author / Publisher</label>
-          <input type="text" id="bookAuthor" placeholder="e.g., Dr. A. Johnson">
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label for="bookAuthor">Author / Publisher</label>
+            <input type="text" id="bookAuthor" placeholder="e.g., Dr. A. Johnson">
+          </div>
+          <div class="form-group">
+            <label for="bookCategory">Category</label>
+            <select id="bookCategory">
+              <option value="Physics">Physics</option>
+              <option value="Chemistry">Chemistry</option>
+              <option value="Mathematics">Mathematics</option>
+              <option value="English">English</option>
+              <option value="General">General</option>
+            </select>
+          </div>
         </div>
-        <div class="form-group">
-          <label for="bookCategory">Category / Subject</label>
-          <select id="bookCategory">
-            <option value="Physics">Physics</option>
-            <option value="Chemistry">Chemistry</option>
-            <option value="Mathematics">Mathematics</option>
-            <option value="English">English</option>
-            <option value="General">General</option>
-          </select>
-        </div>
+
         <div class="form-group">
           <label for="bookFileUrl">PDF / Resource Direct Link *</label>
-          <input type="url" id="bookFileUrl" placeholder="https://drive.google.com/... or direct PDF link" required>
+          <input type="url" id="bookFileUrl" placeholder="https://drive.google.com/..." required>
         </div>
+
         <div class="form-group">
           <label for="bookCoverUrl">Cover Image URL (Optional)</label>
           <input type="url" id="bookCoverUrl" placeholder="https://.../cover.jpg">
         </div>
-        <button type="submit" class="btn-submit" id="submitBtn">
-          <i class="fas fa-upload"></i> Publish to Academy
-        </button>
+
+        <div style="display: flex; gap: 10px;">
+          <button type="submit" class="btn btn-primary" id="submitBtn">
+            <i class="fas fa-upload"></i> Publish to Academy
+          </button>
+          <button type="button" class="btn btn-cancel" id="cancelEditBtn" style="display: none;" onclick="resetForm()">Cancel</button>
+        </div>
+
+        <div class="progress-container" id="progressContainer">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
       </form>
     </div>
+
+    <!-- Manage Existing Books Table -->
+    <div class="card">
+      <h2><i class="fas fa-tasks" style="color: var(--accent-blue);"></i> Manage Existing Books</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Category</th>
+              <th>Author</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="adminBooksTableBody">
+            <tr>
+              <td colspan="4" style="text-align: center; color: var(--text-muted); padding: 20px;">Loading books...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
+
   <script src="admin_books.js"></script>
 </body>
 </html>
