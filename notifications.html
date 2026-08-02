@@ -48,57 +48,65 @@
       </div>
     </div>
   </div>
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    const container = document.getElementById("notifListContainer");
 
-  <script>
-    document.addEventListener("DOMContentLoaded", async () => {
-      const container = document.getElementById("notifListContainer");
+    try {
+      const token = localStorage.getItem("nexusToken") || localStorage.getItem("token") || "";
+      const userEmail = localStorage.getItem("userEmail") || "";
 
-      try {
-        const token = localStorage.getItem("nexusToken") || localStorage.getItem("token") || "";
-        const userEmail = localStorage.getItem("userEmail") || ""; // Optional user email check
+      const headers = {};
+      if (token) {
+        headers["Authorization"] = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
+      }
 
-        const res = await fetch(`/api/notifications.js?action=get-notifications&email=${encodeURIComponent(userEmail)}`, {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
+      const res = await fetch(`/api/notifications.js?action=get-notifications&email=${encodeURIComponent(userEmail)}`, {
+        headers: headers
+      });
 
-        if (!res.ok) throw new Error("Could not load notifications");
+      const data = await res.json();
+      
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || "Server returned invalid response");
+      }
 
-        const data = await res.json();
-        const notifications = data.notifications || [];
+      const notifications = data.notifications || [];
 
-        if (notifications.length === 0) {
-          container.innerHTML = `
-            <div class="empty-state">
-              <i class="fas fa-bell-slash" style="font-size: 2.5rem; margin-bottom: 12px;"></i>
-              <p>You have no new notifications.</p>
-            </div>
-          `;
-          return;
-        }
-
-        container.innerHTML = notifications.map(notif => `
-          <div class="notif-card broadcast">
-            <div class="notif-meta">
-              <div class="notif-title">${escapeHtml(notif.title)}</div>
-              <div class="notif-date">${new Date(Number(notif.created_at)).toLocaleDateString()}</div>
-            </div>
-            <div class="notif-body">${escapeHtml(notif.message)}</div>
-          </div>
-        `).join("");
-
-      } catch (err) {
+      if (notifications.length === 0) {
         container.innerHTML = `
-          <div class="empty-state" style="color: #ef4444;">
-            <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
-            <p>Error loading announcements.</p>
+          <div class="empty-state">
+            <i class="fas fa-bell-slash" style="font-size: 2.5rem; margin-bottom: 12px;"></i>
+            <p>You have no announcements at this time.</p>
           </div>
         `;
+        return;
       }
 
-      function escapeHtml(str) {
-        return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      }
-    });
-  </script>
+      container.innerHTML = notifications.map(notif => `
+        <div class="notif-card broadcast" style="background: #131c2e; border: 1px solid #1e2d4a; padding: 18px; border-radius: 12px; margin-bottom: 14px; border-left: 4px solid #38bdf8;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+            <strong style="font-size: 1.05rem; color: #fff;">${escapeHtml(notif.title)}</strong>
+            <span style="font-size: 0.75rem; color: #94a3b8;">${new Date(Number(notif.created_at) || Date.now()).toLocaleDateString()}</span>
+          </div>
+          <div style="font-size: 0.9rem; color: #cbd5e1; white-space: pre-line;">${escapeHtml(notif.message)}</div>
+        </div>
+      `).join("");
+
+    } catch (err) {
+      console.error("Fetch Notifications Error:", err);
+      container.innerHTML = `
+        <div class="empty-state" style="color: #ef4444; text-align: center; padding: 40px;">
+          <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
+          <p>Failed to load announcements: ${escapeHtml(err.message)}</p>
+        </div>
+      `;
+    }
+
+    function escapeHtml(str) {
+      return String(str || "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+  });
+</script>
 </body>
 </html>
