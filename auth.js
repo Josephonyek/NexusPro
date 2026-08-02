@@ -80,46 +80,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // ================= 4. FORGOT PASSWORD MODAL =================
-  if (forgotPasswordLink && forgotModal && closeResetModal) {
-    forgotPasswordLink.addEventListener("click", (e) => {
-      e.preventDefault();
-      forgotModal.style.display = "flex";
-    });
-
-    closeResetModal.addEventListener("click", () => {
-      forgotModal.style.display = "none";
-    });
-  }
-
-  if (sendResetBtn) {
-    sendResetBtn.addEventListener("click", async () => {
-      const email = document.getElementById("resetEmail")?.value?.trim();
-      if (!email) {
-        alert("Please enter your email address.");
-        return;
-      }
-
-      sendResetBtn.disabled = true;
-      sendResetBtn.textContent = "Sending...";
-
-      try {
-        const res = await fetch(`${API_ENDPOINT}?action=forgot-password`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email })
-        });
-        const data = await res.json();
-        
-        alert(data.message || "Instructions sent if account exists.");
-        forgotModal.style.display = "none";
-      } catch (err) {
-        alert("Error requesting password reset. Try again later.");
-      } finally {
-        sendResetBtn.disabled = false;
-        sendResetBtn.textContent = "Request Reset";
-      }
-    });
-  }
+  
 
   // ================= 5. FORM SUBMISSION HANDLER =================
   if (authForm) {
