@@ -66,55 +66,62 @@
       </form>
     </div>
   </div>
+<script>
+  function toggleStudentEmailInput() {
+    const target = document.getElementById("targetAudience").value;
+    document.getElementById("emailGroup").style.display = target === "single" ? "block" : "none";
+  }
 
-  <script>
-    function toggleStudentEmailInput() {
-      const target = document.getElementById("targetAudience").value;
-      document.getElementById("emailGroup").style.display = target === "single" ? "block" : "none";
+  document.getElementById("broadcastForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const sendBtn = document.getElementById("sendBtn");
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Broadcasting...`;
+
+    const recipientType = document.getElementById("targetAudience").value;
+    const recipientEmail = document.getElementById("studentEmail").value.trim();
+    const title = document.getElementById("notifTitle").value.trim();
+    const message = document.getElementById("notifMessage").value.trim();
+
+    if (recipientType === "single" && !recipientEmail) {
+      alert("Please specify student email.");
+      sendBtn.disabled = false;
+      sendBtn.innerHTML = `<i class="fas fa-paper-plane"></i> Send Notification`;
+      return;
     }
 
-    document.getElementById("broadcastForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const sendBtn = document.getElementById("sendBtn");
-      sendBtn.disabled = true;
-      sendBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Broadcasting...`;
+    // Retrieve Token Safely
+    const token = localStorage.getItem("nexusToken") || localStorage.getItem("token") || "";
 
-      const recipientType = document.getElementById("targetAudience").value;
-      const recipientEmail = document.getElementById("studentEmail").value.trim();
-      const title = document.getElementById("notifTitle").value.trim();
-      const message = document.getElementById("notifMessage").value.trim();
-
-      if (recipientType === "single" && !recipientEmail) {
-        alert("Please specify student email.");
-        sendBtn.disabled = false;
-        sendBtn.innerHTML = `<i class="fas fa-paper-plane"></i> Send Notification`;
-        return;
+    try {
+      const headers = { "Content-Type": "application/json" };
+      if (token) {
+        headers["Authorization"] = token.startsWith("Bearer ") ? token : `Bearer ${token}`;
       }
 
-      try {
-        const token = localStorage.getItem("nexusToken") || localStorage.getItem("token") || "";
-        const res = await fetch("/api/notifications.js?action=send-notification", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
-          body: JSON.stringify({ recipientType, recipientEmail, title, message })
-        });
+      const res = await fetch("/api/notifications.js?action=send-notification", {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify({ recipientType, recipientEmail, title, message })
+      });
 
-        const data = await res.json();
-        if (!res.ok || !data.success) throw new Error(data.error || "Failed to send notification");
-
-        alert("Notification dispatched successfully!");
-        document.getElementById("broadcastForm").reset();
-        toggleStudentEmailInput();
-      } catch (err) {
-        alert("Error: " + err.message);
-      } finally {
-        sendBtn.disabled = false;
-        sendBtn.innerHTML = `<i class="fas fa-paper-plane"></i> Send Notification`;
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || `Server responded with status ${res.status}`);
       }
-    });
-  </script>
+
+      alert("Notification dispatched successfully!");
+      document.getElementById("broadcastForm").reset();
+      toggleStudentEmailInput();
+    } catch (err) {
+      console.error("Broadcast Error:", err);
+      alert("Notification Error: " + err.message);
+    } finally {
+      sendBtn.disabled = false;
+      sendBtn.innerHTML = `<i class="fas fa-paper-plane"></i> Send Notification`;
+    }
+  });
+</script>
+
 </body>
 </html>
