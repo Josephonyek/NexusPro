@@ -4,32 +4,36 @@ document.addEventListener("DOMContentLoaded", () => {
   const searchInput = document.getElementById("searchBookInput");
   const categoryFilter = document.getElementById("categoryFilter");
 
+  // Reader Modal Elements
+  const readerModal = document.getElementById("readerModal");
+  const readerIframe = document.getElementById("readerIframe");
+  const readerTitle = document.getElementById("readerTitle");
+  const readerAuthor = document.getElementById("readerAuthor");
+
   let allBooks = [];
 
-  // 1. Fetch Books
+  // 1. Fetch & Render Books
   async function fetchBooks() {
     try {
       const res = await fetch(`${API_ENDPOINT}?action=list-books`);
-      if (!res.ok) throw new Error("Server error");
+      if (!res.ok) throw new Error("Failed to load");
 
       const data = await res.json();
       allBooks = data.books || (Array.isArray(data) ? data : []);
 
       renderBooks(allBooks);
     } catch (err) {
-      console.error("Fetch books error:", err);
       if (booksGrid) {
         booksGrid.innerHTML = `
           <div class="empty-state" style="color: #ef4444;">
             <i class="fas fa-exclamation-triangle" style="font-size: 2rem; margin-bottom: 10px;"></i>
-            <p>Could not load library contents. Please check your connection.</p>
+            <p>Could not connect to library database.</p>
           </div>
         `;
       }
     }
   }
 
-  // 2. Render Grid
   function renderBooks(books) {
     if (!booksGrid) return;
 
@@ -37,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
       booksGrid.innerHTML = `
         <div class="empty-state">
           <i class="fas fa-folder-open" style="font-size: 2.5rem; margin-bottom: 12px;"></i>
-          <p>No books found matching your criteria.</p>
+          <p>No books match your request.</p>
         </div>
       `;
       return;
@@ -54,27 +58,72 @@ document.addEventListener("DOMContentLoaded", () => {
             <div class="book-title">${escapeHtml(book.title)}</div>
             <div class="book-author">By ${escapeHtml(book.author || "Unknown")}</div>
           </div>
-          <a href="${escapeHtml(book.fileUrl)}" target="_blank" rel="noopener noreferrer" class="btn-read">
-            <i class="fas fa-file-pdf"></i> Access Resource
-          </a>
+          <button class="btn-read" onclick="openReader('${book.id}')">
+            <i class="fas fa-book-reader"></i> Read Online
+          </button>
         </div>
       </div>
     `).join("");
   }
 
-  // 3. Search & Filter Engine
+  // 2. Read Online Only Modal Logic
+  window.openReader = function(id) {
+    const book = allBooks.find(b => String(b.id) === String(id));
+    if (!book) return;
+
+    readerTitle.textContent = book.title;
+    readerAuthor.textContent = `By ${book.author || "Unknown"}`;
+
+    // Format embed URL for reading without direct download options
+    readerIframe.src = formatEmbedUrl(book.fileUrl);
+
+    readerModal.style.display = "flex";
+    document.body.style.overflow = "hidden";
+  };
+
+  window.closeReader = function() {
+    readerModal.style.display = "none";
+    readerIframe.src = "";
+    document.body.style.overflow = "auto";
+  };
+
+  window.toggleNativeFullscreen = function() {
+    if (!document.fullscreenElement) {
+      readerModal.requestFullscreen().catch(err => alert("Fullscreen error: " + err.message));
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  function formatEmbedUrl(url) {
+    if (!url) return "";
+
+    // Convert Google Drive view links into clean inline preview mode
+    if (url.includes("drive.google.com")) {
+      return url.replace(/\/view.*$/, "/preview").replace(/\/edit.*$/, "/preview");
+    }
+
+    // Wrap raw PDF links inside Google Docs viewer for in-browser reading
+    if (url.endsWith(".pdf")) {
+      return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+    }
+
+    return url;
+  }
+
+  // 3. Search & Filter
   function applyFilters() {
     const search = searchInput ? searchInput.value.toLowerCase().trim() : "";
     const category = categoryFilter ? categoryFilter.value.toLowerCase() : "all";
 
     const filtered = allBooks.filter(b => {
-      const titleMatch = (b.title || "").toLowerCase().includes(search);
-      const authorMatch = (b.author || "").toLowerCase().includes(search);
-      const matchesSearch = search === "" || titleMatch || authorMatch;
+      const matchTitle = (b.title || "").toLowerCase().includes(search);
+      const matchAuthor = (b.author || "").toLowerCase().includes(search);
+      const matchSearch = search === "" || matchTitle || matchAuthor;
 
-      const matchesCategory = category === "all" || (b.category || "").toLowerCase() === category;
+      const matchCategory = category === "all" || (b.category || "").toLowerCase() === category;
 
-      return matchesSearch && matchesCategory;
+      return matchSearch && matchCategory;
     });
 
     renderBooks(filtered);
