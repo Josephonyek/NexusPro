@@ -86,7 +86,7 @@ export default async function handler(req, res) {
           sender: { 
             name: "Nexus Pro Security", 
             // Note: Replace with your actual Brevo account email address to avoid sender drop
-            email: "support@nexuspro.com" 
+            email: "onyekajoseph001@gmail.com" 
           },
           to: [{ email: email }],
           subject: "Nexus Pro - Password Reset OTP",
