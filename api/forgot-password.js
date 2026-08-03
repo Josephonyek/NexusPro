@@ -62,7 +62,7 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           sender: { 
             name: "Nexus Pro Security", 
-            email: "noreply@nexuspro.com" // You can set any sender email here
+            email: "josephugo321@gmail.com" // You can set any sender email here
           },
           to: [{ email: email }],
           subject: "Nexus Pro - Password Reset OTP",
