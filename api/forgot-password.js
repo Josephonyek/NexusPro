@@ -15,23 +15,25 @@ export default async function handler(req, res) {
     });
 
     // 2. Safe Auto-Migrations
-    // Runs ALTER TABLE to make sure necessary columns exist without breaking if they already do
+    // Ensure 'password_hash' column exists
     try {
-      await db.execute(`ALTER TABLE users ADD COLUMN password TEXT;`);
+      await db.execute(`ALTER TABLE users ADD COLUMN password_hash TEXT;`);
     } catch (e) {
-      // Ignore error if column already exists
+      // Ignore if column already exists
     }
 
+    // Ensure 'reset_otp' column exists
     try {
       await db.execute(`ALTER TABLE users ADD COLUMN reset_otp VARCHAR(10) DEFAULT NULL;`);
     } catch (e) {
-      // Ignore error if column already exists
+      // Ignore if column already exists
     }
 
+    // Ensure 'reset_otp_expires' column exists
     try {
       await db.execute(`ALTER TABLE users ADD COLUMN reset_otp_expires BIGINT DEFAULT NULL;`);
     } catch (e) {
-      // Ignore error if column already exists
+      // Ignore if column already exists
     }
 
     const brevoApiKey = process.env.BREVO_API_KEY;
@@ -85,7 +87,6 @@ export default async function handler(req, res) {
         body: JSON.stringify({
           sender: { 
             name: "Nexus Pro Security", 
-            // Note: Replace with your actual Brevo account email address to avoid sender drop
             email: "onyekajoseph001@gmail.com" 
           },
           to: [{ email: email }],
@@ -150,11 +151,12 @@ export default async function handler(req, res) {
         return res.status(400).json({ success: false, error: "OTP code has expired. Please request a new one." });
       }
 
-      // Hash new password and clear OTP columns upon success
+      // Hash new password using bcrypt
       const hashedPassword = await bcrypt.hash(newPassword, 10);
 
+      // UPDATE 'password_hash' AND CLEAR OTP FIELDS
       await db.execute({
-        sql: `UPDATE users SET password = ?, reset_otp = NULL, reset_otp_expires = NULL WHERE LOWER(email) = LOWER(?)`,
+        sql: `UPDATE users SET password_hash = ?, reset_otp = NULL, reset_otp_expires = NULL WHERE LOWER(email) = LOWER(?)`,
         args: [hashedPassword, email]
       });
 
@@ -168,4 +170,4 @@ export default async function handler(req, res) {
     console.error("Critical Backend API Error:", err);
     return res.status(500).json({ success: false, error: err.message || "Internal server error." });
   }
-  }
+}
