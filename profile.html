@@ -153,7 +153,7 @@
   <div id="alertBox" class="alert"></div>
 
   <form id="profileForm">
-    <!-- 1. EMAIL ADDRESS (PERMANENTLY LOCKED) -->
+    <!-- 1. EMAIL ADDRESS (LOCKED) -->
     <div class="field-row">
       <div class="field-header">
         <span class="field-label">Email Address</span>
@@ -302,24 +302,36 @@
 </div>
 
 <script>
-  // Robust check for email across common session keys
+  // Detect email across all nexusUser, user_email, or email keys
   const getActiveUserEmail = () => {
-    return localStorage.getItem("user_email") || 
-           localStorage.getItem("email") || 
-           localStorage.getItem("user") || 
-           "";
+    // 1. Direct explicit keys
+    let email = localStorage.getItem("user_email") || localStorage.getItem("email");
+
+    // 2. Extract from nexusUser JSON object
+    if (!email && localStorage.getItem("nexusUser")) {
+      try {
+        const userObj = JSON.parse(localStorage.getItem("nexusUser"));
+        if (userObj && userObj.email) {
+          email = userObj.email;
+        }
+      } catch (e) {
+        console.error("Error parsing nexusUser:", e);
+      }
+    }
+
+    return email ? email.trim() : "";
   };
 
   let activeEdits = new Set();
   let userEmail = "";
 
-  // Load existing exact values into text views and inputs
   async function loadProfileData() {
     userEmail = getActiveUserEmail();
 
     if (!userEmail) {
-      document.getElementById("viewEmail").innerText = "No logged in user found";
+      document.getElementById("viewEmail").innerText = "Not Logged In";
       showAlert("Could not detect session email. Please log in again.", "danger");
+      resetLoadingPlaceholders();
       return;
     }
 
@@ -359,7 +371,7 @@
 
         handleEduTypeChange();
       } else {
-        showAlert(data.error || "Profile info not found.", "danger");
+        showAlert(data.error || "Profile details not found in database.", "danger");
         resetLoadingPlaceholders();
       }
     } catch (err) {
@@ -378,7 +390,6 @@
     });
   }
 
-  // Toggle Edit Field Display when Pencil Icon is clicked
   function toggleEdit(key) {
     const control = document.getElementById(`edit${key}`);
     const row = document.getElementById(`row${key}`);
@@ -396,7 +407,6 @@
     document.getElementById("saveSection").style.display = activeEdits.size > 0 ? "block" : "none";
   }
 
-  // Show proper secondary/tertiary fields based on selection
   function handleEduTypeChange() {
     const selectedType = document.getElementById("inputEduType").value;
     if (selectedType === "secondary") {
@@ -410,7 +420,6 @@
     }
   }
 
-  // Form Submission and Validation
   document.getElementById("profileForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
@@ -471,9 +480,9 @@
     box.style.display = "block";
   }
 
-  // Execute safe load as soon as DOM is ready
+  // Load profile as soon as DOM content is available
   document.addEventListener("DOMContentLoaded", loadProfileData);
 </script>
 
 </body>
-  </html>
+            </html>
