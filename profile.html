@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus Pro - My Profile</title>
+  <style>
+    :root {
+      --primary: #0284c7;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); display: flex; justify-content: center; padding: 40px 20px; }
+
+    .profile-card {
+      background: var(--card-bg);
+      width: 100%;
+      max-width: 500px;
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+    }
+
+    h2 { color: var(--primary); font-size: 24px; margin-bottom: 6px; }
+    p.subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+
+    .form-group { margin-bottom: 20px; }
+    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+    
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 14px;
+      background-color: #fff;
+      outline: none;
+      transition: border 0.2s;
+    }
+
+    input:focus, select:focus { border-color: var(--primary); }
+    
+    /* Lock Email style */
+    input[readonly] {
+      background-color: #f1f5f9;
+      color: #94a3b8;
+      cursor: not-allowed;
+    }
+
+    .section-divider {
+      border: 0;
+      border-top: 1px solid var(--border);
+      margin: 24px 0;
+    }
+
+    .btn-save {
+      width: 100%;
+      padding: 14px;
+      background-color: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .btn-save:hover { opacity: 0.95; }
+
+    .alert {
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .alert-danger { background-color: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+    .alert-success { background-color: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+  </style>
+</head>
+<body>
+
+<div class="profile-card">
+  <h2>Account Profile</h2>
+  <p class="subtitle">View and update your personal and academic details</p>
+
+  <div id="alertBox" class="alert"></div>
+
+  <form id="profileForm">
+    <!-- READ-ONLY EMAIL -->
+    <div class="form-group">
+      <label>Email Address (Unchangeable)</label>
+      <input type="email" id="userEmail" readonly />
+    </div>
+
+    <!-- FIRST & LAST NAME -->
+    <div class="form-group">
+      <label for="firstName">First Name</label>
+      <input type="text" id="firstName" placeholder="Enter first name" required />
+    </div>
+
+    <div class="form-group">
+      <label for="lastName">Last Name</label>
+      <input type="text" id="lastName" placeholder="Enter last name" required />
+    </div>
+
+    <!-- EDUCATIONAL TYPE -->
+    <div class="form-group">
+      <label for="educationalType">Educational Level</label>
+      <select id="educationalType" onchange="toggleEduFields()">
+        <option value="secondary">Secondary School</option>
+        <option value="tertiary">Tertiary Institution</option>
+      </select>
+    </div>
+
+    <!-- SECONDARY FIELD: CLASS -->
+    <div class="form-group" id="secGroup">
+      <label for="studentClass">Class</label>
+      <select id="studentClass">
+        <option value="SS1">SS1</option>
+        <option value="SS2">SS2</option>
+        <option value="SS3">SS3</option>
+        <option value="JSS3">JSS3</option>
+      </select>
+    </div>
+
+    <!-- TERTIARY FIELDS: COURSE & LEVEL -->
+    <div id="tertGroup" style="display: none;">
+      <div class="form-group">
+        <label for="studentCourse">Course of Study</label>
+        <input type="text" id="studentCourse" placeholder="e.g. Computer Science" />
+      </div>
+
+      <div class="form-group">
+        <label for="studentLevel">Level</label>
+        <select id="studentLevel">
+          <option value="100L">100 Level</option>
+          <option value="200L">200 Level</option>
+          <option value="300L">300 Level</option>
+          <option value="400L">400 Level</option>
+          <option value="500L">500 Level</option>
+        </select>
+      </div>
+    </div>
+
+    <hr class="section-divider" />
+
+    <!-- PASSWORD VERIFICATION REQUIREMENT -->
+    <div class="form-group">
+      <label for="currentPassword">Current Password (Required to save changes)</label>
+      <input type="password" id="currentPassword" placeholder="Enter your current password" required />
+    </div>
+
+    <button type="submit" class="btn-save">Save Profile Changes</button>
+  </form>
+</div>
+
+<script>
+  // Get active user email from localStorage session
+  const activeUserEmail = localStorage.getItem("user_email") || "student@example.com";
+
+  function toggleEduFields() {
+    const type = document.getElementById("educationalType").value;
+    if (type === "secondary") {
+      document.getElementById("secGroup").style.display = "block";
+      document.getElementById("tertGroup").style.display = "none";
+    } else {
+      document.getElementById("secGroup").style.display = "none";
+      document.getElementById("tertGroup").style.display = "block";
+    }
+  }
+
+  // Load existing values into form fields
+  async function loadProfile() {
+    document.getElementById("userEmail").value = activeUserEmail;
+
+    try {
+      const res = await fetch(`/api/profile?email=${encodeURIComponent(activeUserEmail)}`);
+      const data = await res.json();
+
+      if (data.success && data.profile) {
+        const p = data.profile;
+        document.getElementById("firstName").value = p.first_name || "";
+        document.getElementById("lastName").value = p.last_name || "";
+        
+        if (p.educational_type) {
+          document.getElementById("educationalType").value = p.educational_type;
+          toggleEduFields();
+        }
+
+        if (p.class) document.getElementById("studentClass").value = p.class;
+        if (p.course) document.getElementById("studentCourse").value = p.course;
+        if (p.level) document.getElementById("studentLevel").value = p.level;
+      }
+    } catch (err) {
+      showAlert("Error loading profile information.", "danger");
+    }
+  }
+
+  // Submit profile updates to backend
+  document.getElementById("profileForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      email: activeUserEmail,
+      currentPassword: document.getElementById("currentPassword").value,
+      first_name: document.getElementById("firstName").value,
+      last_name: document.getElementById("lastName").value,
+      educational_type: document.getElementById("educationalType").value,
+      class: document.getElementById("studentClass").value,
+      course: document.getElementById("studentCourse").value,
+      level: document.getElementById("studentLevel").value
+    };
+
+    try {
+      const res = await fetch("/api/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        showAlert(data.message, "success");
+        document.getElementById("currentPassword").value = "";
+      } else {
+        showAlert(data.error || "Failed to update profile", "danger");
+      }
+    } catch (err) {
+      showAlert("Network error. Please try again.", "danger");
+    }
+  });
+
+  function showAlert(msg, type) {
+    const box = document.getElementById("alertBox");
+    box.className = `alert alert-${type}`;
+    box.innerText = msg;
+    box.style.display = "block";
+  }
+
+  loadProfile();
+</script>
+
+</body>
+  </html>
