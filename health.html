@@ -6,7 +6,18 @@
     <title>Nexus Pro | Health & Wellness</title>
     <!-- Icon Font Library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <script>
+  (function requireAuth() {
+    const token = localStorage.getItem("nexusToken");
+    const user = localStorage.getItem("nexusUser");
+
+    // If no token or user object exists in localStorage, bounce to login
+    if (!token || !user) {
+      alert("Please log in to access this page.");
+      window.location.href = "auth.html";
+    }
+  })();
+    </script>
     <style>
         :root {
             --bg-dark: #0f172a;
