@@ -302,26 +302,42 @@
 </div>
 
 <script>
-  const activeUserEmail = localStorage.getItem("user_email") || "student@example.com";
-  let activeEdits = new Set();
+  // Robust check for email across common session keys
+  const getActiveUserEmail = () => {
+    return localStorage.getItem("user_email") || 
+           localStorage.getItem("email") || 
+           localStorage.getItem("user") || 
+           "";
+  };
 
-  // Load existing exact values into text views and inputs on page initialization
+  let activeEdits = new Set();
+  let userEmail = "";
+
+  // Load existing exact values into text views and inputs
   async function loadProfileData() {
-    document.getElementById("viewEmail").innerText = activeUserEmail;
+    userEmail = getActiveUserEmail();
+
+    if (!userEmail) {
+      document.getElementById("viewEmail").innerText = "No logged in user found";
+      showAlert("Could not detect session email. Please log in again.", "danger");
+      return;
+    }
+
+    document.getElementById("viewEmail").innerText = userEmail;
 
     try {
-      const res = await fetch(`/api/profile?email=${encodeURIComponent(activeUserEmail)}`);
+      const res = await fetch(`/api/profile?email=${encodeURIComponent(userEmail)}`);
       const data = await res.json();
 
       if (data.success && data.profile) {
         const p = data.profile;
 
         // First Name
-        document.getElementById("viewFirstName").innerText = p.first_name || "Not specified";
+        document.getElementById("viewFirstName").innerText = p.first_name || "Not set";
         document.getElementById("inputFirstName").value = p.first_name || "";
 
         // Last Name
-        document.getElementById("viewLastName").innerText = p.last_name || "Not specified";
+        document.getElementById("viewLastName").innerText = p.last_name || "Not set";
         document.getElementById("inputLastName").value = p.last_name || "";
 
         // Educational Level
@@ -330,22 +346,36 @@
         document.getElementById("inputEduType").value = eduType;
 
         // Secondary Class
-        document.getElementById("viewClass").innerText = p.class || "Not specified";
+        document.getElementById("viewClass").innerText = p.class || "Not set";
         if (p.class) document.getElementById("inputClass").value = p.class;
 
         // Tertiary Course
-        document.getElementById("viewCourse").innerText = p.course || "Not specified";
+        document.getElementById("viewCourse").innerText = p.course || "Not set";
         document.getElementById("inputCourse").value = p.course || "";
 
         // Tertiary Level
-        document.getElementById("viewLevel").innerText = p.level || "Not specified";
+        document.getElementById("viewLevel").innerText = p.level || "Not set";
         if (p.level) document.getElementById("inputLevel").value = p.level;
 
         handleEduTypeChange();
+      } else {
+        showAlert(data.error || "Profile info not found.", "danger");
+        resetLoadingPlaceholders();
       }
     } catch (err) {
-      showAlert("Error loading user profile.", "danger");
+      console.error("Fetch profile error:", err);
+      showAlert("Error connecting to server.", "danger");
+      resetLoadingPlaceholders();
     }
+  }
+
+  function resetLoadingPlaceholders() {
+    ["viewFirstName", "viewLastName", "viewEduType", "viewClass", "viewCourse", "viewLevel"].forEach(id => {
+      const el = document.getElementById(id);
+      if (el && el.innerText === "Loading...") {
+        el.innerText = "Not set";
+      }
+    });
   }
 
   // Toggle Edit Field Display when Pencil Icon is clicked
@@ -387,14 +417,13 @@
     const newPassword = document.getElementById("inputNewPassword").value;
     const confirmPassword = document.getElementById("inputConfirmPassword").value;
 
-    // Verify Password match if editing password
     if (activeEdits.has("Password") && newPassword !== confirmPassword) {
       showAlert("New password and confirm password do not match.", "danger");
       return;
     }
 
     const payload = {
-      email: activeUserEmail,
+      email: userEmail,
       currentPassword: document.getElementById("inputCurrentPassword").value,
       newPassword: activeEdits.has("Password") ? newPassword : null,
       first_name: document.getElementById("inputFirstName").value,
@@ -417,12 +446,10 @@
       if (data.success) {
         showAlert("Profile updated successfully!", "success");
 
-        // Clear password fields
         document.getElementById("inputCurrentPassword").value = "";
         document.getElementById("inputNewPassword").value = "";
         document.getElementById("inputConfirmPassword").value = "";
 
-        // Hide edit inputs & refresh updated display values
         document.querySelectorAll(".edit-control").forEach(el => el.style.display = "none");
         document.querySelectorAll(".field-row").forEach(el => el.classList.remove("editing"));
         document.getElementById("saveSection").style.display = "none";
@@ -444,8 +471,9 @@
     box.style.display = "block";
   }
 
-  loadProfileData();
+  // Execute safe load as soon as DOM is ready
+  document.addEventListener("DOMContentLoaded", loadProfileData);
 </script>
 
 </body>
-          </html>
+  </html>
