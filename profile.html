@@ -12,6 +12,7 @@
       --text: #1e293b;
       --text-muted: #64748b;
       --border: #e2e8f0;
+      --lock: #94a3b8;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -20,7 +21,7 @@
     .profile-card {
       background: var(--card-bg);
       width: 100%;
-      max-width: 500px;
+      max-width: 520px;
       padding: 32px;
       border-radius: 16px;
       box-shadow: 0 4px 20px rgba(0,0,0,0.05);
@@ -30,33 +31,89 @@
     h2 { color: var(--primary); font-size: 24px; margin-bottom: 6px; }
     p.subtitle { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
 
-    .form-group { margin-bottom: 20px; }
-    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
-    
+    /* Field Card Row Structure */
+    .field-row {
+      background: #f8fafc;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      transition: border-color 0.2s;
+    }
+
+    .field-row.editing {
+      border-color: var(--primary);
+      background: #ffffff;
+    }
+
+    .field-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .field-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+    }
+
+    .edit-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .edit-btn:hover { background-color: #e0f2fe; }
+
+    .lock-badge {
+      font-size: 12px;
+      color: var(--lock);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .view-value {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 6px;
+    }
+
+    .edit-control {
+      display: none;
+      margin-top: 10px;
+    }
+
     input, select {
       width: 100%;
-      padding: 12px;
+      padding: 10px 12px;
       border: 1px solid var(--border);
       border-radius: 8px;
       font-size: 14px;
-      background-color: #fff;
       outline: none;
-      transition: border 0.2s;
+      background-color: #ffffff;
     }
 
     input:focus, select:focus { border-color: var(--primary); }
-    
-    /* Lock Email style */
-    input[readonly] {
-      background-color: #f1f5f9;
-      color: #94a3b8;
-      cursor: not-allowed;
-    }
 
-    .section-divider {
-      border: 0;
-      border-top: 1px solid var(--border);
-      margin: 24px 0;
+    /* Save Footer Section */
+    .save-section {
+      display: none;
+      margin-top: 24px;
+      padding-top: 20px;
+      border-top: 1px dashed var(--border);
     }
 
     .btn-save {
@@ -69,6 +126,7 @@
       border-radius: 8px;
       cursor: pointer;
       font-size: 15px;
+      margin-top: 10px;
     }
 
     .btn-save:hover { opacity: 0.95; }
@@ -88,58 +146,118 @@
 
 <div class="profile-card">
   <h2>Account Profile</h2>
-  <p class="subtitle">View and update your personal and academic details</p>
+  <p class="subtitle">View your details or click the pencil icon to edit.</p>
 
   <div id="alertBox" class="alert"></div>
 
   <form id="profileForm">
-    <!-- READ-ONLY EMAIL -->
-    <div class="form-group">
-      <label>Email Address (Unchangeable)</label>
-      <input type="email" id="userEmail" readonly />
-    </div>
-
-    <!-- FIRST & LAST NAME -->
-    <div class="form-group">
-      <label for="firstName">First Name</label>
-      <input type="text" id="firstName" placeholder="Enter first name" required />
-    </div>
-
-    <div class="form-group">
-      <label for="lastName">Last Name</label>
-      <input type="text" id="lastName" placeholder="Enter last name" required />
-    </div>
-
-    <!-- EDUCATIONAL TYPE -->
-    <div class="form-group">
-      <label for="educationalType">Educational Level</label>
-      <select id="educationalType" onchange="toggleEduFields()">
-        <option value="secondary">Secondary School</option>
-        <option value="tertiary">Tertiary Institution</option>
-      </select>
-    </div>
-
-    <!-- SECONDARY FIELD: CLASS -->
-    <div class="form-group" id="secGroup">
-      <label for="studentClass">Class</label>
-      <select id="studentClass">
-        <option value="SS1">SS1</option>
-        <option value="SS2">SS2</option>
-        <option value="SS3">SS3</option>
-        <option value="JSS3">JSS3</option>
-      </select>
-    </div>
-
-    <!-- TERTIARY FIELDS: COURSE & LEVEL -->
-    <div id="tertGroup" style="display: none;">
-      <div class="form-group">
-        <label for="studentCourse">Course of Study</label>
-        <input type="text" id="studentCourse" placeholder="e.g. Computer Science" />
+    <!-- 1. READ-ONLY EMAIL -->
+    <div class="field-row">
+      <div class="field-header">
+        <span class="field-label">Email Address</span>
+        <span class="lock-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          Locked
+        </span>
       </div>
+      <div class="view-value" id="viewEmail">Loading...</div>
+    </div>
 
-      <div class="form-group">
-        <label for="studentLevel">Level</label>
-        <select id="studentLevel">
+    <!-- 2. FIRST NAME -->
+    <div class="field-row" id="rowFirstName">
+      <div class="field-header">
+        <span class="field-label">First Name</span>
+        <button type="button" class="edit-btn" onclick="toggleEdit('FirstName')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          Edit
+        </button>
+      </div>
+      <div class="view-value" id="viewFirstName">-</div>
+      <div class="edit-control" id="editFirstName">
+        <input type="text" id="inputFirstName" placeholder="Enter first name" />
+      </div>
+    </div>
+
+    <!-- 3. LAST NAME -->
+    <div class="field-row" id="rowLastName">
+      <div class="field-header">
+        <span class="field-label">Last Name</span>
+        <button type="button" class="edit-btn" onclick="toggleEdit('LastName')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          Edit
+        </button>
+      </div>
+      <div class="view-value" id="viewLastName">-</div>
+      <div class="edit-control" id="editLastName">
+        <input type="text" id="inputLastName" placeholder="Enter last name" />
+      </div>
+    </div>
+
+    <!-- 4. EDUCATIONAL LEVEL -->
+    <div class="field-row" id="rowEduType">
+      <div class="field-header">
+        <span class="field-label">Educational Level</span>
+        <button type="button" class="edit-btn" onclick="toggleEdit('EduType')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          Edit
+        </button>
+      </div>
+      <div class="view-value" id="viewEduType">Secondary School</div>
+      <div class="edit-control" id="editEduType">
+        <select id="inputEduType" onchange="handleEduTypeChange()">
+          <option value="secondary">Secondary School</option>
+          <option value="tertiary">Tertiary Institution</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 5. SECONDARY CLASS -->
+    <div class="field-row" id="rowClass">
+      <div class="field-header">
+        <span class="field-label">Class</span>
+        <button type="button" class="edit-btn" onclick="toggleEdit('Class')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          Edit
+        </button>
+      </div>
+      <div class="view-value" id="viewClass">-</div>
+      <div class="edit-control" id="editClass">
+        <select id="inputClass">
+          <option value="SS1">SS1</option>
+          <option value="SS2">SS2</option>
+          <option value="SS3">SS3</option>
+          <option value="JSS3">JSS3</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 6. TERTIARY COURSE -->
+    <div class="field-row" id="rowCourse" style="display: none;">
+      <div class="field-header">
+        <span class="field-label">Course of Study</span>
+        <button type="button" class="edit-btn" onclick="toggleEdit('Course')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          Edit
+        </button>
+      </div>
+      <div class="view-value" id="viewCourse">-</div>
+      <div class="edit-control" id="editCourse">
+        <input type="text" id="inputCourse" placeholder="e.g. Computer Science" />
+      </div>
+    </div>
+
+    <!-- 7. TERTIARY LEVEL -->
+    <div class="field-row" id="rowLevel" style="display: none;">
+      <div class="field-header">
+        <span class="field-label">Level</span>
+        <button type="button" class="edit-btn" onclick="toggleEdit('Level')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+          Edit
+        </button>
+      </div>
+      <div class="view-value" id="viewLevel">-</div>
+      <div class="edit-control" id="editLevel">
+        <select id="inputLevel">
           <option value="100L">100 Level</option>
           <option value="200L">200 Level</option>
           <option value="300L">300 Level</option>
@@ -149,36 +267,60 @@
       </div>
     </div>
 
-    <hr class="section-divider" />
-
-    <!-- PASSWORD VERIFICATION REQUIREMENT -->
-    <div class="form-group">
-      <label for="currentPassword">Current Password (Required to save changes)</label>
-      <input type="password" id="currentPassword" placeholder="Enter your current password" required />
+    <!-- SAVE & PASSWORD CONFIRMATION SECTION -->
+    <div class="save-section" id="saveSection">
+      <div class="form-group">
+        <label style="font-size: 13px; font-weight: 600; display: block; margin-bottom: 6px;">
+          Confirm Current Password to Save Updates
+        </label>
+        <input type="password" id="currentPassword" placeholder="Enter current password" required />
+      </div>
+      <button type="submit" class="btn-save">Save Profile Updates</button>
     </div>
 
-    <button type="submit" class="btn-save">Save Profile Changes</button>
   </form>
 </div>
 
 <script>
-  // Get active user email from localStorage session
   const activeUserEmail = localStorage.getItem("user_email") || "student@example.com";
+  let editedFields = new Set();
 
-  function toggleEduFields() {
-    const type = document.getElementById("educationalType").value;
-    if (type === "secondary") {
-      document.getElementById("secGroup").style.display = "block";
-      document.getElementById("tertGroup").style.display = "none";
+  // Toggle Edit View for a specific field
+  function toggleEdit(fieldKey) {
+    const editControl = document.getElementById(`edit${fieldKey}`);
+    const row = document.getElementById(`row${fieldKey}`);
+
+    if (editControl.style.display === "block") {
+      editControl.style.display = "none";
+      row.classList.remove("editing");
+      editedFields.delete(fieldKey);
     } else {
-      document.getElementById("secGroup").style.display = "none";
-      document.getElementById("tertGroup").style.display = "block";
+      editControl.style.display = "block";
+      row.classList.add("editing");
+      editedFields.add(fieldKey);
+    }
+
+    // Show password confirmation section if at least one field is in edit mode
+    document.getElementById("saveSection").style.display = editedFields.size > 0 ? "block" : "none";
+  }
+
+  // Adjust visible academic rows based on Educational Type selection
+  function handleEduTypeChange() {
+    const selectedType = document.getElementById("inputEduType").value;
+    if (selectedType === "secondary") {
+      document.getElementById("rowClass").style.display = "block";
+      document.getElementById("rowCourse").style.display = "none";
+      document.getElementById("rowLevel").style.display = "none";
+    } else {
+      document.getElementById("rowClass").style.display = "none";
+      document.getElementById("rowCourse").style.display = "block";
+      document.getElementById("rowLevel").style.display = "block";
     }
   }
 
-  // Load existing values into form fields
+  // Fetch & display user profile data
   async function loadProfile() {
-    document.getElementById("userEmail").value = activeUserEmail;
+    document.getElementById("viewEmail").innerText = activeUserEmail;
 
     try {
       const res = await fetch(`/api/profile?email=${encodeURIComponent(activeUserEmail)}`);
@@ -186,36 +328,52 @@
 
       if (data.success && data.profile) {
         const p = data.profile;
-        document.getElementById("firstName").value = p.first_name || "";
-        document.getElementById("lastName").value = p.last_name || "";
-        
-        if (p.educational_type) {
-          document.getElementById("educationalType").value = p.educational_type;
-          toggleEduFields();
+
+        document.getElementById("viewFirstName").innerText = p.first_name || "Not set";
+        document.getElementById("inputFirstName").value = p.first_name || "";
+
+        document.getElementById("viewLastName").innerText = p.last_name || "Not set";
+        document.getElementById("inputLastName").value = p.last_name || "";
+
+        const eduType = p.educational_type || "secondary";
+        document.getElementById("viewEduType").innerText = eduType === "tertiary" ? "Tertiary Institution" : "Secondary School";
+        document.getElementById("inputEduType").value = eduType;
+
+        if (p.class) {
+          document.getElementById("viewClass").innerText = p.class;
+          document.getElementById("inputClass").value = p.class;
         }
 
-        if (p.class) document.getElementById("studentClass").value = p.class;
-        if (p.course) document.getElementById("studentCourse").value = p.course;
-        if (p.level) document.getElementById("studentLevel").value = p.level;
+        if (p.course) {
+          document.getElementById("viewCourse").innerText = p.course;
+          document.getElementById("inputCourse").value = p.course;
+        }
+
+        if (p.level) {
+          document.getElementById("viewLevel").innerText = p.level;
+          document.getElementById("inputLevel").value = p.level;
+        }
+
+        handleEduTypeChange();
       }
     } catch (err) {
-      showAlert("Error loading profile information.", "danger");
+      showAlert("Failed to load profile data.", "danger");
     }
   }
 
-  // Submit profile updates to backend
+  // Submit profile updates to API
   document.getElementById("profileForm").addEventListener("submit", async (e) => {
     e.preventDefault();
 
     const payload = {
       email: activeUserEmail,
       currentPassword: document.getElementById("currentPassword").value,
-      first_name: document.getElementById("firstName").value,
-      last_name: document.getElementById("lastName").value,
-      educational_type: document.getElementById("educationalType").value,
-      class: document.getElementById("studentClass").value,
-      course: document.getElementById("studentCourse").value,
-      level: document.getElementById("studentLevel").value
+      first_name: document.getElementById("inputFirstName").value,
+      last_name: document.getElementById("inputLastName").value,
+      educational_type: document.getElementById("inputEduType").value,
+      class: document.getElementById("inputClass").value,
+      course: document.getElementById("inputCourse").value,
+      level: document.getElementById("inputLevel").value
     };
 
     try {
@@ -230,6 +388,14 @@
       if (data.success) {
         showAlert(data.message, "success");
         document.getElementById("currentPassword").value = "";
+        
+        // Hide all edit controls and reload updated values
+        document.querySelectorAll(".edit-control").forEach(el => el.style.display = "none");
+        document.querySelectorAll(".field-row").forEach(el => el.classList.remove("editing"));
+        document.getElementById("saveSection").style.display = "none";
+        editedFields.clear();
+
+        loadProfile();
       } else {
         showAlert(data.error || "Failed to update profile", "danger");
       }
@@ -249,4 +415,4 @@
 </script>
 
 </body>
-  </html>
+        </html>
