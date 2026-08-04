@@ -1,6 +1,12 @@
+import { createClient } from "@libsql/client";
 import jwt from "jsonwebtoken";
 
-// Load JWT secret from environment variables
+// Initialize Turso DB connection
+const db = createClient({
+  url: process.env.TURSO_DATABASE_URL,
+  authToken: process.env.TURSO_AUTH_TOKEN,
+});
+
 const JWT_SECRET = process.env.JWT_SECRET || "your-fallback-jwt-secret";
 
 /**
@@ -10,7 +16,7 @@ function authorizeAdmin(req) {
   const authHeader = req.headers.authorization || req.headers.Authorization;
 
   if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    throw { status: 401, message: "Unauthorized access. No authorization token provided." };
+    throw { status: 401, message: "Unauthorized access. Authorization token required." };
   }
 
   const token = authHeader.split(" ")[1];
@@ -18,15 +24,14 @@ function authorizeAdmin(req) {
   try {
     const decoded = jwt.verify(token, JWT_SECRET);
 
-    // Enforce role check for admin
     if (!decoded.role || String(decoded.role).toLowerCase() !== "admin") {
-      throw { status: 403, message: "Forbidden: Admin privileges required to perform this action." };
+      throw { status: 403, message: "Forbidden: Admin privileges required." };
     }
 
     return decoded;
   } catch (err) {
     if (err.status) throw err;
-    throw { status: 401, message: "Invalid or expired session token. Please log in again." };
+    throw { status: 401, message: "Invalid or expired session token." };
   }
 }
 
@@ -66,32 +71,35 @@ export default async function handler(req, res) {
   try {
     const { method } = req;
 
-    // ==========================================
-    // 1. GET /api/admin-books -> Fetch books for reader/admin
-    // ==========================================
+    // =========================================================
+    // 1. GET /api/admin-books -> Retrieve books from Turso DB
+    // =========================================================
     if (method === "GET") {
-      /* 
-         DB QUERY EXAMPLE (Turso / libSQL):
-         const { rows } = await db.execute("SELECT id, title, author, category, fileUrl, coverUrl, created_at FROM books ORDER BY created_at DESC");
-      */
+      const selectedCategory = req.query.category || "all";
 
-      // Sample structure returning exact DB columns
-      const books = [
-        {
-          id: 1,
-          title: "Senior Secondary Physics",
-          author: "P.N. Okeke",
-          category: "Physics",
-          fileUrl: "https://your-storage-provider.com/pdfs/physics.pdf",
-          coverUrl: "https://your-storage-provider.com/covers/physics.jpg",
-          created_at: new Date().toISOString()
-        }
-      ];
+      let query = "SELECT id, title, author, category, fileUrl, coverUrl, created_at FROM books";
+      let params = [];
+
+      // Filter by category if requested (and not 'all')
+      if (selectedCategory.toLowerCase() !== "all") {
+        query += " WHERE LOWER(category) = LOWER(?)";
+        params.push(selectedCategory);
+      }
+
+      query += " ORDER BY created_at DESC";
+
+      // Execute Turso Query
+      const result = await db.execute({ sql: query, args: params });
+
+      // Fetch all unique categories available in DB for dropdown filters
+      const categoriesResult = await db.execute("SELECT DISTINCT category FROM books");
+      const categories = categoriesResult.rows.map((row) => row.category).filter(Boolean);
 
       return res.status(200).json({
         success: true,
-        count: books.length,
-        books
+        count: result.rows.length,
+        categories: ["all", ...categories],
+        books: result.rows
       });
     }
 
@@ -101,13 +109,12 @@ export default async function handler(req, res) {
     authorizeAdmin(req);
     const body = await parseRequestBody(req);
 
-    // ==========================================
-    // 2. POST /api/admin-books -> Add a new book
-    // ==========================================
+    // =========================================================
+    // 2. POST /api/admin-books -> Insert new book into Turso DB
+    // =========================================================
     if (method === "POST") {
       const { title, author, category, fileUrl, coverUrl } = body;
 
-      // Validation
       if (!title || !author || !fileUrl) {
         return res.status(400).json({
           success: false,
@@ -115,33 +122,36 @@ export default async function handler(req, res) {
         });
       }
 
-      const newBook = {
-        title: title.trim(),
-        author: author.trim(),
-        category: category ? category.trim() : "General",
-        fileUrl: fileUrl.trim(),
-        coverUrl: coverUrl ? coverUrl.trim() : "",
-        created_at: new Date().toISOString()
-      };
+      const created_at = new Date().toISOString();
+      const bookCategory = category ? category.trim() : "General";
+      const bookCoverUrl = coverUrl ? coverUrl.trim() : "";
 
-      /*
-         DB INSERT EXAMPLE (Turso / libSQL):
-         await db.execute({
-           sql: "INSERT INTO books (title, author, category, fileUrl, coverUrl, created_at) VALUES (?, ?, ?, ?, ?, ?)",
-           args: [newBook.title, newBook.author, newBook.category, newBook.fileUrl, newBook.coverUrl, newBook.created_at]
-         });
-      */
+      const insertResult = await db.execute({
+        sql: `INSERT INTO books (title, author, category, fileUrl, coverUrl, created_at) 
+              VALUES (?, ?, ?, ?, ?, ?) RETURNING id`,
+        args: [title.trim(), author.trim(), bookCategory, fileUrl.trim(), bookCoverUrl, created_at]
+      });
+
+      const newId = insertResult.rows[0]?.id || null;
 
       return res.status(201).json({
         success: true,
-        message: "Book added successfully!",
-        book: newBook
+        message: "Book added to database successfully!",
+        book: {
+          id: newId,
+          title: title.trim(),
+          author: author.trim(),
+          category: bookCategory,
+          fileUrl: fileUrl.trim(),
+          coverUrl: bookCoverUrl,
+          created_at
+        }
       });
     }
 
-    // ==========================================
-    // 3. PUT /api/admin-books -> Update a book
-    // ==========================================
+    // =========================================================
+    // 3. PUT /api/admin-books -> Update book in Turso DB
+    // =========================================================
     if (method === "PUT") {
       const { id, title, author, category, fileUrl, coverUrl } = body;
 
@@ -152,13 +162,12 @@ export default async function handler(req, res) {
         });
       }
 
-      /*
-         DB UPDATE EXAMPLE (Turso / libSQL):
-         await db.execute({
-           sql: "UPDATE books SET title = ?, author = ?, category = ?, fileUrl = ?, coverUrl = ? WHERE id = ?",
-           args: [title, author, category, fileUrl, coverUrl, id]
-         });
-      */
+      await db.execute({
+        sql: `UPDATE books 
+              SET title = ?, author = ?, category = ?, fileUrl = ?, coverUrl = ? 
+              WHERE id = ?`,
+        args: [title, author, category, fileUrl, coverUrl, id]
+      });
 
       return res.status(200).json({
         success: true,
@@ -167,9 +176,9 @@ export default async function handler(req, res) {
       });
     }
 
-    // ==========================================
-    // 4. DELETE /api/admin-books -> Delete a book
-    // ==========================================
+    // =========================================================
+    // 4. DELETE /api/admin-books -> Delete book from Turso DB
+    // =========================================================
     if (method === "DELETE") {
       const id = req.query.id || body.id;
 
@@ -180,13 +189,10 @@ export default async function handler(req, res) {
         });
       }
 
-      /*
-         DB DELETE EXAMPLE (Turso / libSQL):
-         await db.execute({
-           sql: "DELETE FROM books WHERE id = ?",
-           args: [id]
-         });
-      */
+      await db.execute({
+        sql: "DELETE FROM books WHERE id = ?",
+        args: [id]
+      });
 
       return res.status(200).json({
         success: true,
@@ -210,4 +216,4 @@ export default async function handler(req, res) {
       error: error.message || "Internal Server Error"
     });
   }
-      }
+}
