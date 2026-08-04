@@ -1,44 +1,116 @@
-// api/profile.js - Secure Server-Side Profile Validator
-module.exports = async function handler(req, res) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+import { createClient } from "@libsql/client";
+import bcrypt from "bcryptjs";
 
-    if (req.method === 'OPTIONS') return res.status(200).end();
-    if (req.method !== 'GET') return res.status(405).json({ success: false, message: 'Method not allowed' });
+export default async function handler(req, res) {
+  res.setHeader("Content-Type", "application/json");
 
-    // Retrieve security credentials from incoming authorization request headers
-    const secureToken = req.headers.authorization?.split(' ')[1];
-    const userId = req.query.userId;
+  try {
+    const db = createClient({
+      url: process.env.TURSO_DATABASE_URL,
+      authToken: process.env.TURSO_AUTH_TOKEN,
+    });
 
-    // SECURE ENVIRONMENTAL VARIABLES: Kept isolated on the server side
-    const dbUrl = (process.env.FIREBASE_BASE_URL || "https://nexuspro-cf948-default-rtdb.europe-west1.firebasedatabase.app").replace(/\/$/, "");
+    // Auto-migrate exact columns to ensure table integrity
+    const migrations = [
+      `ALTER TABLE users ADD COLUMN first_name TEXT;`,
+      `ALTER TABLE users ADD COLUMN last_name TEXT;`,
+      `ALTER TABLE users ADD COLUMN educational_type TEXT DEFAULT 'secondary';`,
+      `ALTER TABLE users ADD COLUMN class TEXT;`,
+      `ALTER TABLE users ADD COLUMN course TEXT;`,
+      `ALTER TABLE users ADD COLUMN level TEXT;`
+    ];
 
-    if (!secureToken || !userId) {
-        return res.status(401).json({ success: false, message: 'Unauthorized access sequence intercepted.' });
+    for (const sql of migrations) {
+      try { await db.execute(sql); } catch (e) { /* Column already exists */ }
     }
 
-    try {
-        // Fetch matching profile schema securely
-        const dbResponse = await fetch(`${dbUrl}/users/${userId}.json?auth=${secureToken}`);
-        if (!dbResponse.ok) throw new Error("Database validation failure.");
-        
-        const profile = await dbResponse.json();
-        if (!profile) {
-            return res.status(404).json({ success: false, message: 'User profile node non-existent.' });
-        }
+    // ==========================================
+    // GET: FETCH PROFILE INFO
+    // ==========================================
+    if (req.method === "GET") {
+      const { email } = req.query;
 
-        // Return profile configuration safely without exposing system root keys
-        return res.status(200).json({
-            success: true,
-            name: profile.name || "Scholar",
-            role: profile.role || "student",
-            status: profile.status || "active",
-            gameMetrics: profile.gameMetrics || { totalXP: 0, currentLevel: 1 }
-        });
+      if (!email) {
+        return res.status(400).json({ success: false, error: "Email parameter is required." });
+      }
 
-    } catch (error) {
-        console.error("Profile Endpoint Fault:", error.message);
-        return res.status(500).json({ success: false, message: 'Internal validation failure.' });
+      const userRes = await db.execute({
+        sql: `SELECT id, email, first_name, last_name, educational_type, class, course, level FROM users WHERE LOWER(email) = LOWER(?)`,
+        args: [email]
+      });
+
+      if (!userRes.rows || userRes.rows.length === 0) {
+        return res.status(404).json({ success: false, error: "User profile not found." });
+      }
+
+      return res.status(200).json({ success: true, profile: userRes.rows[0] });
     }
-};
+
+    // ==========================================
+    // POST: UPDATE PROFILE INFO (REQUIRES PASSWORD)
+    // ==========================================
+    if (req.method === "POST") {
+      const { 
+        email, 
+        currentPassword, 
+        first_name, 
+        last_name, 
+        educational_type, 
+        class: studentClass, 
+        course, 
+        level 
+      } = req.body || {};
+
+      if (!email || !currentPassword) {
+        return res.status(400).json({ success: false, error: "Email and current password are required to make changes." });
+      }
+
+      // Fetch existing password hash for verification
+      const userRes = await db.execute({
+        sql: `SELECT id, password_hash FROM users WHERE LOWER(email) = LOWER(?)`,
+        args: [email]
+      });
+
+      if (!userRes.rows || userRes.rows.length === 0) {
+        return res.status(404).json({ success: false, error: "User account not found." });
+      }
+
+      const user = userRes.rows[0];
+
+      // Verify user's current password
+      const isPasswordValid = await bcrypt.compare(currentPassword, user.password_hash || "");
+      if (!isPasswordValid) {
+        return res.status(401).json({ success: false, error: "Incorrect password. Profile changes were not saved." });
+      }
+
+      // Execute UPDATE statement on exact columns (Email is omitted so it stays untouched)
+      await db.execute({
+        sql: `UPDATE users SET 
+                first_name = ?, 
+                last_name = ?, 
+                educational_type = ?, 
+                class = ?, 
+                course = ?, 
+                level = ? 
+              WHERE LOWER(email) = LOWER(?)`,
+        args: [
+          first_name || null,
+          last_name || null,
+          educational_type || "secondary",
+          educational_type === "secondary" ? studentClass : null,
+          educational_type === "tertiary" ? course : null,
+          educational_type === "tertiary" ? level : null,
+          email
+        ]
+      });
+
+      return res.status(200).json({ success: true, message: "Profile updated successfully!" });
+    }
+
+    return res.status(405).json({ success: false, error: "Method not allowed." });
+
+  } catch (err) {
+    console.error("Profile API Error:", err);
+    return res.status(500).json({ success: false, error: err.message || "Internal server error." });
+  }
+}
