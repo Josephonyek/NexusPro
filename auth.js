@@ -144,6 +144,9 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("nexusToken", data.token);
         localStorage.setItem("nexusUser", JSON.stringify(data.user));
         localStorage.setItem("userRole", String(data.user.role).toLowerCase());
+        
+        // ADD THIS LINE: Explicitly store user_email for profile.html to read directly
+        localStorage.setItem("user_email", data.user.email);
 
         // Redirect to dashboard
         window.location.href = "dashboard.html";
@@ -155,7 +158,7 @@ document.addEventListener("DOMContentLoaded", () => {
         submitBtn.textContent = activeTab === "login" ? "Log In" : "Create Account";
       }
     });
-  }
+          }
 
   function showAlert(msg) {
     if (authAlert) {
