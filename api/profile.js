@@ -10,7 +10,7 @@ export default async function handler(req, res) {
       authToken: process.env.TURSO_AUTH_TOKEN,
     });
 
-    // Auto-migrate exact columns to ensure table integrity
+    // Ensure profile columns exist
     const migrations = [
       `ALTER TABLE users ADD COLUMN first_name TEXT;`,
       `ALTER TABLE users ADD COLUMN last_name TEXT;`,
@@ -21,11 +21,11 @@ export default async function handler(req, res) {
     ];
 
     for (const sql of migrations) {
-      try { await db.execute(sql); } catch (e) { /* Column already exists */ }
+      try { await db.execute(sql); } catch (e) { /* Column exists */ }
     }
 
     // ==========================================
-    // GET: FETCH PROFILE INFO
+    // GET: FETCH EXACT USER PROFILE INFO
     // ==========================================
     if (req.method === "GET") {
       const { email } = req.query;
@@ -47,12 +47,13 @@ export default async function handler(req, res) {
     }
 
     // ==========================================
-    // POST: UPDATE PROFILE INFO (REQUIRES PASSWORD)
+    // POST: UPDATE PROFILE & OPTIONAL PASSWORD CHANGE
     // ==========================================
     if (req.method === "POST") {
       const { 
         email, 
         currentPassword, 
+        newPassword,
         first_name, 
         last_name, 
         educational_type, 
@@ -62,10 +63,10 @@ export default async function handler(req, res) {
       } = req.body || {};
 
       if (!email || !currentPassword) {
-        return res.status(400).json({ success: false, error: "Email and current password are required to make changes." });
+        return res.status(400).json({ success: false, error: "Current password is required to save changes." });
       }
 
-      // Fetch existing password hash for verification
+      // Fetch user account and current password hash
       const userRes = await db.execute({
         sql: `SELECT id, password_hash FROM users WHERE LOWER(email) = LOWER(?)`,
         args: [email]
@@ -77,13 +78,19 @@ export default async function handler(req, res) {
 
       const user = userRes.rows[0];
 
-      // Verify user's current password
+      // Validate Current Password
       const isPasswordValid = await bcrypt.compare(currentPassword, user.password_hash || "");
       if (!isPasswordValid) {
-        return res.status(401).json({ success: false, error: "Incorrect password. Profile changes were not saved." });
+        return res.status(401).json({ success: false, error: "Incorrect current password." });
       }
 
-      // Execute UPDATE statement on exact columns (Email is omitted so it stays untouched)
+      // Determine updated password hash (keep old hash if no new password is provided)
+      let finalPasswordHash = user.password_hash;
+      if (newPassword && newPassword.trim() !== "") {
+        finalPasswordHash = await bcrypt.hash(newPassword, 10);
+      }
+
+      // Update database columns except email
       await db.execute({
         sql: `UPDATE users SET 
                 first_name = ?, 
@@ -91,7 +98,8 @@ export default async function handler(req, res) {
                 educational_type = ?, 
                 class = ?, 
                 course = ?, 
-                level = ? 
+                level = ?,
+                password_hash = ?
               WHERE LOWER(email) = LOWER(?)`,
         args: [
           first_name || null,
@@ -100,6 +108,7 @@ export default async function handler(req, res) {
           educational_type === "secondary" ? studentClass : null,
           educational_type === "tertiary" ? course : null,
           educational_type === "tertiary" ? level : null,
+          finalPasswordHash,
           email
         ]
       });
