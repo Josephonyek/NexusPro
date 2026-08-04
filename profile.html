@@ -4,6 +4,18 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nexus Pro - Profile Settings</title>
+  <script>
+  (function requireAuth() {
+    const token = localStorage.getItem("nexusToken");
+    const user = localStorage.getItem("nexusUser");
+
+    // If no token or user object exists in localStorage, bounce to login
+    if (!token || !user) {
+      alert("Please log in to access this page.");
+      window.location.href = "auth.html";
+    }
+  })();
+  </script>
   <style>
     :root {
       --primary: #0284c7;
