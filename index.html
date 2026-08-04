@@ -3,25 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro | Advanced E-Learning & Wellness Platform</title>
-    
-    <!-- Icon<meta name="google-site-verification" content="vcK_Wog8VjBM_8pNG7d2tpqV8ZRceHkVss7mjFxjQE0" /> Font Library Docs -->
+    <title>Nexus Pro | Learn Smarter. Stay Healthy.</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
     <style>
         :root {
-            --bg-dark: #0f172a;
-            --bg-deep: #090d16;
-            --glass-panel: rgba(30, 41, 59, 0.5);
-            --glass-border: rgba(255, 255, 255, 0.1);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --neon-blue: #3b82f6;
-            --neon-glow: rgba(59, 130, 246, 0.25);
-            --accent-green: #10b981;
-            --accent-purple: #8b5cf6;
-            --accent-orange: #f97316;
-            --whatsapp-green: #25d366;
+            --bg: #0b1120;
+            --bg-card: #111827;
+            --border: rgba(255,255,255,0.08);
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --blue: #3b82f6;
+            --blue-dark: #2563eb;
+            --green: #10b981;
+            --purple: #8b5cf6;
+            --orange: #f97316;
+            --whatsapp: #25d366;
         }
 
         * {
@@ -29,242 +25,243 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            scroll-behavior: smooth;
         }
+
+        html { scroll-behavior: smooth; }
 
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            overflow-x: hidden;
+            background: var(--bg);
+            color: var(--text);
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
-        .glass {
-            background: var(--glass-panel);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 1px solid var(--glass-border);
-        }
-
-        section {
-            padding: 100px 24px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 56px;
-        }
-
-        .section-header h2 {
-            font-size: 2.1rem;
-            font-weight: 650;
-            letter-spacing: -0.4px;
-            margin-bottom: 10px;
-        }
-
-        .section-header p {
-            color: var(--text-muted);
-            font-size: 1.05rem;
-            max-width: 540px;
-            margin: 0 auto;
-        }
-
-        /* Header */
+        /* ===== HEADER / MENU ===== */
         header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 72px;
-            padding: 0 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(15, 23, 42, 0.82);
+            height: 70px;
+            background: rgba(11, 17, 32, 0.92);
             backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--glass-border);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 5%;
             z-index: 1000;
         }
 
-        .brand-logo {
+        .logo {
+            font-size: 1.4rem;
             font-weight: 700;
-            font-size: 1.35rem;
-            letter-spacing: 0.3px;
+            color: var(--text);
             text-decoration: none;
-            color: var(--text-main);
             display: flex;
             align-items: center;
             gap: 8px;
         }
+        .logo span { color: var(--blue); }
 
-        .desktop-nav {
+        .nav-links {
             display: flex;
             align-items: center;
             gap: 28px;
         }
 
-        .nav-link {
-            color: var(--text-muted);
+        .nav-links a {
+            color: var(--muted);
             text-decoration: none;
             font-size: 0.95rem;
             font-weight: 500;
-            transition: color 0.2s ease;
+            transition: color 0.2s;
         }
-        .nav-link:hover { color: var(--neon-blue); }
+        .nav-links a:hover { color: var(--blue); }
 
-        .btn-portal {
-            background: var(--neon-blue);
-            color: #ffffff;
-            padding: 10px 22px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 600;
-            box-shadow: 0 4px 14px var(--neon-glow);
-            transition: background 0.2s ease, transform 0.15s ease;
-            border: none;
-            cursor: pointer;
+        .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
+            padding: 10px 22px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
-        .btn-portal:hover {
-            background: #2563eb;
+
+        .btn-primary {
+            background: var(--blue);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(59, 130, 246, 0.3);
+        }
+        .btn-primary:hover {
+            background: var(--blue-dark);
             transform: translateY(-1px);
         }
 
-        .mobile-hamburger {
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-outline:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .hamburger {
             display: none;
             background: none;
             border: none;
-            color: var(--text-main);
+            color: var(--text);
             font-size: 1.4rem;
             cursor: pointer;
-            padding: 6px;
         }
 
-        /* Mobile Menu */
-        .mobile-drawer {
+        /* Mobile menu */
+        .mobile-menu {
             position: fixed;
-            top: 72px;
+            top: 70px;
             left: 0;
             width: 100%;
-            background: #0f172a;
-            border-bottom: 1px solid var(--glass-border);
-            padding: 24px 32px;
+            background: #0b1120;
+            border-bottom: 1px solid var(--border);
+            padding: 20px 5%;
             display: none;
             flex-direction: column;
-            gap: 18px;
+            gap: 16px;
             z-index: 999;
         }
-        .mobile-drawer.active { display: flex; }
+        .mobile-menu.active { display: flex; }
+        .mobile-menu a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        .mobile-menu .btn-primary {
+            text-align: center;
+            margin-top: 8px;
+        }
 
-        /* Hero */
-        .hero-banner {
+        /* ===== HERO ===== */
+        .hero {
             min-height: 100vh;
             display: flex;
             align-items: center;
-            padding-top: 90px;
-            background: radial-gradient(circle at 85% 15%, rgba(59, 130, 246, 0.14) 0%, transparent 55%);
+            padding: 120px 5% 80px;
+            background: radial-gradient(ellipse at 70% 20%, rgba(59,130,246,0.12) 0%, transparent 60%);
         }
 
-        .hero-layout {
+        .hero-content {
+            max-width: 1100px;
+            margin: 0 auto;
             display: grid;
-            grid-template-columns: 1.15fr 0.85fr;
-            gap: 48px;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 60px;
             align-items: center;
-            width: 100%;
         }
 
         .hero-text h1 {
-            font-size: 3.4rem;
+            font-size: 3.2rem;
             font-weight: 700;
             line-height: 1.15;
-            letter-spacing: -1.4px;
-            margin-bottom: 22px;
+            letter-spacing: -1px;
+            margin-bottom: 20px;
         }
 
         .hero-text p {
             font-size: 1.15rem;
-            color: var(--text-muted);
-            margin-bottom: 36px;
-            max-width: 540px;
-            line-height: 1.65;
+            color: var(--muted);
+            max-width: 520px;
+            margin-bottom: 32px;
         }
 
-        .hero-cta-deck {
+        .hero-buttons {
             display: flex;
             gap: 14px;
-            align-items: center;
             flex-wrap: wrap;
         }
 
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-main);
-            border: 1px solid var(--glass-border);
-            padding: 12px 24px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-size: 0.95rem;
-            font-weight: 600;
-            transition: background 0.2s ease;
-        }
-        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
-
-        .hero-graphic {
+        .hero-visual {
             display: flex;
             justify-content: center;
-            position: relative;
         }
 
-        .hero-visual-box {
-            width: 300px;
-            height: 300px;
+        .hero-card {
+            width: 280px;
+            height: 280px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 24px;
             display: flex;
-            justify-content: center;
             align-items: center;
-            font-size: 4.8rem;
-            color: var(--neon-blue);
-            box-shadow: 0 0 60px rgba(59, 130, 246, 0.18);
-            animation: floating 4.5s infinite ease-in-out;
+            justify-content: center;
+            font-size: 5rem;
+            color: var(--blue);
+            box-shadow: 0 0 50px rgba(59,130,246,0.15);
+            animation: float 4s ease-in-out infinite;
         }
 
-        @keyframes floating {
+        @keyframes float {
             0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-14px); }
+            50% { transform: translateY(-12px); }
         }
 
-        /* Services */
+        /* ===== SERVICES ===== */
+        .services {
+            padding: 90px 5%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .section-title h2 {
+            font-size: 2.1rem;
+            font-weight: 650;
+            margin-bottom: 10px;
+        }
+        .section-title p {
+            color: var(--muted);
+            font-size: 1.05rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 24px;
         }
 
         .service-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
             padding: 32px 28px;
-            border-radius: 14px;
-            transition: transform 0.25s ease, border-color 0.25s ease;
+            transition: transform 0.25s, border-color 0.25s;
         }
         .service-card:hover {
             transform: translateY(-6px);
-            border-color: rgba(59, 130, 246, 0.35);
+            border-color: rgba(59,130,246,0.35);
         }
 
         .service-icon {
             width: 48px;
             height: 48px;
-            border-radius: 10px;
+            border-radius: 12px;
             display: flex;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             font-size: 1.25rem;
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         .service-card h3 {
@@ -272,209 +269,199 @@
             font-weight: 600;
             margin-bottom: 10px;
         }
-
         .service-card p {
-            color: var(--text-muted);
+            color: var(--muted);
             font-size: 0.95rem;
-            line-height: 1.55;
         }
 
-        /* Contact */
-        .contact-layout {
-            display: grid;
-            grid-template-columns: 0.85fr 1.15fr;
-            gap: 48px;
-            background: var(--glass-panel);
-            border: 1px solid var(--glass-border);
+        /* ===== CONTACT ===== */
+        .contact {
+            padding: 90px 5%;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .contact-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 20px;
             padding: 48px;
-            backdrop-filter: blur(14px);
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 48px;
         }
 
-        .contact-info-panel h3 {
+        .contact-info h3 {
             font-size: 1.5rem;
-            font-weight: 600;
             margin-bottom: 12px;
         }
-
-        .contact-info-panel p {
-            color: var(--text-muted);
+        .contact-info > p {
+            color: var(--muted);
+            margin-bottom: 30px;
             font-size: 0.98rem;
-            margin-bottom: 32px;
-            line-height: 1.6;
         }
 
-        .info-details-row {
+        .info-row {
             display: flex;
             align-items: center;
-            gap: 16px;
-            margin-bottom: 22px;
-        }
-
-        .info-icon-wrapper {
-            width: 42px;
-            height: 42px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid var(--glass-border);
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            color: var(--neon-blue);
-            flex-shrink: 0;
-        }
-
-        .form-input-group {
+            gap: 14px;
             margin-bottom: 20px;
         }
 
-        .form-input-group label {
+        .info-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--blue);
+            flex-shrink: 0;
+        }
+
+        .info-label {
+            font-size: 0.75rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+        .info-value {
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+        .form-group label {
             display: block;
             font-size: 0.85rem;
             font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 7px;
+            color: var(--muted);
+            margin-bottom: 6px;
         }
-
         .form-control {
             width: 100%;
-            background: rgba(15, 23, 42, 0.65);
-            border: 1px solid var(--glass-border);
-            padding: 13px 16px;
+            background: rgba(11,17,32,0.7);
+            border: 1px solid var(--border);
             border-radius: 9px;
-            color: #ffffff;
+            padding: 13px 16px;
+            color: #fff;
             font-size: 0.95rem;
             outline: none;
-            transition: border-color 0.2s ease;
+            transition: border-color 0.2s;
         }
-        .form-control:focus {
-            border-color: var(--neon-blue);
-        }
+        .form-control:focus { border-color: var(--blue); }
 
         textarea.form-control {
-            resize: vertical;
             min-height: 120px;
+            resize: vertical;
         }
 
-        .form-feedback-msg {
+        .form-feedback {
             font-size: 0.9rem;
             margin-top: 12px;
             display: none;
         }
 
-        /* WhatsApp Button */
-        .whatsapp-floating-btn {
-            position: fixed;
-            bottom: 28px;
-            right: 28px;
-            background-color: var(--whatsapp-green);
-            color: #ffffff;
-            width: 58px;
-            height: 58px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.9rem;
-            box-shadow: 0 4px 18px rgba(37, 211, 102, 0.4);
-            text-decoration: none;
-            z-index: 9999;
-            transition: transform 0.2s ease, background-color 0.2s ease;
-        }
-        .whatsapp-floating-btn:hover {
-            transform: scale(1.08);
-            background-color: #20ba5a;
-        }
-
-        /* Footer */
+        /* ===== FOOTER ===== */
         footer {
-            background-color: var(--bg-deep);
-            border-top: 1px solid var(--glass-border);
-            padding: 64px 40px 32px;
+            background: #070b14;
+            border-top: 1px solid var(--border);
+            padding: 60px 5% 30px;
         }
 
         .footer-grid {
-            max-width: 1200px;
+            max-width: 1100px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 1.6fr repeat(3, 1fr);
+            grid-template-columns: 1.5fr 1fr 1fr 1fr;
             gap: 40px;
             padding-bottom: 40px;
             border-bottom: 1px solid rgba(255,255,255,0.06);
         }
 
-        .footer-brand-summary p {
-            color: var(--text-muted);
+        .footer-brand p {
+            color: var(--muted);
             font-size: 0.95rem;
             margin-top: 14px;
-            max-width: 280px;
-            line-height: 1.55;
+            max-width: 260px;
         }
 
-        .footer-links-column h4 {
+        .footer-col h4 {
             font-size: 0.9rem;
             text-transform: uppercase;
-            letter-spacing: 0.6px;
-            color: #ffffff;
-            margin-bottom: 18px;
-            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin-bottom: 16px;
+            color: #fff;
         }
-
-        .footer-links-column ul {
-            list-style: none;
-        }
-
-        .footer-links-column ul li {
-            margin-bottom: 11px;
-        }
-
-        .footer-links-column ul li a {
-            color: var(--text-muted);
+        .footer-col ul { list-style: none; }
+        .footer-col li { margin-bottom: 10px; }
+        .footer-col a {
+            color: var(--muted);
             text-decoration: none;
             font-size: 0.92rem;
-            transition: color 0.2s ease;
+            transition: color 0.2s;
         }
-        .footer-links-column ul li a:hover { color: var(--neon-blue); }
+        .footer-col a:hover { color: var(--blue); }
 
-        .footer-bottom-deck {
-            max-width: 1200px;
-            margin: 28px auto 0;
+        .footer-bottom {
+            max-width: 1100px;
+            margin: 24px auto 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            color: var(--text-muted);
+            color: var(--muted);
             font-size: 0.88rem;
         }
 
-        .social-links-wrapper {
+        .socials {
             display: flex;
             gap: 18px;
         }
-
-        .social-link {
-            color: var(--text-muted);
+        .socials a {
+            color: var(--muted);
             font-size: 1.15rem;
-            transition: color 0.2s ease;
+            transition: color 0.2s;
         }
-        .social-link:hover { color: var(--neon-blue); }
+        .socials a:hover { color: var(--blue); }
 
-        /* Responsive */
-        @media (max-width: 968px) {
-            .hero-layout {
+        /* ===== WHATSAPP BUTTON ===== */
+        .whatsapp-btn {
+            position: fixed;
+            bottom: 28px;
+            right: 28px;
+            width: 58px;
+            height: 58px;
+            background: var(--whatsapp);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.9rem;
+            box-shadow: 0 4px 18px rgba(37,211,102,0.4);
+            text-decoration: none;
+            z-index: 9999;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .whatsapp-btn:hover {
+            transform: scale(1.08);
+            background: #20ba5a;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .hero-content {
                 grid-template-columns: 1fr;
                 text-align: center;
             }
-            .hero-text p {
-                margin-left: auto;
-                margin-right: auto;
-            }
-            .hero-cta-deck {
-                justify-content: center;
-            }
-            .hero-graphic {
-                display: none;
-            }
-            .contact-layout {
+            .hero-text p { margin-left: auto; margin-right: auto; }
+            .hero-buttons { justify-content: center; }
+            .hero-visual { display: none; }
+            .contact-box {
                 grid-template-columns: 1fr;
                 padding: 36px 28px;
             }
@@ -484,34 +471,17 @@
         }
 
         @media (max-width: 640px) {
-            header {
-                padding: 0 20px;
-            }
-            .desktop-nav {
-                display: none;
-            }
-            .mobile-hamburger {
-                display: block;
-            }
-            .hero-text h1 {
-                font-size: 2.35rem;
-            }
-            .section-header h2 {
-                font-size: 1.8rem;
-            }
-            section {
-                padding: 70px 20px;
-            }
-            .footer-grid {
-                grid-template-columns: 1fr;
-                gap: 32px;
-            }
-            .footer-bottom-deck {
+            .nav-links { display: none; }
+            .hamburger { display: block; }
+            .hero-text h1 { font-size: 2.3rem; }
+            .section-title h2 { font-size: 1.8rem; }
+            .footer-grid { grid-template-columns: 1fr; gap: 28px; }
+            .footer-bottom {
                 flex-direction: column;
-                gap: 16px;
+                gap: 14px;
                 text-align: center;
             }
-            .whatsapp-floating-btn {
+            .whatsapp-btn {
                 bottom: 20px;
                 right: 20px;
                 width: 52px;
@@ -522,150 +492,287 @@
     </style>
 </head>
 <body>
+
 <script src="https://5gvci.com/act/files/tag.min.js?z=11358900" data-cfasync="false" async></script>
 <script>(function(s){s.dataset.zone='11358942',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
 
-    <!-- Floating WhatsApp Button -->
-    <a href="https://wa.me/2349118363627?text=Hello%20Nexus%20Pro%20Support,%20I%20have%20an%20inquiry%20regarding%20the%20e-learning%20platform." 
-       class="whatsapp-floating-btn" 
-       target="_blank" 
-       rel="noopener noreferrer" 
-       title="Chat with Support on WhatsApp">
-        <i class="fab fa-whatsapp"></i>
+<!-- WhatsApp Floating Button -->
+<a href="https://wa.me/2349118363627?text=Hello%20Nexus%20Pro%20Support,%20I%20have%20an%20inquiry%20regarding%20the%20e-learning%20platform."
+   class="whatsapp-btn"
+   target="_blank"
+   rel="noopener noreferrer"
+   title="Chat with Support on WhatsApp">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<!-- Header / Menu Bar -->
+<header>
+    <a href="#" class="logo">
+        <i class="fas fa-cubes" style="color:var(--blue)"></i>
+        Nexus<span>Pro</span>
     </a>
 
-    <!-- Header -->
-    <header>
-        <a href="#" class="brand-logo">
-            <i class="fas fa-cubes" style="color: var(--neon-blue);"></i>Nexus<span style="color:var(--neon-blue)">Pro</span>
-        </a>
-        <nav class="desktop-nav">
-            <a href="#hero" class="nav-link">Home</a>
-            <a href="#services" class="nav-link">Modules</a>
-            <a href="#contact" class="nav-link">Contact</a>
-            <a href="login.html" class="btn-portal">Login</a>
-        </nav>
-        <button class="mobile-hamburger" id="hamburger-toggle-btn" title="Toggle Menu">
-            <i class="fas fa-bars"></i>
-        </button>
-    </header>
+    <nav class="nav-links">
+        <a href="#hero">Home</a>
+        <a href="#services">Modules</a>
+        <a href="#contact">Contact</a>
+        <a href="login.html" class="btn btn-primary">Login</a>
+    </nav>
 
-    <!-- Mobile Menu -->
-    <div class="mobile-drawer" id="mobile-nav-drawer">
-        <a href="#hero" class="nav-link">Home</a>
-        <a href="#services" class="nav-link">Modules</a>
-        <a href="#contact" class="nav-link">Contact</a>
-        <a href="login.html" class="btn-portal" style="text-align: center; margin-top: 6px;">Login</a>
+    <button class="hamburger" id="menu-btn" aria-label="Toggle menu">
+        <i class="fas fa-bars"></i>
+    </button>
+</header>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobile-menu">
+    <a href="#hero">Home</a>
+    <a href="#services">Modules</a>
+    <a href="#contact">Contact</a>
+    <a href="login.html" class="btn btn-primary">Login</a>
+</div>
+
+<main>
+    <!-- Hero -->
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>Master Core Sciences<br>While Optimizing Health</h1>
+                <p>Welcome to Nexus Pro. Get help with your assignments using smart AI tools, access a full digital library, and track your health — all in one clean, easy-to-use platform.</p>
+                <div class="hero-buttons">
+                    <a href="auth.html" class="btn btn-primary">Get Started</a>
+                    <a href="#services" class="btn btn-outline">Explore Modules</a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="hero-card">
+                    <i class="fas fa-graduation-cap"></i>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services / Modules -->
+    <section class="services" id="services">
+        <div class="section-title">
+            <h2>Everything You Need to Succeed</h2>
+            <p>Simple, powerful tools designed to help you learn science better and stay healthy while studying.</p>
+        </div>
+
+        <div class="services-grid">
+            <article class="service-card">
+                <div class="service-icon" style="background:rgba(59,130,246,0.12); color:var(--blue);">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <h3>AI Assignment Solver</h3>
+                <p>Get clear, step-by-step solutions to your assignments powered by smart AI tools that explain the answers.</p>
+            </article>
+
+            <article class="service-card">
+                <div class="service-icon" style="background:rgba(16,185,129,0.12); color:var(--green);">
+                    <i class="fas fa-book-bookmark"></i>
+                </div>
+                <h3>Digital Library</h3>
+                <p>Instant access to textbooks, study guides, and key science resources — available whenever you need them.</p>
+            </article>
+
+            <article class="service-card">
+                <div class="service-icon" style="background:rgba(139,92,246,0.12); color:var(--purple);">
+                    <i class="fas fa-heartbeat"></i>
+                </div>
+                <h3>Health Tracker</h3>
+                <p>Monitor your study habits, sleep, and overall wellness so you can stay focused and perform at your best.</p>
+            </article>
+
+            <article class="service-card">
+                <div class="service-icon" style="background:rgba(249,115,22,0.12); color:var(--orange);">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3>Support Team</h3>
+                <p>Need help? Contact our support team anytime for quick answers and assistance with any platform issues.</p>
+            </article>
+        </div>
+    </section>
+
+    <!-- Contact -->
+    <section class="contact" id="contact">
+        <div class="section-title">
+            <h2>Get in Touch</h2>
+            <p>Have a question about your account or need help getting started? Send us a message — we’re happy to help.</p>
+        </div>
+
+        <div class="contact-box">
+            <div class="contact-info">
+                <h3>Contact Info</h3>
+                <p>Fill out the form on the right to email us, or tap the green WhatsApp button for a quick chat.</p>
+
+                <div class="info-row">
+                    <div class="info-icon"><i class="fas fa-envelope"></i></div>
+                    <div>
+                        <div class="info-label">Email</div>
+                        <div class="info-value">admin@nexuspro.io</div>
+                    </div>
+                </div>
+
+                <div class="info-row">
+                    <div class="info-icon"><i class="fas fa-mobile-button"></i></div>
+                    <div>
+                        <div class="info-label">Chat</div>
+                        <div class="info-value">WhatsApp Available</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="contact-form">
+                <form id="landing-contact-form" novalidate>
+                    <div class="form-group">
+                        <label for="client-name">Full Name</label>
+                        <input type="text" id="client-name" class="form-control" placeholder="Enter your full name">
+                    </div>
+                    <div class="form-group">
+                        <label for="client-email">Email Address</label>
+                        <input type="email" id="client-email" class="form-control" placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="client-message">Your Message</label>
+                        <textarea id="client-message" class="form-control" placeholder="How can we help you?"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width:100%; padding:13px;">
+                        <i class="fas fa-paper-plane"></i> Send Message
+                    </button>
+                    <div id="form-execution-feedback" class="form-feedback"></div>
+                </form>
+            </div>
+        </div>
+   </main>
+
+<!-- Footer -->
+<footer>
+    <div class="footer-grid">
+        <div class="footer-brand">
+            <a href="#" class="logo">
+                <i class="fas fa-cubes" style="color:var(--blue)"></i>
+                Nexus<span>Pro</span>
+            </a>
+            <p>A reliable e-learning and wellness platform built to help students learn smarter and stay healthy.</p>
+        </div>
+
+        <div class="footer-col">
+            <h4>Navigation</h4>
+            <ul>
+                <li><a href="#hero">Home</a></li>
+                <li><a href="#services">Modules</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4>Platform</h4>
+            <ul>
+                <li><a href="login.html">Login</a></li>
+                <li><a href="ai_solver.html">AI Solver</a></li>
+                <li><a href="academy.html">Digital Library</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h4>Support</h4>
+            <ul>
+                <li><a href="support.html">Help Center</a></li>
+                <li><a href="health.html">Health Hub</a></li>
+                <li><a href="notifications.html">Updates</a></li>
+            </ul>
+        </div>
     </div>
 
-    <main>
-        <!-- Hero -->
-        <section id="hero" class="hero-banner">
-            <div class="hero-layout">
-                <div class="hero-text">
-                    <h1>Master Core Sciences While Optimizing Health</h1>
-                    <p>Welcome to Nexus Pro. Get help with your assignments using smart AI tools, access a full digital library, and track your health — all in one clean, easy-to-use platform.</p>
-                    <div class="hero-cta-deck">
-                        <a href="auth.html" class="btn-portal" style="padding: 13px 28px; font-size: 0.95rem;">Get Started</a>
-                        <a href="#services" class="btn-secondary">Explore Modules</a>
-                    </div>
-                </div>
-                <div class="hero-graphic">
-                    <div class="hero-visual-box glass">
-                        <i class="fas fa-graduation-cap"></i>
-                    </div>
-                </div>
-            </div>
-        </section>
+    <div class="footer-bottom">
+        <div>&copy; 2026 Nexus Pro. All rights reserved.</div>
+        <div class="socials">
+            <a href="#" title="GitHub"><i class="fab fa-github"></i></a>
+            <a href="#" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a href="#" title="Twitter"><i class="fab fa-twitter"></i></a>
+        </div>
+    </div>
+</footer>
 
-        <!-- Services -->
-        <section id="services">
-            <div class="section-header">
-                <h2>Everything You Need to Succeed</h2>
-                <p>Simple, powerful tools designed to help you learn science better and stay healthy while studying.</p>
-            </div>
-            
-            <div class="services-grid">
-                <article class="service-card glass">
-                    <div class="service-icon" style="background: rgba(59, 130, 246, 0.12); color: var(--neon-blue);">
-                        <i class="fas fa-robot"></i>
-                    </div>
-                    <h3>AI Assignment Solver</h3>
-                    <p>Get clear, step-by-step solutions to your assignments powered by smart AI tools that explain the answers.</p>
-                </article>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    // Mobile menu
+    const menuBtn = document.getElementById("menu-btn");
+    const mobileMenu = document.getElementById("mobile-menu");
 
-                <article class="service-card glass">
-                    <div class="service-icon" style="background: rgba(16, 185, 129, 0.12); color: var(--accent-green);">
-                        <i class="fas fa-book-bookmark"></i>
-                    </div>
-                    <h3>Digital Library</h3>
-                    <p>Instant access to textbooks, study guides, and key science resources — all available whenever you need them.</p>
-                </article>
+    if (menuBtn && mobileMenu) {
+        menuBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            mobileMenu.classList.toggle("active");
+            const icon = menuBtn.querySelector("i");
+            icon.className = mobileMenu.classList.contains("active") ? "fas fa-times" : "fas fa-bars";
+        });
 
-                <article class="service-card glass">
-                    <div class="service-icon" style="background: rgba(139, 92, 246, 0.12); color: var(--accent-purple);">
-                        <i class="fas fa-heartbeat"></i>
-                    </div>
-                    <h3>Health Tracker</h3>
-                    <p>Monitor your study habits, sleep, and overall wellness so you can stay focused and perform at your best.</p>
-                </article>
+        mobileMenu.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", () => {
+                mobileMenu.classList.remove("active");
+                menuBtn.querySelector("i").className = "fas fa-bars";
+            });
+        });
 
-                <article class="service-card glass">
-                    <div class="service-icon" style="background: rgba(249, 115, 22, 0.12); color: var(--accent-orange);">
-                        <i class="fas fa-headset"></i>
-                    </div>
-                    <h3>Support Team</h3>
-                    <p>Need help? Contact our support team anytime for quick answers and assistance with any platform issues.</p>
-                </article>
-            </div>
-        </section>
+        document.addEventListener("click", (e) => {
+            if (mobileMenu.classList.contains("active") &&
+                !mobileMenu.contains(e.target) &&
+                !menuBtn.contains(e.target)) {
+                mobileMenu.classList.remove("active");
+                menuBtn.querySelector("i").className = "fas fa-bars";
+            }
+        });
+    }
 
-        <!-- Contact -->
-        <section id="contact">
-            <div class="section-header">
-                <h2>Get in Touch</h2>
-                <p>Have a question about your account or need help getting started? Send us a message — we’re happy to help.</p>
-            </div>
+    // Contact form logic
+    const contactForm = document.getElementById("landing-contact-form");
+    const feedbackBlock = document.getElementById("form-execution-feedback");
 
-            <div class="contact-layout">
-                <div class="contact-info-panel">
-                    <h3>Contact Info</h3>
-                    <p>Fill out the form on the right to email us, or tap the green WhatsApp button for a quick chat.</p>
-                    
-                    <div class="info-details-row">
-                        <div class="info-icon-wrapper"><i class="fas fa-envelope"></i></div>
-                                                <div>
-                            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.4px;">Email</div>
-                            <div style="font-size:0.95rem; font-weight:600;">admin@nexuspro.io</div>
-                        </div>
-                    </div>
-                    <div class="info-details-row">
-                        <div class="info-icon-wrapper"><i class="fas fa-mobile-button"></i></div>
-                        <div>
-                            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.4px;">Chat</div>
-                            <div style="font-size:0.95rem; font-weight:600;">WhatsApp Available</div>
-                        </div>
-                    </div>
-                </div>
+    if (contactForm && feedbackBlock) {
+        contactForm.addEventListener("submit", (event) => {
+            event.preventDefault();
 
-                <div class="contact-form-panel">
-                    <form id="landing-contact-form" novalidate>
-                        <div class="form-input-group">
-                            <label for="client-name">Full Name</label>
-                            <input type="text" id="client-name" class="form-control" placeholder="Enter your full name">
-                        </div>
-                        <div class="form-input-group">
-                            <label for="client-email">Email Address</label>
-                            <input type="email" id="client-email" class="form-control" placeholder="you@example.com">
-                        </div>
-                        <div class="form-input-group">
-                            <label for="client-message">Your Message</label>
-                            <textarea id="client-message" class="form-control" placeholder="How can we help you?"></textarea>
-                        </div>
-                        <button type="submit" class="btn-portal" style="width:100%; padding:13px;">
-                            <i class="fas fa-paper-plane"></i> Send Message
-                        </button>
-                        <div id="form-execution-feedback" class="form-feedback-msg"></div>
-                    </form>
-                </div>
-                      
+            const nameVal = document.getElementById("client-name").value.trim();
+            const emailVal = document.getElementById("client-email").value.trim();
+            const messageVal = document.getElementById("client-message").value.trim();
+
+            if (!nameVal || !emailVal || !messageVal) {
+                showFeedback("Please fill in all fields.", "#ef4444");
+                return;
+            }
+
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(emailVal)) {
+                showFeedback("Please enter a valid email address.", "#ef4444");
+                return;
+            }
+
+            showFeedback("Opening your email app...", "#10b981");
+
+            const targetAdminEmail = "josephugo321@gmail.com";
+            const mailSubject = encodeURIComponent("Nexus Pro Form Submission from " + nameVal);
+            const mailBody = encodeURIComponent(
+                "Name: " + nameVal + "\n" +
+                "Email: " + emailVal + "\n\n" +
+                "Message:\n" + messageVal
+            );
+
+            window.location.href = "mailto:" + targetAdminEmail + "?subject=" + mailSubject + "&body=" + mailBody;
+
+            setTimeout(() => {
+                contactForm.reset();
+            }, 1000);
+        });
+    }
+
+    function showFeedback(msg, color) {
+        feedbackBlock.innerText = msg;
+        feedbackBlock.style.color = color;
+        feedbackBlock.style.display = "block";
+    }
+});
+</script>
+</body>
+                        </html>
