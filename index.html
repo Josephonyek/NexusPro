@@ -12,12 +12,12 @@
         :root {
             --bg-dark: #0f172a;
             --bg-deep: #090d16;
-            --glass-panel: rgba(30, 41, 59, 0.45);
-            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-panel: rgba(30, 41, 59, 0.5);
+            --glass-border: rgba(255, 255, 255, 0.1);
             --text-main: #f8fafc;
             --text-muted: #94a3b8;
             --neon-blue: #3b82f6;
-            --neon-glow: rgba(59, 130, 246, 0.2);
+            --neon-glow: rgba(59, 130, 246, 0.25);
             --accent-green: #10b981;
             --accent-purple: #8b5cf6;
             --accent-orange: #f97316;
@@ -28,7 +28,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             scroll-behavior: smooth;
         }
 
@@ -39,58 +39,59 @@
             line-height: 1.6;
         }
 
-        /* Utility Structure Styles */
         .glass {
             background: var(--glass-panel);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
             border: 1px solid var(--glass-border);
         }
 
         section {
-            padding: 90px 24px;
-            max-width: 1250px;
+            padding: 100px 24px;
+            max-width: 1200px;
             margin: 0 auto;
         }
 
         .section-header {
             text-align: center;
-            margin-bottom: 50px;
+            margin-bottom: 56px;
         }
 
         .section-header h2 {
-            font-size: 2.2rem;
-            font-weight: 600;
-            letter-spacing: -0.5px;
+            font-size: 2.1rem;
+            font-weight: 650;
+            letter-spacing: -0.4px;
+            margin-bottom: 10px;
         }
 
         .section-header p {
             color: var(--text-muted);
-            font-size: 1rem;
-            margin-top: 6px;
+            font-size: 1.05rem;
+            max-width: 540px;
+            margin: 0 auto;
         }
 
-        /* Top Navigation Header Bar */
+        /* Header */
         header {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
-            height: 75px;
+            height: 72px;
             padding: 0 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.82);
+            backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--glass-border);
             z-index: 1000;
         }
 
         .brand-logo {
             font-weight: 700;
-            font-size: 1.4rem;
-            letter-spacing: 0.5px;
+            font-size: 1.35rem;
+            letter-spacing: 0.3px;
             text-decoration: none;
             color: var(--text-main);
             display: flex;
@@ -101,7 +102,7 @@
         .desktop-nav {
             display: flex;
             align-items: center;
-            gap: 30px;
+            gap: 28px;
         }
 
         .nav-link {
@@ -109,22 +110,31 @@
             text-decoration: none;
             font-size: 0.95rem;
             font-weight: 500;
-            transition: color 0.2s;
+            transition: color 0.2s ease;
         }
         .nav-link:hover { color: var(--neon-blue); }
 
         .btn-portal {
             background: var(--neon-blue);
             color: #ffffff;
-            padding: 9px 20px;
-            border-radius: 6px;
+            padding: 10px 22px;
+            border-radius: 8px;
             text-decoration: none;
-            font-size: 0.88rem;
+            font-size: 0.9rem;
             font-weight: 600;
-            box-shadow: 0 4px 12px var(--neon-glow);
-            transition: background 0.2s;
+            box-shadow: 0 4px 14px var(--neon-glow);
+            transition: background 0.2s ease, transform 0.15s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .btn-portal:hover { background: #2563eb; }
+        .btn-portal:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
 
         .mobile-hamburger {
             display: none;
@@ -133,74 +143,77 @@
             color: var(--text-main);
             font-size: 1.4rem;
             cursor: pointer;
+            padding: 6px;
         }
 
-        /* Mobile Flyout Menu Panel Drawer */
+        /* Mobile Menu */
         .mobile-drawer {
             position: fixed;
-            top: 75px;
+            top: 72px;
             left: 0;
             width: 100%;
             background: #0f172a;
             border-bottom: 1px solid var(--glass-border);
-            padding: 20px 40px;
+            padding: 24px 32px;
             display: none;
             flex-direction: column;
-            gap: 15px;
+            gap: 18px;
             z-index: 999;
         }
         .mobile-drawer.active { display: flex; }
 
-        /* Hero Engine Canvas Banner */
+        /* Hero */
         .hero-banner {
             min-height: 100vh;
             display: flex;
             align-items: center;
-            padding-top: 100px;
-            background: radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.12) 0%, transparent 50%);
+            padding-top: 90px;
+            background: radial-gradient(circle at 85% 15%, rgba(59, 130, 246, 0.14) 0%, transparent 55%);
         }
 
         .hero-layout {
             display: grid;
-            grid-template-columns: 1.2fr 0.8fr;
-            gap: 40px;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 48px;
             align-items: center;
             width: 100%;
         }
 
         .hero-text h1 {
-            font-size: 3.5rem;
+            font-size: 3.4rem;
             font-weight: 700;
             line-height: 1.15;
-            letter-spacing: -1.5px;
-            margin-bottom: 20px;
+            letter-spacing: -1.4px;
+            margin-bottom: 22px;
         }
 
         .hero-text p {
             font-size: 1.15rem;
             color: var(--text-muted);
-            margin-bottom: 35px;
-            max-width: 600px;
+            margin-bottom: 36px;
+            max-width: 540px;
+            line-height: 1.65;
         }
 
         .hero-cta-deck {
             display: flex;
-            gap: 15px;
+            gap: 14px;
             align-items: center;
+            flex-wrap: wrap;
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.04);
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text-main);
             border: 1px solid var(--glass-border);
             padding: 12px 24px;
-            border-radius: 6px;
+            border-radius: 8px;
             text-decoration: none;
             font-size: 0.95rem;
             font-weight: 600;
-            transition: background 0.2s;
+            transition: background 0.2s ease;
         }
-        .btn-secondary:hover { background: rgba(255, 255, 255, 0.08); }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
 
         .hero-graphic {
             display: flex;
@@ -209,104 +222,106 @@
         }
 
         .hero-visual-box {
-            width: 320px;
-            height: 320px;
+            width: 300px;
+            height: 300px;
             border-radius: 24px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 5rem;
+            font-size: 4.8rem;
             color: var(--neon-blue);
-            box-shadow: 0 0 50px rgba(59, 130, 246, 0.15);
-            animation: floating 4s infinite ease-in-out;
+            box-shadow: 0 0 60px rgba(59, 130, 246, 0.18);
+            animation: floating 4.5s infinite ease-in-out;
         }
 
         @keyframes floating {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-15px); }
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-14px); }
         }
 
-        /* Services Grid Architecture Layout */
+        /* Services */
         .services-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
         }
 
         .service-card {
-            padding: 30px;
-            border-radius: 12px;
-            transition: transform 0.3s ease, border-color 0.3s;
+            padding: 32px 28px;
+            border-radius: 14px;
+            transition: transform 0.25s ease, border-color 0.25s ease;
         }
         .service-card:hover {
-            transform: translateY(-5px);
-            border-color: rgba(59, 130, 246, 0.3);
+            transform: translateY(-6px);
+            border-color: rgba(59, 130, 246, 0.35);
         }
 
         .service-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 8px;
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 1.3rem;
+            font-size: 1.25rem;
             margin-bottom: 20px;
         }
 
         .service-card h3 {
-            font-size: 1.25rem;
+            font-size: 1.2rem;
             font-weight: 600;
             margin-bottom: 10px;
         }
 
         .service-card p {
             color: var(--text-muted);
-            font-size: 0.9rem;
-            line-height: 1.5;
+            font-size: 0.95rem;
+            line-height: 1.55;
         }
 
-        /* Interactive Contact Control Form */
+        /* Contact */
         .contact-layout {
             display: grid;
-            grid-template-columns: 0.8fr 1.2fr;
-            gap: 50px;
+            grid-template-columns: 0.85fr 1.15fr;
+            gap: 48px;
             background: var(--glass-panel);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
-            padding: 45px;
-            backdrop-filter: blur(12px);
+            padding: 48px;
+            backdrop-filter: blur(14px);
         }
 
         .contact-info-panel h3 {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: 12px;
         }
 
         .contact-info-panel p {
             color: var(--text-muted);
-            font-size: 0.95rem;
-            margin-bottom: 30px;
+            font-size: 0.98rem;
+            margin-bottom: 32px;
+            line-height: 1.6;
         }
 
         .info-details-row {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 16px;
+            margin-bottom: 22px;
         }
 
         .info-icon-wrapper {
-            width: 40px;
-            height: 40px;
-            background: rgba(255,255,255,0.04);
+            width: 42px;
+            height: 42px;
+            background: rgba(255,255,255,0.05);
             border: 1px solid var(--glass-border);
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             color: var(--neon-blue);
+            flex-shrink: 0;
         }
 
         .form-input-group {
@@ -318,91 +333,91 @@
             font-size: 0.85rem;
             font-weight: 600;
             color: var(--text-muted);
-            margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            margin-bottom: 7px;
         }
 
         .form-control {
             width: 100%;
-            background: rgba(15, 23, 42, 0.6);
+            background: rgba(15, 23, 42, 0.65);
             border: 1px solid var(--glass-border);
-            padding: 12px 16px;
-            border-radius: 8px;
+            padding: 13px 16px;
+            border-radius: 9px;
             color: #ffffff;
             font-size: 0.95rem;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color 0.2s ease;
         }
         .form-control:focus {
             border-color: var(--neon-blue);
         }
 
         textarea.form-control {
-            resize: none;
-            height: 120px;
+            resize: vertical;
+            min-height: 120px;
         }
 
         .form-feedback-msg {
-            font-size: 0.88rem;
-            margin-top: 8px;
+            font-size: 0.9rem;
+            margin-top: 12px;
             display: none;
         }
 
-        /* Floating WhatsApp Button Action Panel */
+        /* WhatsApp Button */
         .whatsapp-floating-btn {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 28px;
+            right: 28px;
             background-color: var(--whatsapp-green);
             color: #ffffff;
-            width: 60px;
-            height: 60px;
+            width: 58px;
+            height: 58px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
-            font-size: 2rem;
-            box-shadow: 0 4px 16px rgba(37, 211, 102, 0.35);
+            font-size: 1.9rem;
+            box-shadow: 0 4px 18px rgba(37, 211, 102, 0.4);
             text-decoration: none;
             z-index: 9999;
-            transition: transform 0.2s, background-color 0.2s;
+            transition: transform 0.2s ease, background-color 0.2s ease;
         }
         .whatsapp-floating-btn:hover {
-            transform: scale(1.1);
+            transform: scale(1.08);
             background-color: #20ba5a;
         }
 
-        /* Structural Platform Footer */
+        /* Footer */
         footer {
             background-color: var(--bg-deep);
             border-top: 1px solid var(--glass-border);
-            padding: 60px 40px 30px 40px;
+            padding: 64px 40px 32px;
         }
 
         .footer-grid {
-            max-width: 1250px;
+            max-width: 1200px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 1.5fr repeat(3, 1fr);
+            grid-template-columns: 1.6fr repeat(3, 1fr);
             gap: 40px;
             padding-bottom: 40px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.06);
         }
 
         .footer-brand-summary p {
             color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-top: 12px;
-            max-width: 300px;
+            font-size: 0.95rem;
+            margin-top: 14px;
+            max-width: 280px;
+            line-height: 1.55;
         }
 
         .footer-links-column h4 {
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.6px;
             color: #ffffff;
             margin-bottom: 18px;
+            font-weight: 600;
         }
 
         .footer-links-column ul {
@@ -410,64 +425,107 @@
         }
 
         .footer-links-column ul li {
-            margin-bottom: 10px;
+            margin-bottom: 11px;
         }
 
         .footer-links-column ul li a {
             color: var(--text-muted);
             text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.2s;
+            font-size: 0.92rem;
+            transition: color 0.2s ease;
         }
         .footer-links-column ul li a:hover { color: var(--neon-blue); }
 
         .footer-bottom-deck {
-            max-width: 1250px;
-            margin: 25px auto 0 auto;
+            max-width: 1200px;
+            margin: 28px auto 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 0.88rem;
         }
 
         .social-links-wrapper {
             display: flex;
-            gap: 15px;
+            gap: 18px;
         }
 
         .social-link {
             color: var(--text-muted);
-            font-size: 1.1rem;
-            transition: color 0.2s;
+            font-size: 1.15rem;
+            transition: color 0.2s ease;
         }
         .social-link:hover { color: var(--neon-blue); }
 
-        /* Responsive Breakpoint Adaptations */
+        /* Responsive */
         @media (max-width: 968px) {
-            .hero-layout { grid-template-columns: 1fr; text-align: center; }
-            .hero-text p { margin-left: auto; margin-right: auto; }
-            .hero-cta-deck { justify-content: center; }
-            .hero-graphic { display: none; }
-            .contact-layout { grid-template-columns: 1fr; padding: 30px; }
-            .footer-grid { grid-template-columns: repeat(2, 1fr); }
+            .hero-layout {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .hero-text p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+            .hero-cta-deck {
+                justify-content: center;
+            }
+            .hero-graphic {
+                display: none;
+            }
+            .contact-layout {
+                grid-template-columns: 1fr;
+                padding: 36px 28px;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
         }
 
         @media (max-width: 640px) {
-            header { padding: 0 20px; }
-            .desktop-nav { display: none; }
-            .mobile-hamburger { display: block; }
-            .hero-text h1 { font-size: 2.4rem; }
-            .footer-grid { grid-template-columns: 1fr; gap: 30px; }
-            .footer-bottom-deck { flex-direction: column; gap: 15px; text-align: center; }
-            .whatsapp-floating-btn { bottom: 20px; right: 20px; width: 50px; height: 50px; font-size: 1.6rem; }
+            header {
+                padding: 0 20px;
+            }
+            .desktop-nav {
+                display: none;
+            }
+            .mobile-hamburger {
+                display: block;
+            }
+            .hero-text h1 {
+                font-size: 2.35rem;
+            }
+            .section-header h2 {
+                font-size: 1.8rem;
+            }
+            section {
+                padding: 70px 20px;
+            }
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+            .footer-bottom-deck {
+                flex-direction: column;
+                gap: 16px;
+                text-align: center;
+            }
+            .whatsapp-floating-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 52px;
+                height: 52px;
+                font-size: 1.6rem;
+            }
         }
     </style>
 </head>
 <body>
 <script src="https://5gvci.com/act/files/tag.min.js?z=11358900" data-cfasync="false" async></script>
-    <script>(function(s){s.dataset.zone='11358942',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
-    <!-- Floating WhatsApp Action Gateway Component -->
+<script>(function(s){s.dataset.zone='11358942',s.src='https://al5sm.com/tag.min.js'})([document.documentElement, document.body].filter(Boolean).pop().appendChild(document.createElement('script')))</script>
+
+    <!-- Floating WhatsApp Button -->
     <a href="https://wa.me/2349118363627?text=Hello%20Nexus%20Pro%20Support,%20I%20have%20an%20inquiry%20regarding%20the%20e-learning%20platform." 
        class="whatsapp-floating-btn" 
        target="_blank" 
@@ -476,7 +534,7 @@
         <i class="fab fa-whatsapp"></i>
     </a>
 
-    <!-- Header Navigation Shell -->
+    <!-- Header -->
     <header>
         <a href="#" class="brand-logo">
             <i class="fas fa-cubes" style="color: var(--neon-blue);"></i>Nexus<span style="color:var(--neon-blue)">Pro</span>
@@ -484,34 +542,32 @@
         <nav class="desktop-nav">
             <a href="#hero" class="nav-link">Home</a>
             <a href="#services" class="nav-link">Modules</a>
-            <a href="#contact" class="nav-link">Contact Desk</a>
-            <a href="login.html" class="btn-portal">Console Login</a>
+            <a href="#contact" class="nav-link">Contact</a>
+            <a href="login.html" class="btn-portal">Login</a>
         </nav>
-        <button class="mobile-hamburger" id="hamburger-toggle-btn" title="Toggle Navigation Bar">
+        <button class="mobile-hamburger" id="hamburger-toggle-btn" title="Toggle Menu">
             <i class="fas fa-bars"></i>
         </button>
     </header>
 
-    <!-- Mobile Drawer Subnavigation Overlay -->
+    <!-- Mobile Menu -->
     <div class="mobile-drawer" id="mobile-nav-drawer">
         <a href="#hero" class="nav-link">Home</a>
         <a href="#services" class="nav-link">Modules</a>
-        <a href="#contact" class="nav-link">Contact Desk</a>
-        <a href="login.html" class="btn-portal" style="text-align: center; margin-top: 5px;">Console Login</a>
+        <a href="#contact" class="nav-link">Contact</a>
+        <a href="login.html" class="btn-portal" style="text-align: center; margin-top: 6px;">Login</a>
     </div>
 
-    <!-- Core Page Content Wrapper -->
     <main>
-        
-        <!-- Section: Hero Canvas -->
+        <!-- Hero -->
         <section id="hero" class="hero-banner">
             <div class="hero-layout">
                 <div class="hero-text">
                     <h1>Master Core Sciences While Optimizing Health</h1>
-                    <p>Welcome to a next-generation academic terminal. Nexus Pro integrates advanced assignment solver algorithms, comprehensive e-library resources, and clinical self-care tracking mechanics within an immersive dark workspace environment.</p>
+                    <p>Welcome to Nexus Pro. Get help with your assignments using smart AI tools, access a full digital library, and track your health — all in one clean, easy-to-use platform.</p>
                     <div class="hero-cta-deck">
-                        <a href="auth.html" class="btn-portal" style="padding: 13px 28px; font-size: 0.95rem;">Launch Dashboard</a>
-                        <a href="#services" class="btn-secondary">Explore Academic Modules</a>
+                        <a href="auth.html" class="btn-portal" style="padding: 13px 28px; font-size: 0.95rem;">Get Started</a>
+                        <a href="#services" class="btn-secondary">Explore Modules</a>
                     </div>
                 </div>
                 <div class="hero-graphic">
@@ -522,76 +578,72 @@
             </div>
         </section>
 
-        <!-- Section: Services Matrix -->
+        <!-- Services -->
         <section id="services">
             <div class="section-header">
-                <h2>Integrated E-Learning Ecosystem</h2>
-                <p>Powerful modules constructed engineered to optimize secondary science processing and cognitive efficiency metrics.</p>
+                <h2>Everything You Need to Succeed</h2>
+                <p>Simple, powerful tools designed to help you learn science better and stay healthy while studying.</p>
             </div>
             
             <div class="services-grid">
-                <!-- Service 1: AI Assignment Solver -->
                 <article class="service-card glass">
-                    <div class="service-icon" style="background: rgba(59, 130, 246, 0.1); color: var(--neon-blue);">
+                    <div class="service-icon" style="background: rgba(59, 130, 246, 0.12); color: var(--neon-blue);">
                         <i class="fas fa-robot"></i>
                     </div>
-                    <h3>Automated AI Solvers</h3>
-                    <p>Execute text-parsing calculations and step-by-step assignments natively through automated background processing layouts built inside the terminal node.</p>
+                    <h3>AI Assignment Solver</h3>
+                    <p>Get clear, step-by-step solutions to your assignments powered by smart AI tools that explain the answers.</p>
                 </article>
 
-                <!-- Service 2: Premium E-Library Data -->
                 <article class="service-card glass">
-                    <div class="service-icon" style="background: rgba(16, 185, 129, 0.1); color: var(--accent-green);">
+                    <div class="service-icon" style="background: rgba(16, 185, 129, 0.12); color: var(--accent-green);">
                         <i class="fas fa-book-bookmark"></i>
                     </div>
-                    <h3>E-Library Databases</h3>
-                    <p>Instant digital access configurations distributing full secondary textbook volumes, study guides, and core physical science references files securely.</p>
+                    <h3>Digital Library</h3>
+                    <p>Instant access to textbooks, study guides, and key science resources — all available whenever you need them.</p>
                 </article>
 
-                <!-- Service 3: Health Hub Container -->
                 <article class="service-card glass">
-                    <div class="service-icon" style="background: rgba(139, 92, 246, 0.1); color: var(--accent-purple);">
+                    <div class="service-icon" style="background: rgba(139, 92, 246, 0.12); color: var(--accent-purple);">
                         <i class="fas fa-heartbeat"></i>
                     </div>
-                    <h3>Integrated Health Hub</h3>
-                    <p>Monitor high-performance study mechanics alongside core physical health trackers, sleep monitoring arrays, and optimized cognitive recovery data logs.</p>
+                    <h3>Health Tracker</h3>
+                    <p>Monitor your study habits, sleep, and overall wellness so you can stay focused and perform at your best.</p>
                 </article>
 
-                <!-- Service 4: Visual Asset Graphics Design -->
                 <article class="service-card glass">
-                    <div class="service-icon" style="background: rgba(249, 115, 22, 0.1); color: var(--accent-orange);">
+                    <div class="service-icon" style="background: rgba(249, 115, 22, 0.12); color: var(--accent-orange);">
                         <i class="fas fa-headset"></i>
                     </div>
-                    <h3>Technical Support Desk</h3>
-                    <p>Report performance metrics or log runtime debugging tickets down directly to workspace administrative handlers for immediate assistance pipelines.</p>
+                    <h3>Support Team</h3>
+                    <p>Need help? Contact our support team anytime for quick answers and assistance with any platform issues.</p>
                 </article>
             </div>
         </section>
 
-        <!-- Section: Interactive Validated Contact Gateway -->
+        <!-- Contact -->
         <section id="contact">
             <div class="section-header">
-                <h2>System Communication</h2>
-                <p>Submit text inquiries regarding access permission keys or account configurations directly to platform operations.</p>
+                <h2>Get in Touch</h2>
+                <p>Have a question about your account or need help getting started? Send us a message — we’re happy to help.</p>
             </div>
 
             <div class="contact-layout">
                 <div class="contact-info-panel">
-                    <h3>Direct Channels</h3>
-                    <p>Submit the functional interface form on the right to open your email terminal, or toggle the floating overlay button for quick WhatsApp chat synchronization.</p>
+                    <h3>Contact Info</h3>
+                    <p>Fill out the form on the right to email us, or tap the green WhatsApp button for a quick chat.</p>
                     
                     <div class="info-details-row">
                         <div class="info-icon-wrapper"><i class="fas fa-envelope"></i></div>
-                        <div>
-                            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Operations Center</div>
+                                                <div>
+                            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.4px;">Email</div>
                             <div style="font-size:0.95rem; font-weight:600;">admin@nexuspro.io</div>
                         </div>
                     </div>
                     <div class="info-details-row">
                         <div class="info-icon-wrapper"><i class="fas fa-mobile-button"></i></div>
                         <div>
-                           <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Instant Messaging</div>
-                            <div style="font-size:0.95rem; font-weight:600;">WhatsApp Connected</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.4px;">Chat</div>
+                            <div style="font-size:0.95rem; font-weight:600;">WhatsApp Available</div>
                         </div>
                     </div>
                 </div>
@@ -599,153 +651,21 @@
                 <div class="contact-form-panel">
                     <form id="landing-contact-form" novalidate>
                         <div class="form-input-group">
-                            <label for="client-name">Identity Handle</label>
-                            <input type="text" id="client-name" class="form-control" placeholder="Enter full name...">
+                            <label for="client-name">Full Name</label>
+                            <input type="text" id="client-name" class="form-control" placeholder="Enter your full name">
                         </div>
                         <div class="form-input-group">
-                            <label for="client-email">Routing Email Address</label>
-                            <input type="email" id="client-email" class="form-control" placeholder="user@example.com">
+                            <label for="client-email">Email Address</label>
+                            <input type="email" id="client-email" class="form-control" placeholder="you@example.com">
                         </div>
                         <div class="form-input-group">
-                            <label for="client-message">Request Statement</label>
-                            <textarea id="client-message" class="form-control" placeholder="Detail your terminal update requirements or system question parameters here..."></textarea>
+                            <label for="client-message">Your Message</label>
+                            <textarea id="client-message" class="form-control" placeholder="How can we help you?"></textarea>
                         </div>
-                        <button type="submit" class="btn-portal" style="width:100%; padding:12px; display:flex; justify-content:center; align-items:center; gap:8px;">
-                            <i class="fas fa-paper-plane"></i> Initialize Email Routing
+                        <button type="submit" class="btn-portal" style="width:100%; padding:13px;">
+                            <i class="fas fa-paper-plane"></i> Send Message
                         </button>
                         <div id="form-execution-feedback" class="form-feedback-msg"></div>
                     </form>
                 </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Structural Platform Footer Component -->
-    <footer>
-        <div class="footer-grid">
-            <div class="footer-brand-summary">
-                <a href="#" class="brand-logo">
-                    <i class="fas fa-cubes" style="color: var(--neon-blue);"></i>Nexus<span style="color:var(--neon-blue)">Pro</span>
-                </a>
-                <p>High-reliability e-learning infrastructure and cognitive monitoring dashboard matrices built for stable architectural performance.</p>
-            </div>
-            <div class="footer-links-column">
-                <h4>Platform Navigation</h4>
-                <ul>
-                    <li><a href="#hero">Home Canvas</a></li>
-                    <li><a href="#services">Platform Modules</a></li>
-                    <li><a href="#contact">Contact Gateway</a></li>
-                </ul>
-            </div>
-            <div class="footer-links-column">
-                <h4>Console Terminals</h4>
-                <ul>
-                    <li><a href="login.html">Command Dashboard</a></li>
-                    <li><a href="ai_solver.html">AI Research Panel</a></li>
-                    <li><a href="academy.html">E-Library Space</a></li>
-                </ul>
-            </div>
-            <div class="footer-links-column">
-                <h4>Operational Safety</h4>
-                <ul>
-                    <li><a href="support.html">Support Desk</a></li>
-                    <li><a href="health.html">Health Hub</a></li>
-                    <li><a href="notifications.html">System Broadcasts</a></li>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="footer-bottom-deck">
-            <div>&copy; 2026 Nexus Pro Platforms. All structural engineering rights reserved.</div>
-            <div class="social-links-wrapper">
-                <a href="#" class="social-link" title="Source Code Hub"><i class="fab fa-github"></i></a>
-                <a href="#" class="social-link" title="Professional Connection Node"><i class="fab fa-linkedin"></i></a>
-                <a href="#" class="social-link" title="Twitter Platform"><i class="fab fa-twitter"></i></a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Frontend UI Control Interactivity Script -->
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // Mobile Drawer Toggle Control Menu Mechanics
-            const burgerBtn = document.getElementById("hamburger-toggle-btn");
-            const mobileDrawer = document.getElementById("mobile-nav-drawer");
-
-            if (burgerBtn && mobileDrawer) {
-                burgerBtn.addEventListener("click", (e) => {
-                    e.stopPropagation();
-                    mobileDrawer.classList.toggle("active");
-                    const currentIcon = burgerBtn.querySelector("i");
-                    if(mobileDrawer.classList.contains("active")) {
-                        currentIcon.className = "fas fa-times";
-                    } else {
-                        currentIcon.className = "fas fa-bars";
-                    }
-                });
-
-                // Auto collapse drawer on navigating specific hash targets
-                mobileDrawer.querySelectorAll(".nav-link, .btn-portal").forEach(link => {
-                    link.addEventListener("click", () => {
-                        mobileDrawer.classList.remove("active");
-                        burgerBtn.querySelector("i").className = "fas fa-bars";
-                    });
-                });
-            }
-
-            // Contact Form Script Validation & Mailto Forwarding Mechanics
-            const contactForm = document.getElementById("landing-contact-form");
-            const feedbackBlock = document.getElementById("form-execution-feedback");
-
-            if (contactForm && feedbackBlock) {
-                contactForm.addEventListener("submit", (event) => {
-                    event.preventDefault();
-
-                    const nameVal = document.getElementById("client-name").value.trim();
-                    const emailVal = document.getElementById("client-email").value.trim();
-                    const messageVal = document.getElementById("client-message").value.trim();
-
-                    // Baseline validation checks
-                    if (!nameVal || !emailVal || !messageVal) {
-                        renderFormStatus("Error: All form tracking field values are strictly required.", "#ef4444");
-                        return;
-                    }
-
-                    // Email regular expression verification structure
-                    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                    if (!emailPattern.test(emailVal)) {
-                        renderFormStatus("Error: Please specify a valid operational email parameter configuration.", "#ef4444");
-                        return;
-                    }
-
-                    // Success state: Generate system email structure links
-                    renderFormStatus("Routing parameters... Launching secure mail client link.", "#10b981");
-                    
-                    // Re-route parameters straight to your designated management target email address
-                    const targetAdminEmail = "josephugo321@gmail.com"; 
-                    const mailSubject = encodeURIComponent("Nexus Pro Form Submission from " + nameVal);
-                    const mailBody = encodeURIComponent(
-                        "Identity Name: " + nameVal + "\n" +
-                        "Routing Email: " + emailVal + "\n\n" +
-                        "Message Details:\n" + messageVal
-                    );
-
-                    // Execute link launch trigger
-                    window.location.href = "mailto:" + targetAdminEmail + "?subject=" + mailSubject + "&body=" + mailBody;
-
-                    setTimeout(() => {
-                        contactForm.reset();
-                    }, 1000);
-                });
-            }
-
-            function renderFormStatus(msg, hexColor) {
-                feedbackBlock.innerText = msg;
-                feedbackBlock.style.color = hexColor;
-                feedbackBlock.style.display = "block";
-            }
-        });
-    </script>
-</body>
-                     </html>
+                      
