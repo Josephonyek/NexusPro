@@ -5,6 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nexus Pro - Book Library Manager</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <script>
+  (function enforceAdminAuth() {
+    const userStr = localStorage.getItem("nexusUser");
+    const token = localStorage.getItem("nexusToken");
+    const userRole = localStorage.getItem("userRole");
+
+    if (!userStr || !token) {
+      alert("Access denied. Please log in as an administrator.");
+      window.location.href = "login.html";
+      return;
+    }
+
+    try {
+      const user = JSON.parse(userStr);
+      const role = userRole || (user.role ? user.role.toLowerCase() : "");
+
+      if (role !== "admin") {
+        alert("Unauthorized access! This page is restricted to administrators.");
+        window.location.href = "dashboard.html"; // Redirect regular students back to their dashboard
+      }
+    } catch (e) {
+      window.location.href = "auth.html";
+    }
+  })();
+</script>
+  
   <style>
     :root {
       --bg-dark: #090d16;
